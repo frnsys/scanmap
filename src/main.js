@@ -113,6 +113,8 @@ const map = new Map({
   maxZoom: 18,
   minZoom: 10,
   center: [-73.96161699999999, 40.678806]
+}, (coord) => {
+  document.getElementById('coordinates').value = [coord.lat, coord.lng];
 });
 
 update();

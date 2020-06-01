@@ -66,6 +66,7 @@ a, a:visited {
 }
 #location-search-field input {
   flex: 1;
+  margin-bottom: 0;
 }
 #location-search {
   cursor: pointer;
@@ -79,6 +80,11 @@ a, a:visited {
 }
 #coord-results .selected {
   color: blue;
+}
+#coordinates {
+  font-size: 0.6em;
+  border: none;
+  margin-top: 0;
 }
 
 #error {
