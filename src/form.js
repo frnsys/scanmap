@@ -48,6 +48,11 @@ class Form {
   activate(authKey) {
     this.authKey = authKey || prompt('Key');
 
+    document.getElementById('show-help').addEventListener('click', () => {
+      let help = document.getElementById('help');
+      help.style.display = help.style.display == 'block' ? 'none' : 'block';
+    });
+
     document.getElementById('append').style.display = 'block';
     document.getElementById('location').addEventListener('keydown', (ev) => {
       if (ev.key == 'Enter') {

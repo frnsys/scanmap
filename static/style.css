@@ -87,6 +87,20 @@ a, a:visited {
   margin-top: 0;
 }
 
+#help {
+  font-size: 0.75em;
+  background: #fff;
+  max-width: 360px;
+  padding: 0.5em;
+  display: none;
+}
+#show-help {
+  text-align: right;
+  font-size: 0.75em;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 #error {
   background: red;
   color: #fff;
