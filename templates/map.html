@@ -1,0 +1,33 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div id="map"></div>
+<div id="bar">
+    <div id="log"></div>
+    <div id="info">
+        <div>
+        Scanners:
+        <a href="https://www.pscp.tv/w/1jMKgQkRyMqJL">https://www.pscp.tv/w/1jMKgQkRyMqJL</a>
+        <a href="https://twitter.com/BushwickScanner">@BushwickScanner</a>
+        <a href="https://twitter.com/NYPDPoliceRadio">@NYPDPoliceRadio</a>
+        </div>
+        <div id="add">If you have a key, click here to start adding.</div>
+        <div>Questions? DM me <a href="https://twitter.com/frnsys">@frnsys</a>.</div>
+    </div>
+</div>
+<div id="append">
+    <div id="append-form">
+        <input id="text" type="text" placeholder="Note" />
+        <div id="location-search-field">
+            <input id="location" type="text" placeholder="Location" />
+            <div id="location-search">🔍</div>
+        </div>
+        <input id="coordinates" type="hidden" />
+        <ul id="coord-results"></ul>
+        <input id="submit" type="submit" value="Submit" />
+    </div>
+    <div id="error"></div>
+    <div id="status"></div>
+</div>
+<script src="{{ url_for('static', filename='dist/main.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,162 @@
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #222;
+}
+
+main {
+  display: flex;
+}
+
+#map {
+  height: 100vh;
+  flex: 1;
+}
+
+#bar {
+  height: 100vh;
+  width: 320px;
+  background: #222;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+}
+#log, #info {
+  padding: 1em;
+}
+#log {
+  flex: 1;
+  overflow-y: scroll;
+}
+#info {
+  font-size: 0.8em;
+  border-top: 1px solid #444;
+}
+a, a:visited {
+  color: #aaa;
+}
+
+#add {
+  text-decoration: underline;
+}
+
+#append {
+  position: fixed;
+  bottom: 1em;
+  left: 1em;
+  display: none;
+  min-width: 280px;
+  z-index: 10;
+}
+#append-form {
+  background: #fff;
+  padding: 0.5em;
+}
+#append-form input {
+  display: block;
+  margin: 0.5em 0;
+  width: 100%;
+}
+#location-search-field {
+  display: flex;
+}
+#location-search-field input {
+  flex: 1;
+}
+#location-search {
+  cursor: pointer;
+  padding: 0.35em;
+}
+#coord-results {
+  font-size: 0.8em;
+}
+#coord-results li {
+  cursor: pointer;
+}
+#coord-results .selected {
+  color: blue;
+}
+
+#error {
+  background: red;
+  color: #fff;
+  padding: 0.25em 0.5em;
+  font-size: 0.8em;
+  display: none;
+}
+#status {
+  background: #303030;
+  color: #fff;
+  padding: 0.25em 0.5em;
+  font-size: 0.8em;
+  display: none;
+}
+
+ul, li {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.marker {
+  background-color: red;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.marker-preview {
+  background-color: blue;
+}
+
+.logitem {
+  margin-bottom: 1em;
+}
+.logitem-when {
+  font-size: 0.8em;
+  text-decoration: underline;
+}
+.logitem-location {
+  font-size: 0.8em;
+}
+
+.popup-location {
+  font-size: 0.8em;
+  text-decoration: underline;
+}
+.popup-when {
+  font-size: 0.9em;
+  line-height: 1;
+}
+.popup-log h3 {
+  margin: 0;
+  font-weight: normal;
+}
+.popup-log {
+  margin-bottom: 1em;
+}
+.popup-log:last-child {
+  margin-bottom: 0;
+}
+
+
+@media only screen and (max-width: 680px) {
+  main {
+    display: block;
+  }
+  #map {
+    height: 30vh;
+  }
+  #bar {
+    width: 100%;
+    max-width: 100%;
+    height: 70vh;
+  }
+  #log {
+    width: 100%;
+  }
+}
