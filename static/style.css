@@ -208,9 +208,12 @@ ul, li {
   margin-bottom: 0;
 }
 
+.mapboxgl-popup-content {
+  color: #000;
+}
 
 @media only screen and (max-width: 680px) {
-  main {
+  #stage {
     display: block;
   }
   #map {
