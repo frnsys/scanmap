@@ -1,4 +1,5 @@
 import json
+import yaml
 import config
 import requests
 from functools import wraps
@@ -6,6 +7,10 @@ from datetime import datetime, timezone
 from flask import Flask, abort, request, render_template, jsonify
 
 app = Flask(__name__)
+
+def check_key(key, loc):
+    keys = yaml.load(open('keys.yml'))
+    return key in keys.get(loc, [])
 
 def get_conf(loc):
     try:
@@ -28,9 +33,8 @@ def log(location):
     conf = get_conf(location)
     if request.method == 'POST':
         auth = request.headers.get('X-AUTH')
-        if auth not in conf['AUTH_KEYS']:
-            return abort(401)
-
+        if not check_key(auth, location):
+            abort(401)
         data = request.get_json()
         data['timestamp'] = datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()
         data['submitter'] = auth
@@ -50,8 +54,8 @@ def log(location):
 def query_location(location):
     conf = get_conf(location)
     auth = request.headers.get('X-AUTH')
-    if auth not in conf['AUTH_KEYS']:
-        return abort(401)
+    if not check_key(auth, location):
+        abort(401)
     data = request.get_json()
     query = data['query']
     results = google_search_places(query, conf)
