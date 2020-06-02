@@ -1,6 +1,7 @@
 import Map from './map';
 import Form from './form';
 import config from '../config';
+import setupCams from './cams';
 import mapboxgl from 'mapbox-gl';
 
 let lastSeen = 0;
@@ -8,6 +9,7 @@ let expireTime = 60 * 60 * 1000; // in ms. One hour
 const markers = {};
 const updateInterval = 5000; // ms
 let errs = [];
+
 
 function checkVersion() {
   fetch('/version', {
@@ -150,3 +152,5 @@ document.getElementById('add').addEventListener('click', () => {
   let form = new Form(map);
   form.activate();
 });
+
+setupCams(map);

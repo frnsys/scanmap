@@ -8,6 +8,18 @@ from flask import Flask, abort, request, render_template, jsonify
 
 app = Flask(__name__)
 
+CAMERAS = {}
+for loc, conf in config.LOCATIONS.items():
+    if conf.get('CAMERAS'):
+        cams = json.load(open(conf['CAMERAS']))
+        cams = [{
+            'lat': float(c['latitude']),
+            'lng': float(c['longitude']),
+            'url': c['img_url']
+        } for c in cams]
+        CAMERAS[loc] = cams
+
+
 def check_key(key, loc):
     keys = yaml.load(open('keys.yml'))
     return key in keys.get(loc, [])
@@ -31,6 +43,11 @@ def map(location):
     conf = get_conf(location)
     return render_template('map.html', conf=conf, version=config.VERSION)
 
+@app.route('/<location>/cams')
+def cams(location):
+    cameras = CAMERAS.get(location, [])
+    conf = get_conf(location)
+    return jsonify(cams=cameras)
 
 @app.route('/<location>/log', methods=['GET', 'POST'])
 def log(location):

@@ -177,6 +177,13 @@ ul, li {
 .marker-preview {
   background-color: blue;
 }
+.marker-camera {
+  background-color: transparent;
+  width: 18px;
+  height: 18px;
+  background-image: url('/static/camera.png');
+  background-size: cover;
+}
 
 .logitem {
   margin-bottom: 1em;
@@ -217,14 +224,18 @@ ul, li {
     display: block;
   }
   #map {
-    height: 30vh;
+    height: 50vh;
   }
   #bar {
     width: 100%;
     max-width: 100%;
-    height: 70vh;
+    height: 50vh;
   }
   #log {
     width: 100%;
+  }
+
+  .mapboxgl-popup-content img {
+    max-height: 30vh;
   }
 }
