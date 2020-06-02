@@ -33,6 +33,7 @@ def log(location):
 
         data = request.get_json()
         data['timestamp'] = datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()
+        data['submitter'] = auth
         with open(conf['DB_FILE'], 'a') as f:
             f.write(json.dumps(data) + '\n')
         return jsonify(success=True)
