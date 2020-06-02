@@ -2,42 +2,56 @@ class Form {
   constructor(map) {
     this.map = map;
     this.authKey = '';
+    this.marker = null;
   }
 
   queryLocation(query) {
-    let marker;
     let statusEl = document.getElementById('status');
     statusEl.innerText = 'Searching...';
     statusEl.style.display = 'block';
 
-    this.post('/location', {
+    this.post('location', {
       query: query
     }, (json) => {
       // Display search results to choose from
       let list = document.getElementById('coord-results');
       list.innerHTML = '';
       if (json.results.length > 0) {
-        json.results.slice(0, 5).forEach((res) => {
-          console.log(res);
-          let li = document.createElement('li');
-          li.innerText = `${res.name} (${res.coordinates.map((c) => c.toFixed(4))})`
-          li.addEventListener('click', () => {
-            let selected = list.querySelector('.selected');
-            if (selected) selected.classList.remove('selected');
-            li.classList.add('selected');
-            document.getElementById('coordinates').value = res.coordinates;
+        if (json.results.length == 1) {
+          let res = json.results[0];
+          document.getElementById('coordinates').value = `${res.coordinates[0]},${res.coordinates[1]}`;
 
-            // Show location preview
-            // Mapbox is lng, lat
-            let coords = [res.coordinates[1], res.coordinates[0]];
-            if (marker) marker.remove();
-            marker = this.map.addMarker(coords, {
-              className: 'marker marker-preview'
-            });
-            this.map.jumpTo(coords);
+          // Show location preview
+          // Mapbox is lng, lat
+          let coords = [res.coordinates[1], res.coordinates[0]];
+          if (this.marker) this.marker.remove();
+          this.marker = this.map.addMarker(coords, {
+            className: 'marker marker-preview'
           });
-          list.appendChild(li);
-        });
+          this.map.jumpTo(coords);
+        } else {
+          json.results.slice(0, 5).forEach((res) => {
+            console.log(res);
+            let li = document.createElement('li');
+            li.innerText = `${res.name} (${res.coordinates.map((c) => c.toFixed(4))})`
+            li.addEventListener('click', () => {
+              let selected = list.querySelector('.selected');
+              if (selected) selected.classList.remove('selected');
+              li.classList.add('selected');
+              document.getElementById('coordinates').value = `${res.coordinates[0]},${res.coordinates[1]}`;
+
+              // Show location preview
+              // Mapbox is lng, lat
+              let coords = [res.coordinates[1], res.coordinates[0]];
+              if (this.marker) this.marker.remove();
+              this.marker = this.map.addMarker(coords, {
+                className: 'marker marker-preview'
+              });
+              this.map.jumpTo(coords);
+            });
+            list.appendChild(li);
+          });
+        }
       } else {
         list.innerText = 'No results';
       }
@@ -69,16 +83,21 @@ class Form {
       ['text', 'location', 'coordinates'].forEach((k) => {
         data[k] = document.getElementById(k).value;
       });
-      console.log(data);
-      this.post('/log', data, (json) => {
-        console.log(json);
+      if (!data['text'] || !data['location']) {
+        alert('Please fill in the note and the location');
+      } else {
+        console.log(data);
+        this.post('log', data, (json) => {
+          console.log(json);
 
-        // Reset
-        document.getElementById('coord-results').innerHTML = '';
-        ['text', 'location', 'coordinates'].forEach((k) => {
-          document.getElementById(k).value = '';
+          // Reset
+          document.getElementById('coord-results').innerHTML = '';
+          ['text', 'location', 'coordinates'].forEach((k) => {
+            document.getElementById(k).value = '';
+          });
+          if (this.marker) this.marker.remove();
         });
-      });
+      }
     });
   }
 

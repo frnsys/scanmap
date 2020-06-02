@@ -1,43 +1,43 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-<div id="map"></div>
-<div id="bar">
-    <div id="log"></div>
-    <div id="info">
-        <div>
-        Scanners:
-        <a href="https://www.pscp.tv/w/1jMKgQkRyMqJL">https://www.pscp.tv/w/1jMKgQkRyMqJL</a>
-        <a href="https://twitter.com/BushwickScanner">@BushwickScanner</a>
-        <a href="https://twitter.com/NYPDPoliceRadio">@NYPDPoliceRadio</a>
+<div id="stage">
+    <div id="map"></div>
+    <div id="bar">
+        <div id="log"></div>
+        <div id="info">
+            <div>{{ conf.INFO | safe }}</div>
+            <div id="add">If you have a key, click here to start adding.</div>
+            <div>Questions or issues? DM me <a href="https://twitter.com/frnsys">@frnsys</a>.</div>
         </div>
-        <div id="add">If you have a key, click here to start adding.</div>
-        <div>Questions? DM me <a href="https://twitter.com/frnsys">@frnsys</a>.</div>
+    </div>
+    <div id="append">
+        <div id="append-form">
+            <input id="text" type="text" placeholder="Note" />
+            <div id="location-search-field">
+                <input id="location" type="text" placeholder="Location" />
+                <div id="location-search">🔍</div>
+            </div>
+            <input id="coordinates" type="text" readonly />
+            <ul id="coord-results"></ul>
+            <input id="submit" type="submit" value="Submit" />
+            <div id="show-help">Help</div>
+        </div>
+        <div id="help">
+            <ul>
+                <li>1. Add a note describing the report.</li>
+                <li>2. Add a location (cross streets, park name, etc).</li>
+                <li>3a. Click the search icon to find possible coordinates for the location. Click on one of the results to set it.</li>
+                <li>3b. Alternatively, click on the map to set the location.</li>
+                <li>4. Submit!</li>
+            </ul>
+        </div>
+        <div id="error"></div>
+        <div id="status"></div>
     </div>
 </div>
-<div id="append">
-    <div id="append-form">
-        <input id="text" type="text" placeholder="Note" />
-        <div id="location-search-field">
-            <input id="location" type="text" placeholder="Location" />
-            <div id="location-search">🔍</div>
-        </div>
-        <input id="coordinates" type="text" readonly />
-        <ul id="coord-results"></ul>
-        <input id="submit" type="submit" value="Submit" />
-        <div id="show-help">Help</div>
-    </div>
-    <div id="help">
-        <ul>
-            <li>1. Add a note describing the report.</li>
-            <li>2. Add a location (cross streets, park name, etc).</li>
-            <li>3a. Click the search icon to find possible coordinates for the location. Click on one of the results to set it.</li>
-            <li>3b. Alternatively, click on the map to set the location.</li>
-            <li>4. Submit!</li>
-        </ul>
-    </div>
-    <div id="error"></div>
-    <div id="status"></div>
-</div>
+<script>
+const MAP_CENTER = {{ conf.MAP_CENTER }};
+</script>
 <script src="{{ url_for('static', filename='dist/main.js') }}"></script>
 {% endblock %}

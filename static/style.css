@@ -6,10 +6,22 @@ html, body {
   margin: 0;
   padding: 0;
   background: #222;
+  font-family: monospace;
+  color: #fff;
 }
 
-main {
+#stage {
   display: flex;
+}
+
+#listing {
+  max-width: 320px;
+  margin: 0 auto;
+  text-align: center;
+}
+#listing li {
+  font-size: 2em;
+  margin-bottom: 1em;
 }
 
 #map {

@@ -9,7 +9,7 @@ const markers = {};
 const updateInterval = 5000; // ms
 
 function update() {
-  fetch('/log', {
+  fetch('log', {
     headers: {
       'Accept': 'application/json',
       'Content-Type': 'application/json'
@@ -112,9 +112,9 @@ const map = new Map({
   zoom: 12,
   maxZoom: 18,
   minZoom: 10,
-  center: [-73.96161699999999, 40.678806]
+  center: MAP_CENTER
 }, (coord) => {
-  document.getElementById('coordinates').value = [coord.lat, coord.lng];
+  document.getElementById('coordinates').value = `${coord.lat},${coord.lng}`;
 });
 
 update();
