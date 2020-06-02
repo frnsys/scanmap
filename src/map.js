@@ -21,9 +21,19 @@ class Map {
     let marker = new mapboxgl.Marker(el)
       .setLngLat(coords);
 
+    // Setup popup
     if (opts.desc) {
-      marker.setPopup(new mapboxgl.Popup({ offset: 25 })
-        .setHTML(opts.desc))
+      let popup = new mapboxgl.Popup({ offset: 25, ...(opts.popup || {}) })
+        .setHTML(opts.desc);
+
+      if (opts.onPopupOpen) {
+        popup.on('open', () => opts.onPopupOpen(popup));
+      }
+      if (opts.onPopupClose) {
+        popup.on('close', () => opts.onPopupClose(popup));
+      }
+
+      marker.setPopup(popup)
     }
 
     marker.addTo(this.map);
