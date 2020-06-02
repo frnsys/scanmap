@@ -22,10 +22,14 @@ def get_conf(loc):
 def index():
     return render_template('index.html', locations=config.LOCATIONS.keys())
 
+@app.route('/version')
+def version():
+    return jsonify(version=config.VERSION)
+
 @app.route('/<location>/')
 def map(location):
     conf = get_conf(location)
-    return render_template('map.html', conf=conf)
+    return render_template('map.html', conf=conf, version=config.VERSION)
 
 
 @app.route('/<location>/log', methods=['GET', 'POST'])

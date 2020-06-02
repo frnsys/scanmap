@@ -49,6 +49,7 @@
 </div>
 <script>
 const MAP_CENTER = {{ conf.MAP_CENTER }};
+const VERSION = '{{ version }}';
 </script>
-<script src="{{ url_for('static', filename='dist/main.js') }}"></script>
+<script src="{{ url_for('static', filename='dist/main.js') }}?{{version}}"></script>
 {% endblock %}

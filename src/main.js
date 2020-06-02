@@ -9,6 +9,26 @@ const markers = {};
 const updateInterval = 5000; // ms
 let errs = [];
 
+function checkVersion() {
+  fetch('/version', {
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    method: 'GET'
+  })
+    .then((res) => res.json())
+    .then((json) => {
+      if (VERSION != json.version) {
+        console.log('New version detected, reloading...');
+        location.reload();
+      }
+    });
+}
+setInterval(() => {
+  checkVersion();
+}, 5000);
+
 function update() {
   fetch('log', {
     headers: {
