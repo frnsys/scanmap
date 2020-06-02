@@ -59,7 +59,7 @@ def query_location(location):
     data = request.get_json()
     query = data['query']
     results = google_search_places(query, conf)
-    results = [r for r in results if conf['FILTER'] in r['address']]
+    results = [r for r in results if conf['SEARCH']['FILTER'] in r['address']]
     return jsonify(results=results)
 
 
