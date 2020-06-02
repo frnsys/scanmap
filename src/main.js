@@ -66,6 +66,8 @@ function update() {
               newLogText.innerText = l.text;
               newLog.appendChild(newLogText);
               popupEl.querySelector('.popup-logs').prepend(newLog);
+
+              markers[key].lastUpdate = l.timestamp*1000;
             } else {
               let desc = `
                 <div class="popup-location">${l.location}</div>
