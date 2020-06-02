@@ -62,9 +62,13 @@ class Form {
   activate(authKey) {
     this.authKey = authKey || prompt('Key');
 
+    document.getElementById('overlay').style.display = 'block';
+    document.getElementById('ready').addEventListener('click', () => {
+      document.getElementById('overlay').style.display = 'none';
+    });
+
     document.getElementById('show-help').addEventListener('click', () => {
-      let help = document.getElementById('help');
-      help.style.display = help.style.display == 'block' ? 'none' : 'block';
+      document.getElementById('overlay').style.display = 'block';
     });
 
     document.getElementById('append').style.display = 'block';

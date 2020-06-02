@@ -7,6 +7,7 @@ let lastSeen = 0;
 let expireTime = 60 * 60 * 1000; // in ms. One hour
 const markers = {};
 const updateInterval = 5000; // ms
+let errs = [];
 
 function update() {
   fetch('log', {
@@ -92,7 +93,8 @@ function update() {
       });
     })
     .catch((err) => {
-      alert(err);
+      console.log(err);
+      errs.push(err);
     });
 
   // Fade out markers
