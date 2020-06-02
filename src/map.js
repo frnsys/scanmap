@@ -17,6 +17,10 @@ class Map {
 
     let el = document.createElement('div');
     el.className = opts.className || 'marker';
+    if (opts.icon) {
+      el.innerText = opts.icon;
+      el.style.background = 'none';
+    }
 
     let marker = new mapboxgl.Marker(el)
       .setLngLat(coords);

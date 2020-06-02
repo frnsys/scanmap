@@ -124,6 +124,7 @@ a, a:visited {
   margin-top: 0.5em;
 }
 #coord-results {
+  color: #000;
   font-size: 0.8em;
 }
 #coord-results li {
@@ -167,12 +168,18 @@ ul, li {
   padding: 0;
 }
 
+select {
+  width: 100%;
+}
+
 .marker {
   background-color: red;
-  width: 12px;
-  height: 12px;
+  min-width: 12px;
+  min-height: 12px;
   border-radius: 50%;
   cursor: pointer;
+  color: #000;
+  font-size: 1.5em;
 }
 .marker-preview {
   background-color: blue;
@@ -199,6 +206,10 @@ ul, li {
 .popup-location {
   font-size: 0.8em;
   text-decoration: underline;
+}
+.popup-label {
+  font-size: 0.9em;
+  line-height: 1.1;
 }
 .popup-when {
   font-size: 0.9em;

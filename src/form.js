@@ -84,7 +84,7 @@ class Form {
     // Send log
     document.getElementById('submit').addEventListener('click', (ev) => {
       let data = {};
-      ['text', 'location', 'coordinates'].forEach((k) => {
+      ['text', 'location', 'coordinates', 'label'].forEach((k) => {
         data[k] = document.getElementById(k).value;
       });
       if (!data['text'] || !data['location']) {

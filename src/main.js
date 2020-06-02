@@ -10,6 +10,20 @@ const markers = {};
 const updateInterval = 5000; // ms
 let errs = [];
 
+const LABELS = {
+  'other': '',
+  'police':'👮',
+  'fire': '🔥',
+  'prisoner_van': '🚐',
+  'group': '🚩'
+};
+const labelsEl = document.getElementById('label');
+Object.keys(LABELS).forEach((label) => {
+  let el = document.createElement('option');
+  el.innerText = `${LABELS[label]} ${label}`
+  el.value = label;
+  labelsEl.appendChild(el);
+});
 
 function checkVersion() {
   fetch('/version', {
@@ -55,9 +69,27 @@ function update() {
             let key = `${coords[0]}_${coords[1]}`;
             if (key in markers) {
               let popup = markers[key].marker.getPopup();
+
+              let icon = l.label ? LABELS[l.label] : null;
+              let markerEl = markers[key].marker.getElement();
+              if (icon) {
+                markerEl.innerText = icon;
+                markerEl.style.background = 'none';
+              } else {
+                markerEl.innerText = '';
+                markerEl.style.background = 'red';
+              }
+
               let popupEl = popup._content;
               let newLog = document.createElement('div');
               newLog.className = 'popup-log';
+
+              if (l.label) {
+                let newLogLabel = document.createElement('div');
+                newLogLabel.className = 'popup-label';
+                newLogLabel.innerText = `${LABELS[l.label]} ${l.label}`;
+                newLog.appendChild(newLogLabel);
+              }
 
               let newLogWhen = document.createElement('div');
               newLogWhen.className = 'popup-when';
@@ -75,13 +107,15 @@ function update() {
                 <div class="popup-location">${l.location}</div>
                 <div class="popup-logs">
                   <div class="popup-log">
+                    ${l.label ? `<div class="popup-label">${LABELS[l.label]} ${l.label}</div>` : ''}
                     <div class="popup-when">${dt}</div>
                     <h3>${l.text}</h3>
                   </div>
                 </div>`;
+              let icon = l.label ? LABELS[l.label] : null;
               markers[key] = {
                 lastUpdate: l.timestamp*1000,
-                marker: map.addMarker(coords, {desc})
+                marker: map.addMarker(coords, {desc, icon})
               };
             }
           }
