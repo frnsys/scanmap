@@ -90,6 +90,8 @@ a, a:visited {
 
 #add {
   text-decoration: underline;
+  color: #43CC70;
+  cursor: pointer;
 }
 
 #append {
