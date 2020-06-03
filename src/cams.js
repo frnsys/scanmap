@@ -1,64 +1,70 @@
-function setupCams(map) {
-  let camsLoaded = false;
-  let camMarkers = [];
+import {get} from './util';
 
-  document.getElementById('toggle-cams').addEventListener('click', (ev) => {
+const toggleEl = document.getElementById('toggle-cams');
+
+function makeMarkers(map, cams) {
+  let markers = [];
+  if (cams.length == 0) {
+    toggleEl.innerHTML = 'No cameras for this region';
+
+  } else {
+    cams.forEach((cam) => {
+      if (cam.url) {
+        // Update interval
+        let interval;
+
+        // Set up map marker for camera
+        let coords = [cam['lng'], cam['lat']];
+        let marker = map.addMarker(coords, {
+          // Keep the src elsewhere so we can refresh easily
+          desc: `<img src="#" data-src="${cam.url}">`,
+          className: 'marker marker-camera',
+          popup: {
+            maxWidth: 'none'
+          },
+          onPopupOpen: (popup) => {
+            let img = popup._content.querySelector('img');
+            if (img) {
+              let src = img.dataset.src;
+              img.src = src;
+              interval = setInterval(() => {
+                img.src = `${src}#${new Date().getTime()}`;
+              }, 5000);
+            }
+          },
+          onPopupClose: () => {
+            if (interval) clearInterval(interval);
+          }
+        });
+        markers.push(marker);
+      }
+    });
+  }
+  return markers;
+}
+
+function setupCams(map) {
+  let cams = [];
+  let markers = [];
+  let camsLoaded = false;
+  toggleEl.addEventListener('click', (ev) => {
     if (ev.target.checked) {
-      loadCams();
+      // Minimize network traffic,
+      // only load cams once
+      if (!camsLoaded) {
+        get('cams', (json) => {
+          cams = json.cams;
+          camsLoaded = true;
+          markers = makeMarkers(map, cams);
+        });
+      } else {
+        markers = makeMarkers(map, cams);
+      }
     } else {
-      camMarkers.forEach((m) => {
-        m.remove();
-      });
+      // Clean up markers
+      markers.forEach((m) => m.remove());
     }
   });
-
-  function loadCams() {
-    if (!camsLoaded) {
-      fetch('cams', {
-         headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-          method: 'GET'
-        })
-          .then((res) => res.json())
-          .then((json) => {
-            if (json.cams.length > 0) {
-              json.cams.forEach((cam) => {
-                if (cam.url) {
-                  let desc = `<img src="#" data-src="${cam.url}">`;
-                  let className = 'marker marker-camera';
-                  let coords = [cam['lng'], cam['lat']];
-                  let popup = {
-                    maxWidth: 'none'
-                  };
-                  let interval;
-                  let marker = map.addMarker(coords, {desc, className, popup,
-                    onPopupOpen: (popup) => {
-                      let img = popup._content.querySelector('img');
-                      if (img) {
-                        let src = img.dataset.src;
-                        img.src = src;
-                        interval = setInterval(() => {
-                          img.src = `${src}#${new Date().getTime()}`;
-                        }, 5000);
-                      }
-                    },
-                    onPopupClose: () => {
-                      if (interval) clearInterval(interval);
-                    }
-                  });
-                  camMarkers.push(marker);
-                }
-              });
-            } else {
-              document.getElementById('toggle-cams').innerHTML = 'No cameras for this region';
-            }
-          });
-    } else {
-      camMarkers.forEach()
-    }
-  }
 }
 
 export default setupCams;
