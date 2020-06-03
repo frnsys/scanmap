@@ -1,3 +1,10 @@
+const fields = ['text', 'location', 'coordinates', 'label'];
+const overlay = document.getElementById('overlay');
+const errEl = document.getElementById('error');
+const statusEl = document.getElementById('status');
+const resultsEl = document.getElementById('coord-results');
+const coordsEl = document.getElementById('coordinates');
+
 class Form {
   constructor(map) {
     this.map = map;
@@ -6,71 +13,64 @@ class Form {
   }
 
   queryLocation(query) {
-    let statusEl = document.getElementById('status');
     statusEl.innerText = 'Searching...';
     statusEl.style.display = 'block';
 
+    // Search for possible coordinates
+    // based on inputted location
     this.post('location', {
       query: query
     }, (json) => {
       // Display search results to choose from
-      let list = document.getElementById('coord-results');
-      list.innerHTML = '';
+      resultsEl.innerHTML = '';
       if (json.results.length > 0) {
-        if (json.results.length == 1) {
-          let res = json.results[0];
-          document.getElementById('coordinates').value = `${res.coordinates[0]},${res.coordinates[1]}`;
+        // Choose first result by default
+        let res = json.results[0];
+        coordsEl.value = res.coordinates;
+        this.previewCoords([res.coordinates[1], res.coordinates[0]]);
 
-          // Show location preview
-          // Mapbox is lng, lat
-          let coords = [res.coordinates[1], res.coordinates[0]];
-          if (this.marker) this.marker.remove();
-          this.marker = this.map.addMarker(coords, {
-            className: 'marker marker-preview'
-          });
-          this.map.jumpTo(coords);
-        } else {
-          json.results.slice(0, 5).forEach((res) => {
-            console.log(res);
-            let li = document.createElement('li');
-            li.innerText = `${res.name} (${res.coordinates.map((c) => c.toFixed(4))})`
-            li.addEventListener('click', () => {
-              let selected = list.querySelector('.selected');
-              if (selected) selected.classList.remove('selected');
-              li.classList.add('selected');
-              document.getElementById('coordinates').value = `${res.coordinates[0]},${res.coordinates[1]}`;
+        // Only show first 5 results
+        json.results.slice(0, 5).forEach((res) => {
+          let li = document.createElement('li');
+          li.innerText = `${res.name} (${res.coordinates.map((c) => c.toFixed(4))})`
+          li.addEventListener('click', () => {
+            // Visual selection
+            let selected = resultsEl.querySelector('.selected');
+            if (selected) selected.classList.remove('selected');
+            li.classList.add('selected');
 
-              // Show location preview
-              // Mapbox is lng, lat
-              let coords = [res.coordinates[1], res.coordinates[0]];
-              if (this.marker) this.marker.remove();
-              this.marker = this.map.addMarker(coords, {
-                className: 'marker marker-preview'
-              });
-              this.map.jumpTo(coords);
-            });
-            list.appendChild(li);
+            coordsEl.value = res.coordinates;
+            this.previewCoords([res.coordinates[1], res.coordinates[0]]);
           });
-        }
+          resultsEl.appendChild(li);
+        });
       } else {
-        list.innerText = 'No results';
+        resultsEl.innerText = 'No results';
       }
       statusEl.style.display = 'none';
     });
   }
 
+  previewCoords(coords) {
+    if (this.marker) this.marker.remove();
+    this.marker = this.map.addMarker(coords, {
+      className: 'marker marker-preview'
+    });
+    this.map.jumpTo(coords);
+  }
+
   activate(authKey) {
     this.authKey = authKey || prompt('Key');
 
-    document.getElementById('overlay').style.display = 'block';
-    document.getElementById('ready').addEventListener('click', () => {
-      document.getElementById('overlay').style.display = 'none';
+    // Show intro and bind help button
+    overlay.style.display = 'block';
+    ['ready', 'show-help'].forEach((id) => {
+      document.getElementById(id).addEventListener('click', () => {
+        overlay.style.display = 'none';
+      });
     });
 
-    document.getElementById('show-help').addEventListener('click', () => {
-      document.getElementById('overlay').style.display = 'block';
-    });
-
+    // Show form
     document.getElementById('append').style.display = 'block';
     document.getElementById('location').addEventListener('keydown', (ev) => {
       if (ev.key == 'Enter') {
@@ -82,32 +82,38 @@ class Form {
     });
 
     // Send log
-    document.getElementById('submit').addEventListener('click', (ev) => {
-      let data = {};
-      ['text', 'location', 'coordinates', 'label'].forEach((k) => {
-        data[k] = document.getElementById(k).value;
-      });
-      if (!data['text'] || !data['location']) {
-        alert('Please fill in the note and the location');
-      } else {
-        console.log(data);
-        this.post('log', data, (json) => {
-          console.log(json);
+    document.getElementById('submit').addEventListener('click', () => this.submit());
+  }
 
-          // Reset
-          document.getElementById('coord-results').innerHTML = '';
-          ['text', 'location', 'coordinates'].forEach((k) => {
-            document.getElementById(k).value = '';
-          });
-          if (this.marker) this.marker.remove();
-        });
-      }
+  submit() {
+    let data = {};
+    fields.forEach((k) => {
+      data[k] = document.getElementById(k).value;
     });
+
+    // All fields required
+    if (!fields.every((k) => data[k])) {
+      alert('Please fill in the note, location, and coordinates');
+
+    } else {
+      console.log(data);
+      this.post('log', data, (json) => {
+        // Reset fields
+        resultsEl.innerHTML = '';
+        fields.forEach((k) => {
+          let inp = document.getElementById(k);
+          if (inp.tagName !== 'SELECT') {
+            inp.value = '';
+          }
+        });
+        if (this.marker) this.marker.remove();
+      });
+    }
   }
 
   post(url, data, onSuccess) {
     // Reset error
-    document.getElementById('error').style.display = 'none';
+    errEl.style.display = 'none';
 
     fetch(url, {
       headers: {
@@ -126,7 +132,6 @@ class Form {
       })
       .then(onSuccess)
       .catch((err) => {
-        let errEl = document.getElementById('error');
         errEl.innerText = err;
         errEl.style.display = 'block';
       });

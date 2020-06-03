@@ -27,8 +27,10 @@ class Map {
 
     // Setup popup
     if (opts.desc) {
-      let popup = new mapboxgl.Popup({ offset: 25, ...(opts.popup || {}) })
-        .setHTML(opts.desc);
+      let popup = new mapboxgl.Popup({
+        offset: 25,
+        ...(opts.popup || {})
+      }).setHTML(opts.desc);
 
       if (opts.onPopupOpen) {
         popup.on('open', () => opts.onPopupOpen(popup));
