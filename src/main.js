@@ -72,24 +72,23 @@ function update() {
             }
 
             let popupEl = popup._content;
-            let newLog = document.createElement('div');
-            newLog.className = 'popup-log';
-
-            if (l.label) {
-              let newLogLabel = document.createElement('div');
-              newLogLabel.className = 'popup-label';
-              newLogLabel.innerText = `${LABELS[l.label]} ${l.label}`;
-              newLog.appendChild(newLogLabel);
-            }
-
-            let newLogWhen = document.createElement('div');
-            newLogWhen.className = 'popup-when';
-            newLogWhen.innerText = dt;
-            newLog.appendChild(newLogWhen);
-
-            let newLogText = document.createElement('h3');
-            newLogText.innerText = l.text;
-            newLog.appendChild(newLogText);
+            let newLog = el({
+              // id: l.timestamp,
+              tag: 'div',
+              className: 'popup-log',
+              children: [{
+                tag: 'div',
+                className: 'popup-label',
+                innerText: `${LABELS[l.label]} ${l.label}`,
+              }, {
+                tag: 'div',
+                className: 'popup-when',
+                innerText: dt,
+              }, {
+                tag: 'h3',
+                innerText: l.text
+              }]
+            });
             popupEl.querySelector('.popup-logs').prepend(newLog);
 
             markers[key].lastUpdate = l.timestamp*1000;
@@ -114,6 +113,7 @@ function update() {
         // Add to log sidebar
         let logEl = document.getElementById('log');
         let logItem = el({
+          id: l.timestamp,
           tag: 'div',
           className: 'logitem',
           children: [{
