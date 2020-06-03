@@ -68,6 +68,9 @@ def log(location):
                 logs = f.read().split('\n')
         except FileNotFoundError:
             logs = []
+
+        # Limit amount of logs sent
+        logs = logs[-config.MAX_LOGS:]
         return jsonify(logs=[json.loads(l) for l in logs if l])
 
 @app.route('/<location>/location', methods=['POST'])

@@ -5,11 +5,15 @@ Notation here is `<description:example value>`.
 ```
 # config.py
 
+# Maximum amount of logs to send
+MAX_LOGS = 200
+
 # For querying coordinates for locations
 GOOGLE_PLACES_API_KEY = '<key>'
 
 LOCATIONS = {
     '<location key:NY>': {
+        'CAMERAS': '<traffic cam file:cams/ny.json>',
         'DB_FILE': '<db file name:logs.ny.jsonl>',
         'MAP_CENTER': <lnglat:[-73.96161699999999, 40.678806]>,
         'SEARCH': {
