@@ -46,7 +46,14 @@ setInterval(() => {
 
 function update() {
   get('log', (json) => {
+    // Track what log entries we have
+    let logIds = new Set([...document.querySelectorAll('.logitem')].map((el) => el.id));
+
     json.logs.forEach((l) => {
+      // Track which log entries are still present
+      let logId = l.timestamp.toString();
+      logIds.delete(logId);
+
       if (l.timestamp > lastSeen) {
         let dt = new Date(l.timestamp*1000).toLocaleString('en-US');
 
@@ -73,7 +80,7 @@ function update() {
 
             let popupEl = popup._content;
             let newLog = el({
-              // id: l.timestamp,
+              id: `popup-${logId}`,
               tag: 'div',
               className: 'popup-log',
               children: [{
@@ -113,7 +120,7 @@ function update() {
         // Add to log sidebar
         let logEl = document.getElementById('log');
         let logItem = el({
-          id: l.timestamp,
+          id: logId,
           tag: 'div',
           className: 'logitem',
           children: [{
@@ -139,6 +146,14 @@ function update() {
         }
         lastSeen = l.timestamp;
       }
+    });
+
+    // Remove entries for remaining logIds
+    logIds.forEach((logId) => {
+      [logId, `popup-${logId}`].forEach((id) => {
+        let el = document.getElementById(id);
+        el.parentNode.removeChild(el);
+      });
     });
   }).catch((err) => {
     console.log(err);
