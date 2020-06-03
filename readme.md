@@ -42,6 +42,15 @@ LOCATIONS = {
 
 ---
 
+# Running
+
+1. Install frontend deps: `npm install -d`
+2. Install backend deps: `pip install -r requirements.txt`
+3. Start frontend: `npm start`
+4. Start backend: `python app.py`
+
+---
+
 Example `config.py`:
 
 ```
