@@ -64,10 +64,11 @@ class Form {
 
     // Show intro and bind help button
     overlay.style.display = 'block';
-    ['ready', 'show-help'].forEach((id) => {
-      document.getElementById(id).addEventListener('click', () => {
+    document.getElementById('ready').addEventListener('click', () => {
         overlay.style.display = 'none';
-      });
+    });
+    document.getElementById('show-help').addEventListener('click', () => {
+      overlay.style.display = 'block';
     });
 
     // Show form
