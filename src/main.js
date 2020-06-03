@@ -180,8 +180,12 @@ const map = new Map({
   zoom: MAP_ZOOM,
   center: MAP_CENTER
 }, (coord) => {
-  document.getElementById('coordinates').value = `${coord.lat},${coord.lng}`;
+  if (form.authKey) {
+    document.getElementById('coordinates').value = `${coord.lat},${coord.lng}`;
+    form.previewCoords([coord.lng, coord.lat]);
+  }
 });
+const form = new Form(map);
 
 // For getting current map zoom/center
 window.queryMap = () => {
@@ -190,7 +194,6 @@ window.queryMap = () => {
 }
 
 document.getElementById('add').addEventListener('click', () => {
-  let form = new Form(map);
   form.activate();
 });
 

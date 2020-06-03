@@ -27,7 +27,7 @@ class Form {
         // Choose first result by default
         let res = json.results[0];
         coordsEl.value = res.coordinates;
-        this.previewCoords([res.coordinates[1], res.coordinates[0]]);
+        this.previewCoords([res.coordinates[1], res.coordinates[0]], true);
 
         // Only show first 5 results
         json.results.slice(0, 5).forEach((res) => {
@@ -40,7 +40,7 @@ class Form {
             li.classList.add('selected');
 
             coordsEl.value = res.coordinates;
-            this.previewCoords([res.coordinates[1], res.coordinates[0]]);
+            this.previewCoords([res.coordinates[1], res.coordinates[0]], true);
           });
           resultsEl.appendChild(li);
         });
@@ -51,12 +51,12 @@ class Form {
     });
   }
 
-  previewCoords(coords) {
+  previewCoords(coords, jump) {
     if (this.marker) this.marker.remove();
     this.marker = this.map.addMarker(coords, {
       className: 'marker marker-preview'
     });
-    this.map.jumpTo(coords);
+    if (jump) this.map.jumpTo(coords);
   }
 
   activate(authKey) {
