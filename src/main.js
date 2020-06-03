@@ -175,13 +175,19 @@ mapboxgl.accessToken = config.MAPBOX_TOKEN;
 const map = new Map({
   container: 'map',
   style: 'mapbox://styles/mapbox/streets-v11',
-  zoom: 12,
   maxZoom: 18,
   minZoom: 10,
+  zoom: MAP_ZOOM,
   center: MAP_CENTER
 }, (coord) => {
   document.getElementById('coordinates').value = `${coord.lat},${coord.lng}`;
 });
+
+// For getting current map zoom/center
+window.queryMap = () => {
+  console.log(`Zoom:${map.map.getZoom()}`);
+  console.log(`Center:${map.map.getCenter()}`);
+}
 
 document.getElementById('add').addEventListener('click', () => {
   let form = new Form(map);

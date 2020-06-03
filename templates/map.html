@@ -54,7 +54,8 @@
     </div>
 </div>
 <script>
-const MAP_CENTER = {{ conf.MAP_CENTER }};
+const MAP_CENTER = {{ conf.MAP['CENTER'] }};
+const MAP_ZOOM = {{ conf.MAP['ZOOM'] }};
 const VERSION = '{{ version }}';
 </script>
 <script src="{{ url_for('static', filename='dist/main.js') }}?{{version}}"></script>
