@@ -1,6 +1,9 @@
 App is broken down by location, which is just a key identifying a location, e.g. `NY`.
 
-You need two files, one to configure the app (`config.py`) and one where you add/revoke keys for adding to maps (`keys.yml`).
+You need two files to configure the application:
+
+- `config.py`: general app/maps configuration options
+- `keys.yml`: adding/revoking keys for adding to maps
 
 Notation here is `<description:example value>`.
 
@@ -27,7 +30,7 @@ LOCATIONS = {
             'CENTER': <latlng:[40.678806,-73.96161699999999]>,
             'RADIUS': <search radius in m:15000>
         },
-        'INFO': '<extra info to show up on page>'
+        'INFO': '<additional info to include>'
     }
 }
 ```
@@ -48,6 +51,10 @@ LOCATIONS = {
 2. Install backend deps: `pip install -r requirements.txt`
 3. Start frontend: `npm start`
 4. Start backend: `python app.py`
+
+# Deployment notes
+
+- Ensure that proper permissions/ownership are set for the log files (`*.jsonl`)
 
 ---
 
