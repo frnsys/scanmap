@@ -130,6 +130,13 @@ def keys(location):
     keys = kr.get_keys(location, typ='write')
     return jsonify(keys=keys)
 
+@app.route('/<location>/checkauth', methods=['POST'])
+def check_auth(location):
+    auth = request.headers.get('X-AUTH')
+    success = kr.check_key(auth, location)
+    return jsonify(success=success)
+
+
 
 if __name__ == '__main__':
     app.run(debug=config.DEBUG, port=8800)
