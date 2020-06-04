@@ -80,8 +80,9 @@ def edit_log(location):
                 db.delete(location, timestamp)
                 return jsonify(success=True)
             elif action == 'update':
-                log = data['log']
-                db.update(location, timestamp, log)
+                for k, v in data['changes'].items():
+                    log['data'][k] = v
+                db.update(location, timestamp, log['data'])
                 return jsonify(success=True)
             return jsonify(success=False, error='Unknown action')
         else:

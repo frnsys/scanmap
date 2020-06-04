@@ -180,7 +180,10 @@ select {
   font-size: 1.5em;
 }
 .marker-preview {
-  background-color: blue;
+  width: 16px;
+  height: 16px;
+  background-color: yellow;
+  border: 4px solid black;
 }
 .marker-camera {
   background-color: transparent;
@@ -201,7 +204,23 @@ select {
   font-size: 0.8em;
   text-decoration: underline;
 }
-.logitem-location {
+.logitem-meta {
+  font-size: 0.8em;
+}
+.logitem-coords {
+  display: none;
+  font-size: 0.7em;
+  border: none;
+  background: none;
+  color: yellow;
+  width: 100%;
+}
+.logitem-text-input,
+.logitem-location-input,
+.logitem-edit-cancel {
+  display: none;
+}
+.logitem-location-input {
   font-size: 0.8em;
 }
 .logitem .delete-log {

@@ -6,10 +6,23 @@ class Map {
     this.map = new mapboxgl.Map(conf);
     this.map.dragRotate.disable();
     this.map.touchZoomRotate.disableRotation();
+    this.clickListeners = {
+      root: onClick
+    };
 
-    this.map.on('click', function(e) {
-      onClick(e.lngLat);
+    this.map.on('click', (e) => {
+      Object.values(this.clickListeners).forEach((fn) => {
+        fn(e.lngLat);
+      });
     });
+  }
+
+  addClickListener(id, fn) {
+    this.clickListeners[id] = fn;
+  }
+
+  removeClickListener(id) {
+    delete this.clickListeners[id];
   }
 
   addMarker(coords, opts) {
