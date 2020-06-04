@@ -10,6 +10,8 @@ class Form {
     this.map = map;
     this.authKey = '';
     this.marker = null;
+
+    this.lastSubmission = null;
   }
 
   queryLocation(query) {
@@ -97,6 +99,10 @@ class Form {
       alert('Please fill in the note, location, and coordinates');
 
     } else {
+      // Debounce, avoid duplicate submissions
+      let h = JSON.stringify(data);
+      if (this.lastSubmission == h) return;
+
       console.log(data);
       this.post('log', data, (json) => {
         // Reset fields
@@ -109,6 +115,7 @@ class Form {
         });
         if (this.marker) this.marker.remove();
       });
+      this.lastSubmission = h;
     }
   }
 
