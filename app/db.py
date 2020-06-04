@@ -4,23 +4,30 @@ from datetime import datetime, timezone
 
 class Database:
     def __init__(self, path):
-        self.con = sqlite3.connect(path)
-        self.cur = self.con.cursor()
-        self.cur.execute('CREATE TABLE IF NOT EXISTS logs \
-                         (timestamp text primary key,\
-                         location text,\
-                         submitter text,\
-                         data json not null)')
+        self.path = path
+        _, cur = self._con()
+        cur.execute('CREATE TABLE IF NOT EXISTS logs \
+                (timestamp text primary key,\
+                location text,\
+                submitter text,\
+                data json not null)')
+
+    def _con(self):
+        con = sqlite3.connect(self.path)
+        cur = con.cursor()
+        return con, cur
 
     def add(self, location, submitter, log):
         timestamp = datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()
-        self.cur.execute(
+        con, cur = self._con()
+        cur.execute(
             'INSERT INTO logs(timestamp, location, submitter, data) VALUES (?,?,?,?)',
             (timestamp, location, submitter, json.dumps(log)))
-        self.con.commit()
+        con.commit()
 
     def logs(self, location, n):
-        rows = self.cur.execute(
+        con, cur = self._con()
+        rows = cur.execute(
                 'SELECT timestamp, submitter, data FROM logs WHERE location == ? LIMIT ?',
                 (location, n)).fetchall()
         return [{
@@ -30,12 +37,14 @@ class Database:
         } for timestamp, submitter, data in rows]
 
     def delete(self, location, timestamp):
-        self.cur.execute(
+        con, cur = self._con()
+        cur.execute(
             'DELETE FROM logs WHERE location == ? AND timestamp == ?',
             (location, timestamp)).fetchone()
-        self.con.commit()
+        con.commit()
 
     def update(self, location, timestamp, log):
-        self.cur.execute('UPDATE logs SET data = ? WHERE location == ? AND timestamp == ?',
-                         (json.dumps(log), location, timestamp))
-        self.con.commit()
+        con, cur = self._con()
+        cur.execute('UPDATE logs SET data = ? WHERE location == ? AND timestamp == ?',
+                (json.dumps(log), location, timestamp))
+        con.commit()

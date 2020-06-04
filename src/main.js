@@ -56,9 +56,13 @@ function update() {
 
       if (l.timestamp > lastSeen) {
         let dt = new Date(l.timestamp*1000).toLocaleString('en-US');
+        let ld = l.data;
+
+        let icon = ld.label ? LABELS[ld.label] : null;
+        let labelText = `${LABELS[ld.label]} ${ld.label}`;
 
         // Add marker to map
-        let coords = l.coordinates.split(',').map((c) => parseFloat(c));
+        let coords = ld.coordinates.split(',').map((c) => parseFloat(c));
         if (coords.length == 2) {
           coords.reverse();
 
@@ -68,7 +72,6 @@ function update() {
           if (key in markers) {
             let popup = markers[key].marker.getPopup();
 
-            let icon = l.label ? LABELS[l.label] : null;
             let markerEl = markers[key].marker.getElement();
             if (icon) {
               markerEl.innerText = icon;
@@ -86,14 +89,14 @@ function update() {
               children: [{
                 tag: 'div',
                 className: 'popup-label',
-                innerText: `${LABELS[l.label]} ${l.label}`,
+                innerText: labelText,
               }, {
                 tag: 'div',
                 className: 'popup-when',
                 innerText: dt,
               }, {
                 tag: 'h3',
-                innerText: l.text
+                innerText: ld.text
               }]
             });
             popupEl.querySelector('.popup-logs').prepend(newLog);
@@ -101,15 +104,14 @@ function update() {
             markers[key].lastUpdate = l.timestamp*1000;
           } else {
             let desc = `
-              <div class="popup-location">${l.location}</div>
+              <div class="popup-location">${ld.location}</div>
               <div class="popup-logs">
                 <div class="popup-log">
-                  ${l.label ? `<div class="popup-label">${LABELS[l.label]} ${l.label}</div>` : ''}
+                  <div class="popup-label">${labelText}</div>
                   <div class="popup-when">${dt}</div>
-                  <h3>${l.text}</h3>
+                  <h3>${ld.text}</h3>
                 </div>
               </div>`;
-            let icon = l.label ? LABELS[l.label] : null;
             markers[key] = {
               lastUpdate: l.timestamp*1000,
               marker: map.addMarker(coords, {desc, icon})
@@ -130,11 +132,11 @@ function update() {
           }, {
             tag: 'div',
             className: 'logitem-location',
-            innerText: `${l.label && l.label !== 'other' ? `${LABELS[l.label]} ${l.label} @ ` : ''}${l.location}`
+            innerText: `${ld.label && ld.label !== 'other' ? `${labelText} @ ` : ''}${ld.location}`
           }, {
             tag: 'div',
             className: 'logitem-text',
-            innerText: l.text
+            innerText: ld.text
           }]
         });
         logEl.prepend(logItem);
