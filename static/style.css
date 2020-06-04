@@ -82,6 +82,9 @@ html, body {
   font-size: 0.8em;
   border-top: 1px solid #444;
 }
+#info div {
+  margin: 0.7em 0px;
+}
 a, a:visited {
   color: #aaa;
 }
