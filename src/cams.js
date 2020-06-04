@@ -1,4 +1,4 @@
-import {get} from './util';
+import {get, el} from './util';
 
 const toggleEl = document.getElementById('toggle-cams');
 
@@ -17,7 +17,13 @@ function makeMarkers(map, cams) {
         let coords = [cam['lng'], cam['lat']];
         let marker = map.addMarker(coords, {
           // Keep the src elsewhere so we can refresh easily
-          desc: `<img src="#" data-src="${cam.url}">`,
+          element: el({
+            tag: 'img',
+            src: '#',
+            dataset: {
+              src: cam.url
+            }
+          }),
           className: 'marker marker-camera',
           popup: {
             maxWidth: 'none'
