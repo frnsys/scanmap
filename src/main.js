@@ -44,126 +44,135 @@ setInterval(() => {
   });
 }, 5000);
 
-function update() {
-  get('log', (json) => {
-    // Track what log entries we have
-    let logIds = new Set([...document.querySelectorAll('.logitem')].map((el) => el.id));
+function writeLogs(logs) {
+  // Track what log entries we have
+  let logIds = new Set([...document.querySelectorAll('.logitem')].map((el) => el.id));
 
-    json.logs.forEach((l) => {
-      // Track which log entries are still present
-      let logId = l.timestamp.toString();
-      logIds.delete(logId);
+  logs.forEach((l) => {
+    // Track which log entries are still present
+    let logId = l.timestamp.toString();
+    logIds.delete(logId);
+    let ld = l.data;
 
-      if (l.timestamp > lastSeen) {
-        let dt = new Date(l.timestamp*1000).toLocaleString('en-US');
-        let ld = l.data;
+    if (l.timestamp > lastSeen) {
+      let dt = new Date(l.timestamp*1000).toLocaleString('en-US');
 
-        let icon = ld.label ? LABELS[ld.label] : null;
-        let labelText = `${LABELS[ld.label]} ${ld.label}`;
+      let icon = ld.label ? LABELS[ld.label] : null;
+      let labelText = ld.label ? `${LABELS[ld.label]} ${ld.label}` : '';
 
-        // Add marker to map
-        let coords = ld.coordinates.split(',').map((c) => parseFloat(c));
-        if (coords.length == 2) {
-          coords.reverse();
-
-          // Check if marker exists for this location,
-          // if so, append log
-          let key = `${coords[0]}_${coords[1]}`;
-          if (key in markers) {
-            let popup = markers[key].marker.getPopup();
-
-            let markerEl = markers[key].marker.getElement();
-            if (icon) {
-              markerEl.innerText = icon;
-              markerEl.style.background = 'none';
-            } else {
-              markerEl.innerText = '';
-              markerEl.style.background = 'red';
-            }
-
-            let popupEl = popup._content;
-            let newLog = el({
-              id: `popup-${logId}`,
-              tag: 'div',
-              className: 'popup-log',
-              children: [{
-                tag: 'div',
-                className: 'popup-label',
-                innerText: labelText,
-              }, {
-                tag: 'div',
-                className: 'popup-when',
-                innerText: dt,
-              }, {
-                tag: 'h3',
-                innerText: ld.text
-              }]
-            });
-            popupEl.querySelector('.popup-logs').prepend(newLog);
-
-            markers[key].lastUpdate = l.timestamp*1000;
-          } else {
-            let desc = `
-              <div class="popup-location">${ld.location}</div>
-              <div class="popup-logs">
-                <div class="popup-log">
-                  <div class="popup-label">${labelText}</div>
-                  <div class="popup-when">${dt}</div>
-                  <h3>${ld.text}</h3>
-                </div>
-              </div>`;
-            markers[key] = {
-              lastUpdate: l.timestamp*1000,
-              marker: map.addMarker(coords, {desc, icon})
-            };
-          }
-        }
-
-        // Add to log sidebar
-        let logEl = document.getElementById('log');
-        let logItem = el({
-          id: logId,
+      // Add marker to map
+      let coords = ld.coordinates.split(',').map((c) => parseFloat(c));
+      if (coords.length == 2) {
+        let newLog = el({
+          id: `popup-${logId}`,
           tag: 'div',
-          className: 'logitem',
+          className: 'popup-log',
           children: [{
             tag: 'div',
-            className: 'logitem-when',
+            className: 'popup-label',
+            innerText: labelText,
+          }, {
+            tag: 'div',
+            className: 'popup-when',
             innerText: dt,
           }, {
-            tag: 'div',
-            className: 'logitem-location',
-            innerText: `${ld.label && ld.label !== 'other' ? `${labelText} @ ` : ''}${ld.location}`
-          }, {
-            tag: 'div',
-            className: 'logitem-text',
+            tag: 'h3',
             innerText: ld.text
           }]
         });
-        logEl.prepend(logItem);
 
-        if (coords.length == 2) {
-          logItem.addEventListener('click', () => {
-            map.jumpTo(coords);
+        // Check if marker exists for this location,
+        // if so, append log
+        coords.reverse();
+        let key = `${coords[0]}_${coords[1]}`;
+        if (key in markers) {
+          // Update marker icon to latest event's icon
+          let markerEl = markers[key].marker.getElement();
+          if (icon) {
+            markerEl.innerText = icon;
+            markerEl.style.background = 'none';
+          } else {
+            markerEl.innerText = '';
+            markerEl.style.background = 'red';
+          }
+
+          // Add to popup list
+          let popup = markers[key].marker.getPopup();
+          let popupEl = popup._content;
+          popupEl.querySelector('.popup-logs').prepend(newLog);
+
+          markers[key].lastUpdate = l.timestamp*1000;
+        } else {
+          // Create new marker
+          let element = el({
+            tag: 'div',
+            children: [{
+              tag: 'div',
+              className: 'popup-location',
+              innerText: ld.location
+            }, {
+              tag: 'div',
+              className: 'popup-logs',
+              children: [newLog]
+            }]
           });
-        }
-        lastSeen = l.timestamp;
-      } else {
-        // See if we need to update the entry
-        let el = document.getElementById(logId).querySelector('.logitem-text');
-        if (el.innerText != l.text) {
-          el.innerText = l.text;
+          markers[key] = {
+            lastUpdate: l.timestamp*1000,
+            marker: map.addMarker(coords, {element, icon})
+          };
         }
       }
-    });
 
-    // Remove entries for remaining logIds
-    logIds.forEach((logId) => {
-      [logId, `popup-${logId}`].forEach((id) => {
-        let el = document.getElementById(id);
-        el.parentNode.removeChild(el);
+      // Add to log sidebar
+      let logEl = document.getElementById('log');
+      let logItem = el({
+        id: logId,
+        tag: 'div',
+        className: 'logitem',
+        children: [{
+          tag: 'div',
+          className: 'logitem-when',
+          innerText: dt,
+        }, {
+          tag: 'div',
+          className: 'logitem-location',
+          innerText: ``
+        }, {
+          tag: 'div',
+          className: 'logitem-text',
+          innerText: ld.text
+        }]
       });
+      logEl.prepend(logItem);
+
+      if (coords.length == 2) {
+        logItem.addEventListener('click', () => {
+          map.jumpTo(coords);
+        });
+      }
+      lastSeen = l.timestamp;
+    } else {
+      // See if we need to update the entry
+      let el = document.getElementById(logId).querySelector('.logitem-text');
+      if (el.innerText != ld.text) {
+        el.innerText = ld.text;
+      }
+    }
+  });
+
+  // Remove entries for remaining logIds
+  logIds.forEach((logId) => {
+    [logId, `popup-${logId}`].forEach((id) => {
+      let el = document.getElementById(id);
+      el.parentNode.removeChild(el);
     });
-  }).catch((err) => {
+  });
+}
+
+function update() {
+  get('log', ({logs}) => {
+    writeLogs(logs);
+  }, form.authKey).catch((err) => {
     console.log(err);
     errs.push(err);
   });

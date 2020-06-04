@@ -53,7 +53,7 @@ function el(spec) {
   });
 
   children.forEach((ch) => {
-    let e = el(ch);
+    let e = ch instanceof HTMLElement ? ch : el(ch);
     pa.appendChild(e);
   });
   return pa;
