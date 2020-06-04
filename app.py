@@ -1,7 +1,7 @@
 import json
-import yaml
 import config
 import requests
+import keydb as kdb
 from datetime import datetime, timezone
 from flask import Flask, abort, request, render_template, jsonify
 
@@ -18,10 +18,6 @@ for loc, conf in config.LOCATIONS.items():
         } for c in cams]
         CAMERAS[loc] = cams
 
-
-def check_key(key, loc):
-    keys = yaml.load(open('keys.yml'))
-    return key in keys.get(loc, [])
 
 def get_conf(loc):
     try:
@@ -48,12 +44,38 @@ def cams(location):
     conf = get_conf(location)
     return jsonify(cams=cameras)
 
+@app.route('/<location>/panel')
+def panel(location):
+    conf = get_conf(location)
+    return render_template('panel.html', conf=conf)
+
+@app.route('/<location>/keys', methods=['GET', 'POST'])
+def keys(location):
+    auth = request.headers.get('X-AUTH')
+    if not kdb.check_key(auth, location, typ='prime'):
+        abort(401)
+
+    if request.method == 'POST':
+        data = request.get_json()
+        action = data['action']
+        if action == 'revoke':
+            kdb.del_key(location, 'write', data['key'])
+            return jsonify(success=True)
+        elif action == 'create':
+            key = kdb.new_key()
+            kdb.add_key(location, 'write', key)
+            return jsonify(success=True, key=key)
+        return jsonify(success=False)
+
+    keys = kdb.get_keys(location, typ='write')
+    return jsonify(keys=keys)
+
 @app.route('/<location>/log', methods=['GET', 'POST'])
 def log(location):
     conf = get_conf(location)
     if request.method == 'POST':
         auth = request.headers.get('X-AUTH')
-        if not check_key(auth, location):
+        if not kdb.check_key(auth, location):
             abort(401)
 
         data = request.get_json()
@@ -77,7 +99,7 @@ def log(location):
 def query_location(location):
     conf = get_conf(location)
     auth = request.headers.get('X-AUTH')
-    if not check_key(auth, location):
+    if not kdb.check_key(auth, location):
         abort(401)
     data = request.get_json()
     results = google_search_places(data['query'], conf)

@@ -1,3 +1,5 @@
+import {post} from './util';
+
 const fields = ['text', 'location', 'coordinates', 'label'];
 const overlay = document.getElementById('overlay');
 const errEl = document.getElementById('error');
@@ -115,23 +117,7 @@ class Form {
   post(url, data, onSuccess) {
     // Reset error
     errEl.style.display = 'none';
-
-    fetch(url, {
-      headers: {
-        'X-AUTH': this.authKey,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      method: 'POST',
-      body: JSON.stringify(data)
-    })
-      .then((res) => {
-        if (res.status == 401) {
-          throw new Error('Unauthorized');
-        }
-        return res.json();
-      })
-      .then(onSuccess)
+    post(url, data, onSuccess, this.authKey)
       .catch((err) => {
         errEl.innerText = err;
         errEl.style.display = 'block';

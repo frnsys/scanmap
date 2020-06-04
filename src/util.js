@@ -1,13 +1,38 @@
-function get(url, onSuccess) {
+function get(url, onSuccess, authKey) {
   return fetch(url, {
     headers: {
       'Accept': 'application/json',
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'X-AUTH': authKey
     },
     method: 'GET'
   })
-    .then((res) => res.json())
-    .then((json) => onSuccess(json));
+    .then((res) => {
+      if (res.status == 401) {
+        throw new Error('Unauthorized');
+      }
+      return res.json();
+    })
+    .then(onSuccess);
+}
+
+function post(url, data, onSuccess, authKey) {
+  return fetch(url, {
+    headers: {
+      'X-AUTH': authKey,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    method: 'POST',
+    body: JSON.stringify(data)
+  })
+    .then((res) => {
+      if (res.status == 401) {
+        throw new Error('Unauthorized');
+      }
+      return res.json();
+    })
+    .then(onSuccess);
 }
 
 // Convenience function to create HTML elements
@@ -16,6 +41,12 @@ function el(spec) {
   let children = spec.children || [];
   delete spec.tag;
   delete spec.children;
+
+  let events = spec.on || {};
+  Object.keys(events).forEach((ev) => {
+    pa.addEventListener(ev, events[ev]);
+  });
+  delete spec.on;
 
   Object.keys(spec).forEach((k) => {
     pa[k] = spec[k];
@@ -28,4 +59,4 @@ function el(spec) {
   return pa;
 }
 
-export {get, el};
+export {get, post, el};

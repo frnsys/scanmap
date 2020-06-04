@@ -145,6 +145,12 @@ function update() {
           });
         }
         lastSeen = l.timestamp;
+      } else {
+        // See if we need to update the entry
+        let el = document.getElementById(logId);
+        if (el.innerText != l.text) {
+          el.innerText = l.text;
+        }
       }
     });
 

@@ -230,6 +230,42 @@ select {
   color: #000;
 }
 
+#panel {
+  max-width: 640px;
+  margin: 0 auto;
+}
+#panel #key {
+  display: block;
+  margin: 1em auto;
+}
+#panel #manage-keys {
+  text-align: center;
+}
+#panel #keys {
+  padding: 2em;
+}
+#panel-main {
+  display: none;
+}
+.revoke-key {
+  margin-left: 0.5em;
+  display: inline-block;
+}
+.action {
+  cursor: pointer;
+}
+.action:hover {
+  text-decoration: underline
+}
+#panel-errors {
+  display: none;
+  background: red;
+  color: #fff;
+  text-align: center;
+  width: 100%;
+  padding: 0.5em 1em;
+}
+
 @media only screen and (max-width: 680px) {
   #stage {
     display: block;
