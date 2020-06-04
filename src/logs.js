@@ -307,7 +307,7 @@ function showLogs(logs, map, form) {
 
         // If only event in marker, remove marker entirely
         let events = popupEl.querySelectorAll('.popup-log');
-        let popupItem = popupEl.querySelector(`popup-${log.elId}`);
+        let popupItem = popupEl.querySelector(`#popup-${log.elId}`);
         if (events.length == 1) {
           markers[key].marker.remove();
           delete markers[key];
