@@ -4,6 +4,7 @@ import random
 import string
 
 class KeyRing:
+    """Manages keys (adding/revoking), which provide write access."""
     def __init__(self, path):
         self.path = path
 

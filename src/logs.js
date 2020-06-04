@@ -283,6 +283,10 @@ function showLogs(logs, map, form) {
       if (el.innerText != ld.text) {
         el.innerText = ld.text;
       }
+      el = logItem.querySelector('.logitem-location');
+      if (el.innerText != ld.location) {
+        el.innerText = ld.location;
+      }
     }
   });
 

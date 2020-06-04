@@ -70,7 +70,10 @@ LOCATIONS = {
     'NY': {
         'CAMERAS': 'cams/ny.json',
         'DB_FILE': 'logs.ny.jsonl',
-        'MAP_CENTER': [-73.96161699999999, 40.678806],
+        'MAP': {
+            'CENTER': [-73.96161699999999, 40.678806],
+            'ZOOM': 12
+        },
         'SEARCH': {
             'FILTER': ' NY ',
             'CENTER': [40.678802, -73.95528399999999],

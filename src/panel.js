@@ -44,6 +44,7 @@ function keyItem(key) {
 function loadKeys() {
   get('keys', (json) => {
     json.keys.forEach((k) => keyItem(k));
+    document.getElementById('panel-main').style.display = 'block';
   }, KEY).catch((err) => {
     showError(err);
   });
@@ -54,7 +55,6 @@ document.getElementById('key').addEventListener('keydown', (ev) => {
   if (ev.key == 'Enter') {
     KEY = ev.target.value;
     ev.target.parentNode.removeChild(ev.target);
-    document.getElementById('panel-main').style.display = 'block';
     loadKeys();
   }
 });

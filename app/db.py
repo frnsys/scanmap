@@ -41,7 +41,10 @@ class Database:
         res = cur.execute(
                 'SELECT submitter, data FROM logs WHERE location == ? AND timestamp == ?',
                 (location, timestamp)).fetchone()
-        return res[0]
+        return {
+            'submitter': res[0],
+            'data': json.loads(res[1])
+        }
 
     def delete(self, location, timestamp):
         con, cur = self._con()
