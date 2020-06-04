@@ -1,0 +1,16 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div id="panel">
+    <div id="panel-errors"></div>
+    <input id="key" type="text" placeholder="Key" autocomplete="off" />
+    <div id="panel-main">
+        <div id="manage-keys">
+            <ul id="keys"></ul>
+            <div id="add-key" class="action">Add Key</div>
+        </div>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='dist/panel.js') }}"></script>
+{% endblock %}
+
