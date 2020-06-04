@@ -147,7 +147,7 @@ function update() {
         lastSeen = l.timestamp;
       } else {
         // See if we need to update the entry
-        let el = document.getElementById(logId);
+        let el = document.getElementById(logId).querySelector('.logitem-text');
         if (el.innerText != l.text) {
           el.innerText = l.text;
         }
