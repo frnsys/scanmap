@@ -44,7 +44,7 @@ def log(location):
         if not authed:
             abort(401)
         data = request.get_json()
-        db.add(auth, data)
+        db.add(location, auth, data)
         return jsonify(success=True)
     else:
         # Limit amount of logs sent
