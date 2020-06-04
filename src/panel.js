@@ -24,7 +24,7 @@ function keyItem(key) {
       className: 'revoke-key action',
       innerText: 'revoke',
       on: {
-        'click': () => {
+        click: () => {
           if (confirm(`Are you sure you want to revoke key "${key}"?`)) {
             post('keys', {
               key: key,

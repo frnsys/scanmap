@@ -1,6 +1,6 @@
 import Map from './map';
 import Form from './form';
-import {get, el} from './util';
+import {get, post, el} from './util';
 import config from '../config';
 import setupCams from './cams';
 import mapboxgl from 'mapbox-gl';
@@ -129,18 +129,42 @@ function writeLogs(logs) {
         id: logId,
         tag: 'div',
         className: 'logitem',
+        dataset: {
+          permit: l.permit || false
+        },
         children: [{
           tag: 'div',
-          className: 'logitem-when',
-          innerText: dt,
+          className: 'logitem-log',
+          children: [{
+            tag: 'div',
+            className: 'logitem-when',
+            innerText: dt,
+          }, {
+            tag: 'div',
+            className: 'logitem-location',
+            innerText: `${ld.label && ld.label !== 'other' ? `${LABELS[ld.label]} ${ld.label} @ ` : ''}${ld.location}`
+          }, {
+            tag: 'div',
+            className: 'logitem-text',
+            innerText: ld.text
+          }]
         }, {
           tag: 'div',
-          className: 'logitem-location',
-          innerText: ``
-        }, {
-          tag: 'div',
-          className: 'logitem-text',
-          innerText: ld.text
+          className: 'delete-log',
+          innerText: '❌',
+          on: {
+            click: () => {
+              if (confirm('Are you sure you want to delete this?')) {
+                post('log/edit', {
+                  timestamp: logId,
+                  action: 'delete'
+                }, () => {
+                  logItem.parentNode.removeChild(logItem);
+                  console.log('deleted');
+                }, form.authKey);
+              }
+            }
+          }
         }]
       });
       logEl.prepend(logItem);
@@ -153,7 +177,9 @@ function writeLogs(logs) {
       lastSeen = l.timestamp;
     } else {
       // See if we need to update the entry
-      let el = document.getElementById(logId).querySelector('.logitem-text');
+      let logItem = document.getElementById(logId);
+      logItem.dataset.permit = l.permit || false;
+      let el = logItem.querySelector('.logitem-text');
       if (el.innerText != ld.text) {
         el.innerText = ld.text;
       }

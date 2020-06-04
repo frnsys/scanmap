@@ -26,11 +26,11 @@ class Map {
       .setLngLat(coords);
 
     // Setup popup
-    if (opts.desc) {
+    if (opts.element) {
       let popup = new mapboxgl.Popup({
         offset: 25,
         ...(opts.popup || {})
-      }).setHTML(opts.desc);
+      }).setDOMContent(opts.element);
 
       if (opts.onPopupOpen) {
         popup.on('open', () => opts.onPopupOpen(popup));

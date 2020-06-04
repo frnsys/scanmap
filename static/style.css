@@ -73,14 +73,12 @@ html, body {
   display: flex;
   flex-direction: column;
 }
-#log, #info {
-  padding: 1em;
-}
 #log {
   flex: 1;
   overflow-y: scroll;
 }
 #info {
+  padding: 1em;
   font-size: 0.8em;
   border-top: 1px solid #444;
 }
@@ -193,7 +191,11 @@ select {
 }
 
 .logitem {
-  margin-bottom: 1em;
+  display: flex;
+  padding: 0.5em 1em;
+}
+.logitem-log {
+  flex: 1;
 }
 .logitem-when {
   font-size: 0.8em;
@@ -201,6 +203,16 @@ select {
 }
 .logitem-location {
   font-size: 0.8em;
+}
+.logitem .delete-log {
+  display: none;
+  cursor: pointer;
+}
+.logitem[data-permit=true] .delete-log {
+  display: block;
+}
+.logitem[data-permit=true]:hover {
+  background: #2f2f2f;
 }
 
 .popup-location {

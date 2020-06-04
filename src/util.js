@@ -48,6 +48,12 @@ function el(spec) {
   });
   delete spec.on;
 
+  let dataset = spec.dataset || {};
+  Object.keys(dataset).forEach((k) => {
+    pa.dataset[k] = dataset[k];
+  });
+  delete spec.dataset;
+
   Object.keys(spec).forEach((k) => {
     pa[k] = spec[k];
   });

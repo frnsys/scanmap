@@ -36,11 +36,18 @@ class Database:
             'submitter': submitter[:8]
         } for timestamp, submitter, data in rows]
 
+    def log(self, location, timestamp):
+        con, cur = self._con()
+        res = cur.execute(
+                'SELECT submitter, data FROM logs WHERE location == ? AND timestamp == ?',
+                (location, timestamp)).fetchone()
+        return res[0]
+
     def delete(self, location, timestamp):
         con, cur = self._con()
         cur.execute(
             'DELETE FROM logs WHERE location == ? AND timestamp == ?',
-            (location, timestamp)).fetchone()
+            (location, timestamp))
         con.commit()
 
     def update(self, location, timestamp, log):
