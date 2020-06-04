@@ -37,18 +37,56 @@ def cams(location):
 @app.route('/<location>/log', methods=['GET', 'POST'])
 def log(location):
     conf = get_conf(location)
+    auth = request.headers.get('X-AUTH')
+    authed = kr.check_key(auth, location)
+    prime = kr.check_key(auth, location, typ='prime')
     if request.method == 'POST':
-        auth = request.headers.get('X-AUTH')
-        if not kr.check_key(auth, location):
+        if not authed:
             abort(401)
-
         data = request.get_json()
         db.add(auth, data)
         return jsonify(success=True)
     else:
         # Limit amount of logs sent
         logs = db.logs(location, n=config.MAX_LOGS)
+
+        # Strip submitter info
+        # Check permissions
+        for l in logs:
+            submitter = l.pop('submitter')
+            if authed and (prime or auth.startswith(submitter)):
+                l['permit'] = True
         return jsonify(logs=logs)
+
+@app.route('/<location>/log/edit', methods=['POST'])
+def edit_log(location):
+    auth = request.headers.get('X-AUTH')
+    authed = kr.check_key(auth, location)
+    prime = kr.check_key(auth, location, typ='prime')
+
+    # Abort if not authed at all
+    if not authed:
+        abort(401)
+
+    if request.method == 'POST':
+        data = request.get_json()
+        action = data['action']
+        timestamp = data['timestamp']
+        log = db.log(location, timestamp)
+
+        # Abort if not prime key or not submitter
+        if prime or auth == log['submitter']:
+            if action == 'delete':
+                db.delete(location, timestamp)
+                return jsonify(success=True)
+            elif action == 'update':
+                log = data['log']
+                db.update(location, timestamp, log)
+                return jsonify(success=True)
+            return jsonify(success=False, error='Unknown action')
+        else:
+            abort(401)
+    return jsonify(success=False)
 
 @app.route('/<location>/location', methods=['POST'])
 def query_location(location):
@@ -62,7 +100,6 @@ def query_location(location):
 
 
 # Panel
-
 @app.route('/<location>/panel')
 def panel(location):
     conf = get_conf(location)
@@ -88,26 +125,6 @@ def keys(location):
 
     keys = kr.get_keys(location, typ='write')
     return jsonify(keys=keys)
-
-@app.route('/<location>/log/edit', methods=['POST'])
-def edit_log(location):
-    auth = request.headers.get('X-AUTH')
-    if not kr.check_key(auth, location, typ='prime'):
-        abort(401)
-
-    if request.method == 'POST':
-        data = request.get_json()
-        action = data['action']
-        timestamp = data['timestamp']
-        if action == 'delete':
-            db.delete(location, timestamp)
-            return jsonify(success=True)
-        elif action == 'update':
-            log = data['log']
-            db.update(location, timestamp, log)
-            return jsonify(success=True)
-        return jsonify(success=False)
-    return jsonify(success=False)
 
 
 if __name__ == '__main__':
