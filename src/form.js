@@ -11,7 +11,22 @@ class Form {
     this.authKey = '';
     this.marker = null;
 
-    this.lastSubmission = null;
+    document.getElementById('ready').addEventListener('click', () => {
+        overlay.style.display = 'none';
+    });
+    document.getElementById('show-help').addEventListener('click', () => {
+      overlay.style.display = 'block';
+    });
+    document.getElementById('location').addEventListener('keydown', (ev) => {
+      if (ev.key == 'Enter') {
+        this.queryLocation(ev.target.value);
+      }
+    });
+    document.getElementById('location-search').addEventListener('click', () => {
+      this.queryLocation(document.getElementById('location').value);
+    });
+
+    document.getElementById('submit').addEventListener('click', () => this.submit());
   }
 
   queryLocation(query) {
@@ -66,26 +81,9 @@ class Form {
 
     // Show intro and bind help button
     overlay.style.display = 'block';
-    document.getElementById('ready').addEventListener('click', () => {
-        overlay.style.display = 'none';
-    });
-    document.getElementById('show-help').addEventListener('click', () => {
-      overlay.style.display = 'block';
-    });
 
     // Show form
     document.getElementById('append').style.display = 'block';
-    document.getElementById('location').addEventListener('keydown', (ev) => {
-      if (ev.key == 'Enter') {
-        this.queryLocation(ev.target.value);
-      }
-    });
-    document.getElementById('location-search').addEventListener('click', () => {
-      this.queryLocation(document.getElementById('location').value);
-    });
-
-    // Send log
-    document.getElementById('submit').addEventListener('click', () => this.submit());
   }
 
   submit() {
@@ -99,10 +97,6 @@ class Form {
       alert('Please fill in the note, location, and coordinates');
 
     } else {
-      // Debounce, avoid duplicate submissions
-      let h = JSON.stringify(data);
-      if (this.lastSubmission == h) return;
-
       console.log(data);
       this.post('log', data, (json) => {
         // Reset fields
@@ -115,7 +109,6 @@ class Form {
         });
         if (this.marker) this.marker.remove();
       });
-      this.lastSubmission = h;
     }
   }
 
