@@ -18,13 +18,16 @@ VERSION = '1591117380'
 # Maximum amount of logs to send
 MAX_LOGS = 200
 
+# Where the database and keys files are located
+DB_PATH = 'data/logs.db'
+KEYS_FILE = 'data/keys.yml'
+
 # For querying coordinates for locations
 GOOGLE_PLACES_API_KEY = '<key>'
 
 LOCATIONS = {
     '<location key:NY>': {
         'CAMERAS': '<traffic cam file:cams/ny.json>',
-        'DB_FILE': '<db file name:logs.ny.jsonl>',
         'MAP_CENTER': <lnglat:[-73.96161699999999, 40.678806]>,
         'SEARCH': {
             'FILTER': '<address filter term: NY >',
@@ -39,7 +42,9 @@ LOCATIONS = {
 ```
 # keys.yml
 - <location key:NY>:
+    prime: # admin keys
     - <auth key>
+    write: # regular write access keys
     - <auth key>
     - <auth key>
 ```
@@ -55,7 +60,7 @@ LOCATIONS = {
 
 # Deployment notes
 
-- Ensure that proper permissions/ownership are set for the log files (`*.jsonl`)
+- Ensure that proper permissions/ownership are set for files that are written to (e.g. `data/keys.yml`)
 
 ---
 
@@ -64,12 +69,13 @@ Example `config.py`:
 ```
 VERSION = '1591117380'
 MAX_LOGS = 200
+DB_PATH = 'data/logs.db'
+KEYS_FILE = 'data/keys.yml'
 GOOGLE_PLACES_API_KEY = '<KEY>'
 
 LOCATIONS = {
     'NY': {
         'CAMERAS': 'cams/ny.json',
-        'DB_FILE': 'logs.ny.jsonl',
         'MAP': {
             'CENTER': [-73.96161699999999, 40.678806],
             'ZOOM': 12
