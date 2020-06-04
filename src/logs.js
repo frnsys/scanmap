@@ -175,7 +175,7 @@ function showLogs(logs, map, form) {
               className: 'logitem-location',
               innerText: log.location,
               on: {
-                click: (ev) => {
+                dblclick: (ev) => {
                   if (ev.target.closest('.logitem').dataset.permit == 'true') {
                     let inp = ev.target.parentNode.querySelector('.logitem-location-input');
                     let can = ev.target.parentNode.querySelector('.logitem-edit-cancel');
@@ -254,7 +254,7 @@ function showLogs(logs, map, form) {
             className: 'logitem-text',
             innerText: log.text,
             on: {
-              click: (ev) => {
+              dblclick: (ev) => {
                 if (ev.target.closest('.logitem').dataset.permit == 'true') {
                   let inp = ev.target.parentNode.querySelector('.logitem-text-input');
                   inp.style.display = 'block';
