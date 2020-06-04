@@ -1,0 +1,10 @@
+.DS_Store
+__pycache__/
+config.js
+config.py
+data/keys.yml
+data/logs.db
+node_modules/
+static/dist/
+venv/
+env/
