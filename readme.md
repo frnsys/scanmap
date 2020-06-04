@@ -1,8 +1,9 @@
 App is broken down by location, which is just a key identifying a location, e.g. `NY`.
 
-You need two files to configure the application:
+You need three files to configure the application:
 
 - `config.py`: general app/maps configuration options
+- `config.js`: mostly for setting up mapbox
 - `keys.yml`: adding/revoking keys for adding to maps
 
 Notation here is `<description:example value>`.
@@ -78,4 +79,12 @@ LOCATIONS = {
         'INFO': ''
     }
 }
+```
+
+Example `config.js`:
+
+```
+export default {
+  MAPBOX_TOKEN: '<mapbox token>'
+};
 ```
