@@ -28,23 +28,24 @@ class Database:
     def logs(self, location, n):
         con, cur = self._con()
         rows = cur.execute(
-                'SELECT timestamp, submitter, data FROM logs WHERE location == ? LIMIT ?',
+                'SELECT timestamp, submitter, data FROM logs WHERE location == ? ORDER BY timestamp DESC LIMIT ?',
                 (location, n)).fetchall()
         return [{
             'timestamp': timestamp,
             'data': json.loads(data),
-            'submitter': submitter[:8]
-        } for timestamp, submitter, data in rows]
+            'submitter': submitter[:8] if submitter else None
+        } for timestamp, submitter, data in rows][::-1]
 
     def log(self, location, timestamp):
         con, cur = self._con()
         res = cur.execute(
                 'SELECT submitter, data FROM logs WHERE location == ? AND timestamp == ?',
                 (location, timestamp)).fetchone()
-        return {
-            'submitter': res[0],
-            'data': json.loads(res[1])
-        }
+        if res:
+            return {
+                'submitter': res[0],
+                'data': json.loads(res[1])
+            }
 
     def delete(self, location, timestamp):
         con, cur = self._con()

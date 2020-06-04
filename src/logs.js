@@ -287,49 +287,51 @@ function showLogs(logs, map, form) {
     } else {
       // See if we need to update the entry
       let logItem = document.getElementById(log.elId);
-      logItem.dataset.permit = log.permit || false;
-      let el = logItem.querySelector('.logitem-text');
-      if (el.innerText != log.text) {
-        el.innerText = log.text;
-      }
-      el = logItem.querySelector('.logitem-location');
-      if (el.innerText != log.location) {
-        el.innerText = log.location;
-      }
-
-      // Move marker if necessary
-      if (logItem.dataset.coords != log.coordinates) {
-        // Get existing marker
-        let coords = logItem.dataset.coords.split(',').map((c) => parseFloat(c));
-        let key = `${coords[1]}_${coords[0]}`;
-        let markerEl = markers[key].marker.getElement();
-        let popupEl = markers[key].marker.getPopup()._content;
-
-        // If only event in marker, remove marker entirely
-        let events = popupEl.querySelectorAll('.popup-log');
-        let popupItem = popupEl.querySelector(`#popup-${log.elId}`);
-        if (events.length == 1) {
-          markers[key].marker.remove();
-          delete markers[key];
-
-        // Otherwise, only remove that event
-        } else {
-          popupItem.parentNode.removeChild(popupItem);
-
-          // Update icon
-          let mostRecent = popupEl.querySelector('.popup-log');
-          let icon = mostRecent.dataset.icon;
-          if (icon) {
-            markerEl.innerText = icon;
-            markerEl.style.background = 'none';
-          } else {
-            markerEl.innerText = '';
-            markerEl.style.background = 'red';
-          }
+      if (logItem) {
+        logItem.dataset.permit = log.permit || false;
+        let el = logItem.querySelector('.logitem-text');
+        if (el.innerText != log.text) {
+          el.innerText = log.text;
+        }
+        el = logItem.querySelector('.logitem-location');
+        if (el.innerText != log.location) {
+          el.innerText = log.location;
         }
 
-        addOrUpdateMarker(log, map);
-        logItem.dataset.coords = log.coordinates;
+        // Move marker if necessary
+        if (logItem.dataset.coords != log.coordinates) {
+          // Get existing marker
+          let coords = logItem.dataset.coords.split(',').map((c) => parseFloat(c));
+          let key = `${coords[1]}_${coords[0]}`;
+          let markerEl = markers[key].marker.getElement();
+          let popupEl = markers[key].marker.getPopup()._content;
+
+          // If only event in marker, remove marker entirely
+          let events = popupEl.querySelectorAll('.popup-log');
+          let popupItem = popupEl.querySelector(`#popup-${log.elId}`);
+          if (events.length == 1) {
+            markers[key].marker.remove();
+            delete markers[key];
+
+          // Otherwise, only remove that event
+          } else {
+            popupItem.parentNode.removeChild(popupItem);
+
+            // Update icon
+            let mostRecent = popupEl.querySelector('.popup-log');
+            let icon = mostRecent.dataset.icon;
+            if (icon) {
+              markerEl.innerText = icon;
+              markerEl.style.background = 'none';
+            } else {
+              markerEl.innerText = '';
+              markerEl.style.background = 'red';
+            }
+          }
+
+          addOrUpdateMarker(log, map);
+          logItem.dataset.coords = log.coordinates;
+        }
       }
     }
   });
@@ -338,7 +340,9 @@ function showLogs(logs, map, form) {
   logIds.forEach((logId) => {
     [logId, `popup-${logId}`].forEach((id) => {
       let el = document.getElementById(id);
-      el.parentNode.removeChild(el);
+      if (el) {
+        el.parentNode.removeChild(el);
+      }
     });
   });
 }

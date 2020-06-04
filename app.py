@@ -73,6 +73,8 @@ def edit_log(location):
         action = data['action']
         timestamp = data['timestamp']
         log = db.log(location, timestamp)
+        if log is None:
+            abort(404)
 
         # Abort if not prime key or not submitter
         if prime or auth == log['submitter']:
