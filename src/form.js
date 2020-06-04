@@ -6,6 +6,7 @@ const errEl = document.getElementById('error');
 const statusEl = document.getElementById('status');
 const resultsEl = document.getElementById('coord-results');
 const coordsEl = document.getElementById('coordinates');
+const authStatusEl = document.getElementById('auth-status');
 
 class Form {
   constructor(map) {
@@ -83,11 +84,27 @@ class Form {
   activate(authKey) {
     this.authKey = authKey || prompt('Key');
 
-    // Show intro and bind help button
-    overlay.style.display = 'block';
+    if (this.authKey.trim() == "") return;
 
-    // Show form
-    document.getElementById('append').style.display = 'block';
+    authStatusEl.innerText = 'Authorizing';
+    authStatusEl.style.display = 'block';
+    // Reset error
+    post('checkauth', {}, (results) => {
+      if (results.success === true) {
+        // Show intro and bind help button
+        authStatusEl.style.display = 'none';
+        overlay.style.display = 'block';
+
+        // Show form
+        document.getElementById('append').style.display = 'block';
+      } else {
+        authStatusEl.innerText = 'Invalid key';
+        authStatusEl.style.display = 'block';
+      }
+    }, this.authKey).catch((err) => {
+      authStatusEl.innerText = err;
+      authStatusEl.style.display = 'block';
+    });
   }
 
   submit() {

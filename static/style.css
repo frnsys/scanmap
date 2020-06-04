@@ -168,6 +168,22 @@ a, a:visited {
   display: none;
 }
 
+#auth-status {
+  background: red;
+  color: #fff;
+  padding: 1.25em 1.5em;
+  font-size: 0.8em;
+  display: none;
+  position: fixed;
+  top: 20px;
+  height: auto;
+  width: 100%;
+  text-align: center;
+  width: 30%;
+  left: 50%;
+  margin-left: -15%;
+}
+
 ul, li {
   list-style-type: none;
   margin: 0;
