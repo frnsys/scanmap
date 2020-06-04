@@ -131,7 +131,6 @@ function removeLogFromMarker(key, elId) {
 function showLogs(logs, map, form) {
   // Track what log entries we have
   let logIds = new Set([...document.querySelectorAll('.logitem')].map((el) => el.id));
-  console.log(logIds);
 
   logs.forEach((l) => {
     let log = {

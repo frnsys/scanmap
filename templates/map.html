@@ -56,7 +56,7 @@
 <script>
 const MAP_CENTER = {{ conf.MAP['CENTER'] }};
 const MAP_ZOOM = {{ conf.MAP['ZOOM'] }};
-const VERSION = '{{ version }}';
+const VERSION = '{{ config.VERSION }}';
 </script>
-<script src="{{ url_for('static', filename='dist/main.js') }}?{{version}}"></script>
+<script src="{{ url_for('static', filename='dist/main.js') }}?{{config.VERSION}}"></script>
 {% endblock %}

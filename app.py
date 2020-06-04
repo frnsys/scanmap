@@ -6,6 +6,7 @@ from app.geo import search_places
 from flask import Flask, abort, request, render_template, jsonify
 
 app = Flask(__name__)
+app.config.from_object(config)
 kr = KeyRing(config.KEYS_FILE)
 db = Database(config.DB_PATH)
 
@@ -26,7 +27,7 @@ def version():
 @app.route('/<location>/')
 def map(location):
     conf = get_conf(location)
-    return render_template('map.html', conf=conf, version=config.VERSION)
+    return render_template('map.html', conf=conf)
 
 @app.route('/<location>/cams')
 def cams(location):
