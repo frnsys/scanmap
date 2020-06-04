@@ -100,7 +100,7 @@ a, a:visited {
   bottom: 1em;
   left: 1em;
   display: none;
-  min-width: 280px;
+  width: 280px;
   z-index: 10;
 }
 #append-form {
@@ -127,9 +127,14 @@ a, a:visited {
 #coord-results {
   color: #000;
   font-size: 0.8em;
+  height: 12em;
 }
 #coord-results li {
   cursor: pointer;
+  border-bottom: 1px solid #ccc;
+}
+#coord-results li:hover {
+  background: #eee;
 }
 #coord-results .selected {
   color: blue;

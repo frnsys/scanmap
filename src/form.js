@@ -1,4 +1,4 @@
-import {post} from './util';
+import {post, debounce} from './util';
 
 const fields = ['text', 'location', 'coordinates', 'label'];
 const overlay = document.getElementById('overlay');
@@ -16,14 +16,16 @@ class Form {
     document.getElementById('ready').addEventListener('click', () => {
         overlay.style.display = 'none';
     });
+
     document.getElementById('show-help').addEventListener('click', () => {
       overlay.style.display = 'block';
     });
-    document.getElementById('location').addEventListener('keydown', (ev) => {
-      if (ev.key == 'Enter') {
+
+    // autocomplete location search every 250ms
+    document.getElementById('location').addEventListener('keydown', debounce((ev) => {
         this.queryLocation(ev.target.value);
-      }
-    });
+    }, 250));
+
     document.getElementById('location-search').addEventListener('click', () => {
       this.queryLocation(document.getElementById('location').value);
     });
@@ -32,8 +34,8 @@ class Form {
   }
 
   queryLocation(query) {
-    statusEl.innerText = 'Searching...';
-    statusEl.style.display = 'block';
+    // statusEl.innerText = 'Searching...';
+    // statusEl.style.display = 'block';
 
     // Search for possible coordinates
     // based on inputted location
@@ -44,9 +46,9 @@ class Form {
       resultsEl.innerHTML = '';
       if (json.results.length > 0) {
         // Choose first result by default
-        let res = json.results[0];
-        coordsEl.value = res.coordinates;
-        this.previewCoords([res.coordinates[1], res.coordinates[0]], true);
+        // let res = json.results[0];
+        // coordsEl.value = res.coordinates;
+        // this.previewCoords([res.coordinates[1], res.coordinates[0]], true);
 
         // Only show first 5 results
         json.results.slice(0, 5).forEach((res) => {
