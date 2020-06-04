@@ -1,23 +1,13 @@
-import json
 import config
-import requests
-import keydb as kdb
-from datetime import datetime, timezone
+from app.db import Database
+from app.cams import cameras
+from app.keys import KeyRing
+from app.geo import search_places
 from flask import Flask, abort, request, render_template, jsonify
 
 app = Flask(__name__)
-
-CAMERAS = {}
-for loc, conf in config.LOCATIONS.items():
-    if conf.get('CAMERAS'):
-        cams = json.load(open(conf['CAMERAS']))
-        cams = [{
-            'lat': float(c['latitude']),
-            'lng': float(c['longitude']),
-            'url': c['img_url']
-        } for c in cams]
-        CAMERAS[loc] = cams
-
+kr = KeyRing(config.KEYS_FILE)
+db = Database(config.DB_PATH)
 
 def get_conf(loc):
     try:
@@ -40,9 +30,38 @@ def map(location):
 
 @app.route('/<location>/cams')
 def cams(location):
-    cameras = CAMERAS.get(location, [])
+    cams = cameras.get(location, [])
     conf = get_conf(location)
-    return jsonify(cams=cameras)
+    return jsonify(cams=cams)
+
+@app.route('/<location>/log', methods=['GET', 'POST'])
+def log(location):
+    conf = get_conf(location)
+    if request.method == 'POST':
+        auth = request.headers.get('X-AUTH')
+        if not kr.check_key(auth, location):
+            abort(401)
+
+        data = request.get_json()
+        db.add(auth, data)
+        return jsonify(success=True)
+    else:
+        # Limit amount of logs sent
+        logs = db.logs(location, n=config.MAX_LOGS)
+        return jsonify(logs=logs)
+
+@app.route('/<location>/location', methods=['POST'])
+def query_location(location):
+    conf = get_conf(location)
+    auth = request.headers.get('X-AUTH')
+    if not kr.check_key(auth, location):
+        abort(401)
+    data = request.get_json()
+    results = search_places(data['query'], conf)
+    return jsonify(results=results)
+
+
+# Panel
 
 @app.route('/<location>/panel')
 def panel(location):
@@ -52,89 +71,43 @@ def panel(location):
 @app.route('/<location>/keys', methods=['GET', 'POST'])
 def keys(location):
     auth = request.headers.get('X-AUTH')
-    if not kdb.check_key(auth, location, typ='prime'):
+    if not kr.check_key(auth, location, typ='prime'):
         abort(401)
 
     if request.method == 'POST':
         data = request.get_json()
         action = data['action']
         if action == 'revoke':
-            kdb.del_key(location, 'write', data['key'])
+            kr.del_key(location, 'write', data['key'])
             return jsonify(success=True)
         elif action == 'create':
-            key = kdb.new_key()
-            kdb.add_key(location, 'write', key)
+            key = kr.new_key()
+            kr.add_key(location, 'write', key)
             return jsonify(success=True, key=key)
         return jsonify(success=False)
 
-    keys = kdb.get_keys(location, typ='write')
+    keys = kr.get_keys(location, typ='write')
     return jsonify(keys=keys)
 
-@app.route('/<location>/log', methods=['GET', 'POST'])
-def log(location):
-    conf = get_conf(location)
-    if request.method == 'POST':
-        auth = request.headers.get('X-AUTH')
-        if not kdb.check_key(auth, location):
-            abort(401)
-
-        data = request.get_json()
-        data['submitter'] = auth
-        data['timestamp'] = datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()
-        with open(conf['DB_FILE'], 'a') as f:
-            f.write(json.dumps(data) + '\n')
-        return jsonify(success=True)
-    else:
-        try:
-            with open(conf['DB_FILE'], 'r') as f:
-                logs = f.read().split('\n')
-        except FileNotFoundError:
-            logs = []
-
-        # Limit amount of logs sent
-        logs = logs[-config.MAX_LOGS:]
-        return jsonify(logs=[json.loads(l) for l in logs if l])
-
-@app.route('/<location>/location', methods=['POST'])
-def query_location(location):
-    conf = get_conf(location)
+@app.route('/<location>/log/edit', methods=['POST'])
+def edit_log(location):
     auth = request.headers.get('X-AUTH')
-    if not kdb.check_key(auth, location):
+    if not kr.check_key(auth, location, typ='prime'):
         abort(401)
-    data = request.get_json()
-    results = google_search_places(data['query'], conf)
-    return jsonify(results=results)
 
-def google_search_places(query, conf):
-    """Reference: <https://developers.google.com/places/web-service/search?hl=ru#nearby-search-and-text-search-responses>"""
-    params = {
-        'key': config.GOOGLE_PLACES_API_KEY,
-        'query': query,
-
-        # Influence results
-        'location': conf['SEARCH']['CENTER'],
-        'radius': conf['SEARCH']['RADIUS']
-    }
-
-    # Not paginating results because we
-    # only will show a few
-    resp = requests.get(
-            'https://maps.googleapis.com/maps/api/place/textsearch/json',
-            params=params)
-    data = resp.json()
-    results = data['results']
-
-    # Hard filter to keep search results relevant to the region
-    results = [r for r in results
-                if conf['SEARCH']['FILTER'] in r['formatted_address']]
-
-    return [{
-        'name': r['name'],
-        'coordinates': [
-            r['geometry']['location']['lat'],
-            r['geometry']['location']['lng']
-        ]
-    } for r in results]
+    if request.method == 'POST':
+        data = request.get_json()
+        action = data['action']
+        timestamp = data['timestamp']
+        if action == 'delete':
+            db.delete(location, timestamp)
+            return jsonify(success=True)
+        elif action == 'update':
+            log = data['log']
+            db.update(location, timestamp, log)
+            return jsonify(success=True)
+        return jsonify(success=False)
+    return jsonify(success=False)
 
 
 if __name__ == '__main__':
