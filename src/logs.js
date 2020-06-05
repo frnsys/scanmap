@@ -123,17 +123,19 @@ function removeLogFromMarker(key, elId) {
 
     // Otherwise, only remove that event
     } else {
-      popupItem.parentNode.removeChild(popupItem);
+      if (popupItem) {
+        popupItem.parentNode.removeChild(popupItem);
 
-      // Update icon
-      let mostRecent = popupEl.querySelector('.popup-log');
-      let icon = mostRecent.dataset.icon;
-      if (icon) {
-        markerEl.innerText = icon;
-        markerEl.style.background = 'none';
-      } else {
-        markerEl.innerText = '';
-        markerEl.style.background = 'red';
+        // Update icon
+        let mostRecent = popupEl.querySelector('.popup-log');
+        let icon = mostRecent.dataset.icon;
+        if (icon) {
+          markerEl.innerText = icon;
+          markerEl.style.background = 'none';
+        } else {
+          markerEl.innerText = '';
+          markerEl.style.background = 'red';
+        }
       }
     }
   }
