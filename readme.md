@@ -84,6 +84,7 @@ KEYS_FILE = 'data/keys.yml'
 GOOGLE_PLACES_API_KEY = '<KEY>'
 REDIS_URL = 'redis://localhost'
 DEBUG = False
+REDIS_URL = 'redis://localhost'
 
 LOCATIONS = {
     'NY': {
