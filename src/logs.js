@@ -13,6 +13,7 @@ const LABELS = {
   'alert': '⚠',
   'police_presence':'👮',
   'units_requested':'🚓',
+  'arrest': '🚨',
   'fire': '🔥',
   'prisoner_van': '🚐',
   'group': '🚩',
