@@ -17,7 +17,7 @@ setInterval(() => {
       location.reload();
     }
   });
-}, 5000);
+}, 5*60*1000);
 
 function update() {
   get('log', ({logs}) => {
