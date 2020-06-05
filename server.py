@@ -65,6 +65,7 @@ def log(location):
         data = request.get_json()
         db.add(location, key, data)
         timestamp = datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()
+        cache.clear()
         sse.publish(json.dumps(
             {'data': data, 'timestamp': timestamp}), channel=location)
         return jsonify(success=True)
@@ -102,12 +103,14 @@ def edit_log(location):
         if auth == 'prime' or key == log['submitter']:
             if action == 'delete':
                 db.delete(location, timestamp)
+                cache.clear()
                 sse.publish('delete' , channel=location)
                 return jsonify(success=True)
             elif action == 'update':
                 for k, v in data['changes'].items():
                     log['data'][k] = v
                 db.update(location, timestamp, log['data'])
+                cache.clear()
                 sse.publish('update' , channel=location)
                 return jsonify(success=True)
             return jsonify(success=False, error='Unknown action')
