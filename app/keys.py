@@ -9,15 +9,15 @@ class KeyRing:
         self.path = path
 
     def check_key(self, key, loc, typ=None):
-        valid = self.get_keys(loc, typ=typ)
-        return key in valid
+        valid = self.get_keys(loc)
+        for typ, keys in valid.items():
+            if key in valid:
+                return typ
+        return False
 
-    def get_keys(self, loc, typ=None):
+    def get_keys(self, loc):
         keys = self.load_keys()
-        if typ:
-            return keys.get(loc, {}).get(typ, [])
-        else:
-            return sum(keys.get(loc, {}).values(), [])
+        return keys.get(loc, {})
 
     def new_key(self):
         return ''.join(random.choices(

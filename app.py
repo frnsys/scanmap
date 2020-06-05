@@ -44,16 +44,16 @@ def cams(location):
         make_cache_key=lambda *args, **kwargs: '{}_{}'.format(
             request.path,
             request.headers.get('X-AUTH', 'noauth')))
+
 def log(location):
     conf = get_conf(location)
-    auth = request.headers.get('X-AUTH')
-    authed = kr.check_key(auth, location)
-    prime = kr.check_key(auth, location, typ='prime')
+    key = request.headers.get('X-AUTH')
+    auth = kr.check_key(key, location)
     if request.method == 'POST':
-        if not authed:
+        if not auth:
             abort(401)
         data = request.get_json()
-        db.add(location, auth, data)
+        db.add(location, key, data)
         return jsonify(success=True)
     else:
         # Limit amount of logs sent
@@ -63,18 +63,17 @@ def log(location):
         # Check permissions
         for l in logs:
             submitter = l.pop('submitter')
-            if authed and (prime or auth.startswith(submitter)):
+            if auth and (auth == 'prime' or key.startswith(submitter)):
                 l['permit'] = True
         return jsonify(logs=logs)
 
 @app.route('/<location>/log/edit', methods=['POST'])
 def edit_log(location):
-    auth = request.headers.get('X-AUTH')
-    authed = kr.check_key(auth, location)
-    prime = kr.check_key(auth, location, typ='prime')
+    key = request.headers.get('X-AUTH')
+    auth = kr.check_key(key, location)
 
     # Abort if not authed at all
-    if not authed:
+    if not auth:
         abort(401)
 
     if request.method == 'POST':
@@ -86,7 +85,7 @@ def edit_log(location):
             abort(404)
 
         # Abort if not prime key or not submitter
-        if prime or auth == log['submitter']:
+        if auth == 'prime' or key == log['submitter']:
             if action == 'delete':
                 db.delete(location, timestamp)
                 return jsonify(success=True)
@@ -103,8 +102,8 @@ def edit_log(location):
 @app.route('/<location>/location', methods=['POST'])
 def query_location(location):
     conf = get_conf(location)
-    auth = request.headers.get('X-AUTH')
-    if not kr.check_key(auth, location):
+    key = request.headers.get('X-AUTH')
+    if not kr.check_key(key, location):
         abort(401)
     data = request.get_json()
     results = search_places(data['query'], conf)
@@ -119,8 +118,8 @@ def panel(location):
 
 @app.route('/<location>/keys', methods=['GET', 'POST'])
 def keys(location):
-    auth = request.headers.get('X-AUTH')
-    if not kr.check_key(auth, location, typ='prime'):
+    key = request.headers.get('X-AUTH')
+    if not kr.check_key(key, location) == 'prime':
         abort(401)
 
     if request.method == 'POST':
@@ -135,15 +134,14 @@ def keys(location):
             return jsonify(success=True, key=key)
         return jsonify(success=False)
 
-    keys = kr.get_keys(location, typ='write')
+    keys = kr.get_keys(location).get('write')
     return jsonify(keys=keys)
 
 @app.route('/<location>/checkauth', methods=['POST'])
 def check_auth(location):
-    auth = request.headers.get('X-AUTH')
-    success = kr.check_key(auth, location)
-    return jsonify(success=success)
-
+    key = request.headers.get('X-AUTH')
+    typ = kr.check_key(key, location)
+    return jsonify(success=bool(typ))
 
 
 if __name__ == '__main__':
