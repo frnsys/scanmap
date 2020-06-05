@@ -327,6 +327,12 @@ select {
   padding: 0.5em 1em;
 }
 
+#legend {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+}
+
 @media only screen and (max-width: 680px) {
   #stage {
     display: block;
