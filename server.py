@@ -11,7 +11,6 @@ from datetime import datetime, timezone
 
 app = Flask(__name__)
 app.config.from_object(config)
-app.config['REDIS_URL'] = 'redis://localhost'
 app.register_blueprint(sse, url_prefix='/location-stream')
 
 kr = KeyRing(config.KEYS_FILE)
