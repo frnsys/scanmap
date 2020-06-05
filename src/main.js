@@ -17,7 +17,7 @@ setInterval(() => {
       location.reload();
     }
   });
-}, 5000);
+}, 5*60*1000);
 
 function update() {
   get('log', ({logs}) => {
@@ -54,6 +54,12 @@ window.queryMap = () => {
 
 document.getElementById('add').addEventListener('click', () => {
   form.activate();
+});
+document.getElementById('info-toggle').addEventListener('click', () => {
+  let b = document.getElementById('info-body');
+  let open = b.style.display != 'none';
+  b.style.display = open ? 'none' : 'block';
+  document.getElementById('info-toggle').innerText = open ? '▲' : '▼';
 });
 
 update();

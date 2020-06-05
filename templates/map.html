@@ -6,10 +6,13 @@
     <div id="bar">
         <div id="log"></div>
         <div id="info">
-            <div>{{ conf.INFO | safe }}</div>
-            <div id="toggle-cams"><input type="checkbox" autocomplete="off" id="cam-toggle-input"> <label for="cam-toggle-input">Toggle cams</label></div>
-            <div id="add">If you have a key, click here to start adding.</div>
-            <div>Questions or issues? DM me <a href="https://twitter.com/frnsys">@frnsys</a>.</div>
+            <div id="info-toggle">▼</div>
+            <div id="info-body">
+                <div>{{ conf.INFO | safe }}</div>
+                <div id="toggle-cams"><input type="checkbox" autocomplete="off" id="cam-toggle-input"> <label for="cam-toggle-input">Toggle cams</label></div>
+                <div id="add">If you have a key, click here to start adding.</div>
+                <div id="legend"></div>
+            </div>
         </div>
     </div>
     <div id="overlay">
@@ -57,7 +60,7 @@
 <script>
 const MAP_CENTER = {{ conf.MAP['CENTER'] }};
 const MAP_ZOOM = {{ conf.MAP['ZOOM'] }};
-const VERSION = '{{ version }}';
+const VERSION = '{{ config.VERSION }}';
 </script>
-<script src="{{ url_for('static', filename='dist/main.js') }}?{{version}}"></script>
+<script src="{{ url_for('static', filename='dist/main.js') }}?{{config.VERSION}}"></script>
 {% endblock %}

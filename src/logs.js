@@ -10,7 +10,6 @@ const markers = {};
 const logMarkers = {};
 
 const LABELS = {
-  'other': '',
   'alert': '⚠',
   'police_presence':'👮',
   'units_requested':'🚓',
@@ -18,14 +17,23 @@ const LABELS = {
   'prisoner_van': '🚐',
   'group': '🚩',
   'injury': '🩹',
-  'barricade': '🚧'
+  'barricade': '🚧',
+  'other': ''
 };
 const labelsEl = document.getElementById('label');
+const legendEl = document.getElementById('legend');
 Object.keys(LABELS).forEach((label) => {
+  // Form dropdown
   let el = document.createElement('option');
   el.innerText = `${LABELS[label]} ${label}`
   el.value = label;
   labelsEl.appendChild(el);
+
+  // Legend
+  let icon = label == 'other' ? '🔴' : LABELS[label];
+  el = document.createElement('span');
+  el.innerText = `${icon} ${label}`;
+  legendEl.appendChild(el);
 });
 
 function addOrUpdateMarker(log, map) {
@@ -100,30 +108,32 @@ function addOrUpdateMarker(log, map) {
 }
 
 function removeLogFromMarker(key, elId) {
-  let {marker} = markers[key];
-  let markerEl = marker.getElement();
-  let popupEl = marker.getPopup()._content;
+  if (markers[key]) {
+    let {marker} = markers[key];
+    let markerEl = marker.getElement();
+    let popupEl = marker.getPopup()._content;
 
-  // If only event in marker, remove marker entirely
-  let events = popupEl.querySelectorAll('.popup-log');
-  let popupItem = popupEl.querySelector(`#popup-${elId}`);
-  if (events.length == 1) {
-    markers[key].marker.remove();
-    delete markers[key];
+    // If only event in marker, remove marker entirely
+    let events = popupEl.querySelectorAll('.popup-log');
+    let popupItem = popupEl.querySelector(`#popup-${elId}`);
+    if (events.length == 1) {
+      markers[key].marker.remove();
+      delete markers[key];
 
-  // Otherwise, only remove that event
-  } else {
-    popupItem.parentNode.removeChild(popupItem);
-
-    // Update icon
-    let mostRecent = popupEl.querySelector('.popup-log');
-    let icon = mostRecent.dataset.icon;
-    if (icon) {
-      markerEl.innerText = icon;
-      markerEl.style.background = 'none';
+    // Otherwise, only remove that event
     } else {
-      markerEl.innerText = '';
-      markerEl.style.background = 'red';
+      popupItem.parentNode.removeChild(popupItem);
+
+      // Update icon
+      let mostRecent = popupEl.querySelector('.popup-log');
+      let icon = mostRecent.dataset.icon;
+      if (icon) {
+        markerEl.innerText = icon;
+        markerEl.style.background = 'none';
+      } else {
+        markerEl.innerText = '';
+        markerEl.style.background = 'red';
+      }
     }
   }
 }
@@ -131,7 +141,6 @@ function removeLogFromMarker(key, elId) {
 function showLogs(logs, map, form) {
   // Track what log entries we have
   let logIds = new Set([...document.querySelectorAll('.logitem')].map((el) => el.id));
-  console.log(logIds);
 
   logs.forEach((l) => {
     let log = {
@@ -176,7 +185,7 @@ function showLogs(logs, map, form) {
               className: 'logitem-location',
               innerText: log.location,
               on: {
-                click: (ev) => {
+                dblclick: (ev) => {
                   if (ev.target.closest('.logitem').dataset.permit == 'true') {
                     let inp = ev.target.parentNode.querySelector('.logitem-location-input');
                     let can = ev.target.parentNode.querySelector('.logitem-edit-cancel');
@@ -255,7 +264,7 @@ function showLogs(logs, map, form) {
             className: 'logitem-text',
             innerText: log.text,
             on: {
-              click: (ev) => {
+              dblclick: (ev) => {
                 if (ev.target.closest('.logitem').dataset.permit == 'true') {
                   let inp = ev.target.parentNode.querySelector('.logitem-text-input');
                   inp.style.display = 'block';
