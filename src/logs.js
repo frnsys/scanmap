@@ -10,7 +10,6 @@ const markers = {};
 const logMarkers = {};
 
 const LABELS = {
-  'other': '',
   'alert': '⚠',
   'police_presence':'👮',
   'units_requested':'🚓',
@@ -18,14 +17,23 @@ const LABELS = {
   'prisoner_van': '🚐',
   'group': '🚩',
   'injury': '🩹',
-  'barricade': '🚧'
+  'barricade': '🚧',
+  'other': ''
 };
 const labelsEl = document.getElementById('label');
+const legendEl = document.getElementById('legend');
 Object.keys(LABELS).forEach((label) => {
+  // Form dropdown
   let el = document.createElement('option');
   el.innerText = `${LABELS[label]} ${label}`
   el.value = label;
   labelsEl.appendChild(el);
+
+  // Legend
+  let icon = label == 'other' ? '🔴' : LABELS[label];
+  el = document.createElement('span');
+  el.innerText = `${icon} ${label}`;
+  legendEl.appendChild(el);
 });
 
 function addOrUpdateMarker(log, map) {
