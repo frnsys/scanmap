@@ -138,7 +138,7 @@ a, a:visited {
 #coord-results {
   color: #000;
   font-size: 0.8em;
-  height: 12em;
+  height: 9em;
 }
 #coord-results li {
   cursor: pointer;

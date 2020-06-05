@@ -11,7 +11,7 @@ class KeyRing:
     def check_key(self, key, loc, typ=None):
         valid = self.get_keys(loc)
         for typ, keys in valid.items():
-            if key in valid:
+            if key in keys:
                 return typ
         return False
 

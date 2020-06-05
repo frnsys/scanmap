@@ -141,6 +141,7 @@ def keys(location):
 def check_auth(location):
     key = request.headers.get('X-AUTH')
     typ = kr.check_key(key, location)
+    print(key)
     return jsonify(success=bool(typ))
 
 

@@ -35,26 +35,17 @@ class Form {
   }
 
   queryLocation(query) {
-    // statusEl.innerText = 'Searching...';
-    // statusEl.style.display = 'block';
-
+    if (query.trim() == "") return;
     // Search for possible coordinates
     // based on inputted location
-    this.post('location', {
-      query: query
-    }, (json) => {
+    this.post('location', {query: query}, (json) => {
       // Display search results to choose from
       resultsEl.innerHTML = '';
       if (json.results.length > 0) {
-        // Choose first result by default
-        // let res = json.results[0];
-        // coordsEl.value = res.coordinates;
-        // this.previewCoords([res.coordinates[1], res.coordinates[0]], true);
-
         // Only show first 5 results
         json.results.slice(0, 5).forEach((res) => {
           let li = document.createElement('li');
-          li.innerText = `${res.name} (${res.coordinates.map((c) => c.toFixed(4))})`
+          li.innerText = res.name;
           li.addEventListener('click', () => {
             // Visual selection
             let selected = resultsEl.querySelector('.selected');
@@ -63,6 +54,8 @@ class Form {
 
             coordsEl.value = res.coordinates;
             this.previewCoords([res.coordinates[1], res.coordinates[0]], true);
+
+            document.getElementById('location').value = res.name;
           });
           resultsEl.appendChild(li);
         });
