@@ -3,12 +3,14 @@ from app.db import Database
 from app.cams import cameras
 from app.keys import KeyRing
 from app.geo import search_places
+from flask_caching import Cache
 from flask import Flask, abort, request, render_template, jsonify
 
 app = Flask(__name__)
 app.config.from_object(config)
 kr = KeyRing(config.KEYS_FILE)
 db = Database(config.DB_PATH)
+cache = Cache(app)
 
 def get_conf(loc):
     try:
@@ -21,6 +23,7 @@ def index():
     return render_template('index.html', locations=config.LOCATIONS.keys())
 
 @app.route('/version')
+@cache.cached(timeout=600)
 def version():
     return jsonify(version=config.VERSION)
 
@@ -36,6 +39,7 @@ def cams(location):
     return jsonify(cams=cams)
 
 @app.route('/<location>/log', methods=['GET', 'POST'])
+@cache.cached(timeout=10)
 def log(location):
     conf = get_conf(location)
     auth = request.headers.get('X-AUTH')
