@@ -6,30 +6,7 @@ import mapboxgl from 'mapbox-gl';
 import { get } from './util';
 import { showLogs, fadeMarkers } from './logs';
 
-const errs = [];
-const updateInterval = 5000; // ms
-
-/* server sent events coooooode */
-console.log('setup event source');
-const logSource = new EventSource(SSE_URL);
-logSource.onmessage = function (event) {
-  const log = JSON.parse(event.data);
-  showLogs([log], map, form);
-  fadeMarkers();
-};
-/* end server sent events coooooode */
-
-// Check for updates
-setInterval(() => {
-  get('/version', (json) => {
-    if (VERSION != json.version) {
-      console.log('New version detected, reloading...');
-      location.reload();
-    }
-  });
-}, 5*60*1000);
-
-function update() {
+function fetchLogs() {
   get(
     'log',
     ({ logs }) => {
@@ -38,10 +15,21 @@ function update() {
     form.authKey
   ).catch((err) => {
     console.log(err);
-    errs.push(err);
   });
-  fadeMarkers();
 }
+
+/* server sent events coooooode */
+const logSource = new EventSource(SSE_URL);
+logSource.onmessage = function(event) {
+  // const log = JSON.parse(event.data);
+  // showLogs([log], map, form);
+
+  // For now just reloading logs,
+  // for compatibility with how the editing system works.
+  // TODO: properly integrate updates
+  fetchLogs();
+};
+/* end server sent events coooooode */
 
 mapboxgl.accessToken = config.MAPBOX_TOKEN;
 const map = new Map(
@@ -71,7 +59,12 @@ window.queryMap = () => {
 };
 
 document.getElementById('add').addEventListener('click', () => {
-  form.activate();
+  let authKey = prompt('Key');
+  form.activate(authKey, () => {
+    // Re-fetch logs on success,
+    // to show edit UI if necessary
+    fetchLogs();
+  });
 });
 document.getElementById('info-toggle').addEventListener('click', () => {
   let b = document.getElementById('info-body');
@@ -80,6 +73,18 @@ document.getElementById('info-toggle').addEventListener('click', () => {
   document.getElementById('info-toggle').innerText = open ? '▲' : '▼';
 });
 
-update();
-// setInterval(update, updateInterval);
+// Check for updates
+setInterval(() => {
+  get('/version', (json) => {
+    if (VERSION != json.version) {
+      console.log('New version detected, reloading...');
+      location.reload();
+    }
+  });
+}, 5*60*1000);
+
+fetchLogs();
+setInterval(() => {
+  fadeMarkers();
+}, 5000);
 setupCams(map);

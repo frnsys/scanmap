@@ -79,8 +79,8 @@ class Form {
     if (jump) this.map.jumpTo(coords);
   }
 
-  activate(authKey) {
-    this.authKey = authKey || prompt('Key');
+  activate(authKey, onActivate) {
+    this.authKey = authKey;
 
     if (this.authKey.trim() == "") return;
 
@@ -95,6 +95,7 @@ class Form {
 
         // Show form
         document.getElementById('append').style.display = 'block';
+        onActivate();
       } else {
         authStatusEl.innerText = 'Invalid key';
         authStatusEl.style.display = 'block';

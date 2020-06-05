@@ -1,6 +1,5 @@
-import config
-from time import sleep
 import json
+import config
 from app.db import Database
 from app.cams import cameras
 from app.keys import KeyRing
@@ -12,7 +11,7 @@ from datetime import datetime, timezone
 
 app = Flask(__name__)
 app.config.from_object(config)
-app.config["REDIS_URL"] = "redis://localhost"
+app.config['REDIS_URL'] = 'redis://localhost'
 app.register_blueprint(sse, url_prefix='/location-stream')
 
 kr = KeyRing(config.KEYS_FILE)
@@ -41,7 +40,7 @@ def version():
 @app.route('/<location>/')
 def map(location):
     conf = get_conf(location)
-    return render_template('map.html', conf=conf, version=config.VERSION, location=location)
+    return render_template('map.html', conf=conf, location=location)
 
 
 @app.route('/<location>/cams')
@@ -65,7 +64,7 @@ def log(location):
         if not auth:
             abort(401)
         data = request.get_json()
-        db.add(location, auth, data)
+        db.add(location, key, data)
         timestamp = datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()
         sse.publish(json.dumps(
             {'data': data, 'timestamp': timestamp}), channel=location)
@@ -104,11 +103,13 @@ def edit_log(location):
         if auth == 'prime' or key == log['submitter']:
             if action == 'delete':
                 db.delete(location, timestamp)
+                sse.publish('delete' , channel=location)
                 return jsonify(success=True)
             elif action == 'update':
                 for k, v in data['changes'].items():
                     log['data'][k] = v
                 db.update(location, timestamp, log['data'])
+                sse.publish('update' , channel=location)
                 return jsonify(success=True)
             return jsonify(success=False, error='Unknown action')
         else:

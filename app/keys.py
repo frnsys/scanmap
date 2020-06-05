@@ -8,10 +8,10 @@ class KeyRing:
     def __init__(self, path):
         self.path = path
 
-    def check_key(self, key, loc, typ=None):
+    def check_key(self, key, loc):
         valid = self.get_keys(loc)
         for typ, keys in valid.items():
-            if key in valid:
+            if key in keys:
                 return typ
         return False
 
