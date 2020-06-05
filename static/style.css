@@ -40,6 +40,8 @@ html, body {
   background: #fff;
   color: #000;
   padding: 1em 2em;
+  max-height: 80vh;
+  overflow-y: scroll;
 }
 #intro li {
   list-style-type: disc;
