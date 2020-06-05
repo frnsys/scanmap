@@ -41,7 +41,9 @@ def cams(location):
 @app.route('/<location>/log', methods=['GET', 'POST'])
 @cache.cached(timeout=5,
         unless=lambda: request.method != 'GET',
-        make_cache_key=lambda *args, **kwargs: request.headers.get('X-AUTH', 'noauth'))
+        make_cache_key=lambda *args, **kwargs: '{}_{}'.format(
+            request.path,
+            request.headers.get('X-AUTH', 'noauth')))
 def log(location):
     conf = get_conf(location)
     auth = request.headers.get('X-AUTH')
