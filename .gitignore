@@ -2,9 +2,11 @@
 __pycache__/
 config.js
 config.py
-data/keys.yml
 data/logs.db
-node_modules/
+data/keys.yml
 static/dist/
+node_modules/
 venv/
 env/
+.venv
+.vscode

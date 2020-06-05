@@ -61,6 +61,7 @@
 const MAP_CENTER = {{ conf.MAP['CENTER'] }};
 const MAP_ZOOM = {{ conf.MAP['ZOOM'] }};
 const VERSION = '{{ config.VERSION }}';
+const SSE_URL = '{{url_for("sse.stream", channel=location)}}'
 </script>
 <script src="{{ url_for('static', filename='dist/main.js') }}?{{config.VERSION}}"></script>
 {% endblock %}
