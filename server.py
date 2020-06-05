@@ -1,16 +1,24 @@
 import config
+from time import sleep
+import json
 from app.db import Database
 from app.cams import cameras
 from app.keys import KeyRing
 from app.geo import search_places
 from flask_caching import Cache
 from flask import Flask, abort, request, render_template, jsonify
+from flask_sse import sse
+from datetime import datetime, timezone
 
 app = Flask(__name__)
 app.config.from_object(config)
+app.config["REDIS_URL"] = "redis://localhost"
+app.register_blueprint(sse, url_prefix='/location-stream')
+
 kr = KeyRing(config.KEYS_FILE)
 db = Database(config.DB_PATH)
 cache = Cache(app)
+
 
 def get_conf(loc):
     try:
@@ -18,19 +26,23 @@ def get_conf(loc):
     except KeyError:
         abort(404)
 
+
 @app.route('/')
 def index():
     return render_template('index.html', locations=config.LOCATIONS.keys())
+
 
 @app.route('/version')
 @cache.cached(timeout=600)
 def version():
     return jsonify(version=config.VERSION)
 
+
 @app.route('/<location>/')
 def map(location):
     conf = get_conf(location)
-    return render_template('map.html', conf=conf)
+    return render_template('map.html', conf=conf, version=config.VERSION, location=location)
+
 
 @app.route('/<location>/cams')
 def cams(location):
@@ -38,13 +50,13 @@ def cams(location):
     conf = get_conf(location)
     return jsonify(cams=cams)
 
+
 @app.route('/<location>/log', methods=['GET', 'POST'])
 @cache.cached(timeout=5,
-        unless=lambda: request.method != 'GET',
-        make_cache_key=lambda *args, **kwargs: '{}_{}'.format(
-            request.path,
-            request.headers.get('X-AUTH', 'noauth')))
-
+              unless=lambda: request.method != 'GET',
+              make_cache_key=lambda *args, **kwargs: '{}_{}'.format(
+                  request.path,
+                  request.headers.get('X-AUTH', 'noauth')))
 def log(location):
     conf = get_conf(location)
     key = request.headers.get('X-AUTH')
@@ -53,7 +65,10 @@ def log(location):
         if not auth:
             abort(401)
         data = request.get_json()
-        db.add(location, key, data)
+        db.add(location, auth, data)
+        timestamp = datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()
+        sse.publish(json.dumps(
+            {'data': data, 'timestamp': timestamp}), channel=location)
         return jsonify(success=True)
     else:
         # Limit amount of logs sent
@@ -66,6 +81,7 @@ def log(location):
             if auth and (auth == 'prime' or key.startswith(submitter)):
                 l['permit'] = True
         return jsonify(logs=logs)
+
 
 @app.route('/<location>/log/edit', methods=['POST'])
 def edit_log(location):
@@ -99,6 +115,7 @@ def edit_log(location):
             abort(401)
     return jsonify(success=False)
 
+
 @app.route('/<location>/location', methods=['POST'])
 def query_location(location):
     conf = get_conf(location)
@@ -109,12 +126,14 @@ def query_location(location):
     results = search_places(data['query'], conf)
     return jsonify(results=results)
 
-
 # Panel
+
+
 @app.route('/<location>/panel')
 def panel(location):
     conf = get_conf(location)
     return render_template('panel.html', conf=conf)
+
 
 @app.route('/<location>/keys', methods=['GET', 'POST'])
 def keys(location):
@@ -136,6 +155,7 @@ def keys(location):
 
     keys = kr.get_keys(location).get('write')
     return jsonify(keys=keys)
+
 
 @app.route('/<location>/checkauth', methods=['POST'])
 def check_auth(location):

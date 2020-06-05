@@ -3,11 +3,21 @@ import Form from './form';
 import config from '../config';
 import setupCams from './cams';
 import mapboxgl from 'mapbox-gl';
-import {get} from './util';
-import {showLogs, fadeMarkers} from './logs';
+import { get } from './util';
+import { showLogs, fadeMarkers } from './logs';
 
 const errs = [];
 const updateInterval = 5000; // ms
+
+/* server sent events coooooode */
+console.log('setup event source');
+const logSource = new EventSource(SSE_URL);
+logSource.onmessage = function (event) {
+  const log = JSON.parse(event.data);
+  showLogs([log], map, form);
+  fadeMarkers();
+};
+/* end server sent events coooooode */
 
 // Check for updates
 setInterval(() => {
@@ -20,37 +30,45 @@ setInterval(() => {
 }, 5*60*1000);
 
 function update() {
-  get('log', ({logs}) => {
-    showLogs(logs, map, form);
-  }, form.authKey).catch((err) => {
+  get(
+    'log',
+    ({ logs }) => {
+      showLogs(logs, map, form);
+    },
+    form.authKey
+  ).catch((err) => {
     console.log(err);
     errs.push(err);
   });
   fadeMarkers();
 }
 
-
 mapboxgl.accessToken = config.MAPBOX_TOKEN;
-const map = new Map({
-  container: 'map',
-  style: 'mapbox://styles/mapbox/streets-v11',
-  maxZoom: 18,
-  minZoom: 10,
-  zoom: MAP_ZOOM,
-  center: MAP_CENTER
-}, (coord) => {
-  if (form.authKey) {
-    document.getElementById('coordinates').value = `${coord.lat},${coord.lng}`;
-    form.previewCoords([coord.lng, coord.lat]);
+const map = new Map(
+  {
+    container: 'map',
+    style: 'mapbox://styles/mapbox/streets-v11',
+    maxZoom: 18,
+    minZoom: 10,
+    zoom: MAP_ZOOM,
+    center: MAP_CENTER
+  },
+  (coord) => {
+    if (form.authKey) {
+      document.getElementById(
+        'coordinates'
+      ).value = `${coord.lat},${coord.lng}`;
+      form.previewCoords([coord.lng, coord.lat]);
+    }
   }
-});
+);
 const form = new Form(map);
 
 // For getting current map zoom/center
 window.queryMap = () => {
   console.log(`Zoom:${map.map.getZoom()}`);
   console.log(`Center:${map.map.getCenter()}`);
-}
+};
 
 document.getElementById('add').addEventListener('click', () => {
   form.activate();
@@ -63,5 +81,5 @@ document.getElementById('info-toggle').addEventListener('click', () => {
 });
 
 update();
-setInterval(update, updateInterval);
+// setInterval(update, updateInterval);
 setupCams(map);
