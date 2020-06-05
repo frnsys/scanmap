@@ -100,30 +100,32 @@ function addOrUpdateMarker(log, map) {
 }
 
 function removeLogFromMarker(key, elId) {
-  let {marker} = markers[key];
-  let markerEl = marker.getElement();
-  let popupEl = marker.getPopup()._content;
+  if (markers[key]) {
+    let {marker} = markers[key];
+    let markerEl = marker.getElement();
+    let popupEl = marker.getPopup()._content;
 
-  // If only event in marker, remove marker entirely
-  let events = popupEl.querySelectorAll('.popup-log');
-  let popupItem = popupEl.querySelector(`#popup-${elId}`);
-  if (events.length == 1) {
-    markers[key].marker.remove();
-    delete markers[key];
+    // If only event in marker, remove marker entirely
+    let events = popupEl.querySelectorAll('.popup-log');
+    let popupItem = popupEl.querySelector(`#popup-${elId}`);
+    if (events.length == 1) {
+      markers[key].marker.remove();
+      delete markers[key];
 
-  // Otherwise, only remove that event
-  } else {
-    popupItem.parentNode.removeChild(popupItem);
-
-    // Update icon
-    let mostRecent = popupEl.querySelector('.popup-log');
-    let icon = mostRecent.dataset.icon;
-    if (icon) {
-      markerEl.innerText = icon;
-      markerEl.style.background = 'none';
+    // Otherwise, only remove that event
     } else {
-      markerEl.innerText = '';
-      markerEl.style.background = 'red';
+      popupItem.parentNode.removeChild(popupItem);
+
+      // Update icon
+      let mostRecent = popupEl.querySelector('.popup-log');
+      let icon = mostRecent.dataset.icon;
+      if (icon) {
+        markerEl.innerText = icon;
+        markerEl.style.background = 'none';
+      } else {
+        markerEl.innerText = '';
+        markerEl.style.background = 'red';
+      }
     }
   }
 }
