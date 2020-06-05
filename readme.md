@@ -51,12 +51,19 @@ LOCATIONS = {
 
 ---
 
+# pre-reqs
+
+**redis**
+
+- handles the pub/sub for server sent events.
+- with docker: `docker run --name scanmap-redis -p 6379:6379 -d redis`
+
 # Running
 
 1. Install frontend deps: `npm install -d`
 2. Install backend deps: `pip install -r requirements.txt`
 3. Start frontend: `npm start`
-4. Start backend: `python app.py`
+4. Start backend: `gunicorn server:app --worker-class gevent --bind 127.0.0.1:8000`
 
 # Deployment notes
 
@@ -99,4 +106,14 @@ Example `config.js`:
 export default {
   MAPBOX_TOKEN: '<mapbox token>'
 };
+```
+
+Example `keys.yml`:
+
+```
+<location key:NY>:
+    <type key:write>:
+        - <auth key>
+        - <auth key>
+        - <auth key>
 ```
