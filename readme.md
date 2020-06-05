@@ -79,8 +79,6 @@ MAX_LOGS = 200
 DB_PATH = 'data/logs.db'
 KEYS_FILE = 'data/keys.yml'
 GOOGLE_PLACES_API_KEY = '<KEY>'
-KEYS_FILE='<path to keys.yml>'
-DB_PATH = 'log_data'
 DEBUG = False
 
 LOCATIONS = {
