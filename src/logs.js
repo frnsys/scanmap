@@ -18,6 +18,7 @@ const LABELS = {
   'group': '🚩',
   'injury': '🩹',
   'barricade': '🚧',
+  'aviation': '🚁',
   'other': ''
 };
 const labelsEl = document.getElementById('label');
