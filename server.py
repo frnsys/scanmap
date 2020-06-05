@@ -27,7 +27,9 @@ def get_conf(loc):
 
 @app.route('/')
 def index():
-    return render_template('index.html', locations=config.LOCATIONS.keys())
+    return render_template('index.html',
+            locations=[k for k in config.LOCATIONS.keys()
+                if config.LOCATIONS[k]['LIVE']])
 
 
 @app.route('/version')
