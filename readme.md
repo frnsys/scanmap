@@ -82,6 +82,7 @@ GOOGLE_PLACES_API_KEY = '<KEY>'
 KEYS_FILE='<path to keys.yml>'
 DB_PATH = 'log_data'
 DEBUG = False
+REDIS_URL = 'redis://localhost'
 
 LOCATIONS = {
     'NY': {
