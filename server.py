@@ -73,7 +73,8 @@ def log(location):
             abort(401)
         data = request.get_json()
         db.add(location, key, data)
-        api.update_status('LOCATION: ' + data['location'] + ' | MESSAGE: ' + data['text'])
+        if location == 'NY':
+            api.update_status('LOCATION: ' + data['location'] + ' | MESSAGE: ' + data['text'])
         timestamp = datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()
         cache.clear()
         sse.publish(json.dumps(
