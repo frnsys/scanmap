@@ -122,6 +122,60 @@ def test_get_cams_unknown_location(client):
 
 # ----------------------------------
 # ----------------------------------
+# ---  GET, POST /<location>/log ---
+# ----------------------------------
+# ----------------------------------
+
+def test_get_log(client, log_in_db):
+    """Tests getting logs without auth"""
+
+    log_response = client.get('/NY/log')
+
+    assert(log_response.status_code == 200)
+    assert(len(log_response.get_json()['logs']) == 1)
+
+def test_get_log_unknown_location(client, log_in_db):
+    """Tests getting logs with unknown location"""
+
+    log_response = client.get('/YN/log')
+
+    assert(log_response.status_code == 404)
+
+def test_get_log_hit_cache(client, sse, log_in_db):
+    """Tests getting logs populated cache"""
+
+    import server
+
+    log_response = client.get('/NY/log')
+
+    assert(log_response.status_code == 200)
+
+    cached = server.cache.get('/NY/log_noauth')
+
+    assert(cached.status_code == 200)
+    assert(len(cached.get_json()['logs']) == 1)
+
+def test_new_log_unauthorized(client, log_in_db):
+    """Tests adding log without a key"""
+
+    log_response = client.post('/NY/log')
+
+    assert(log_response.status_code == 401)
+
+def test_new_log_ok(client, sse, log_in_db):
+    """Tests adding a new log record"""
+
+    log_response = client.post(
+        '/NY/log',
+        headers={'X-AUTH': 'WRITE'},
+        json={'text': 'TEST', 'location': 'A AND B ST', 'coordinates': '0,0', 'label': 'other'})
+
+    assert(log_response.status_code == 200)
+    assert(log_response.get_json() == {'success': True})
+    assert(sse.publish_called)
+
+# ----------------------------------
+# ----------------------------------
 # ---  POST /<location>/log/edit ---
 # ----------------------------------
 # ----------------------------------

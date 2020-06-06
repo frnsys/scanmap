@@ -1,5 +1,8 @@
 import os
 
+# For Flask-Cache. Allow testing with caching enabled.
+CACHE_TYPE = 'simple'
+
 # Version timestamp, which can be used
 # to get frontend clients to reload for an update
 VERSION = 'TEST'
