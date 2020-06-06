@@ -2,7 +2,6 @@ import Map from './map';
 import Form from './form';
 import config from '../config';
 import setupCams from './cams';
-import mapboxgl from 'mapbox-gl';
 import { get } from './util';
 import { showLogs, fadeMarkers } from './logs';
 
