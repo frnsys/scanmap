@@ -1,7 +1,7 @@
 .DS_Store
 __pycache__/
 config.js
-config.py
+/config.py
 data/logs.db
 data/keys.yml
 static/dist/
