@@ -31,7 +31,7 @@ GOOGLE_PLACES_API_KEY = '<key>'
 LOCATIONS = {
     '<location key:NY>': {
         'LIVE': <display map link on homepage:True>,
-        'CAMERAS': '<traffic cam file:cams/ny.json>',
+        'CAMERAS': '<traffic cam file:data/cams/ny.json>',
         'MAP_CENTER': <lnglat:[-73.96161699999999, 40.678806]>,
         'SEARCH': {
             'FILTER': '<address filter term: NY >',
@@ -45,12 +45,12 @@ LOCATIONS = {
 
 ```
 # keys.yml
-- <location key:NY>:
+<location key:NY>:
     prime: # admin keys
-    - <auth key>
+        - <auth key>
     write: # regular write access keys
-    - <auth key>
-    - <auth key>
+        - <auth key>
+        - <auth key>
 ```
 
 ---
