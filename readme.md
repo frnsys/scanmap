@@ -69,6 +69,10 @@ LOCATIONS = {
 3. Start frontend: `npm start`
 4. Start backend: `gunicorn server:app --worker-class gevent --bind 127.0.0.1:8000`
 
+## Tests
+
+Run `PYTHONPATH="$(pwd)/tests/app:$(pwd)" pytest` from the project root
+
 # Deployment notes
 
 - Ensure that proper permissions/ownership are set for files that are written to (e.g. `data/keys.yml`)
