@@ -165,6 +165,8 @@ def test_new_log_unauthorized(client, log_in_db):
 def test_new_log_ok(client, sse, log_in_db):
     """Tests adding a new log record"""
 
+    import server
+
     log_response = client.post(
         '/NY/log',
         headers={'X-AUTH': 'WRITE'},
@@ -173,6 +175,23 @@ def test_new_log_ok(client, sse, log_in_db):
     assert(log_response.status_code == 200)
     assert(log_response.get_json() == {'success': True})
     assert(sse.publish_called)
+    assert(len(server.db.logs('NY', 10)) == 2)
+
+def test_new_log_no_cache(client, sse, log_in_db):
+    """Tests adding a new log doesn't populate cache"""
+
+    import server
+
+    log_response = client.post(
+        '/NY/log',
+        headers={'X-AUTH': 'WRITE'},
+        json={'text': 'TEST', 'location': 'A AND B ST', 'coordinates': '0,0', 'label': 'other'})
+
+    assert(log_response.status_code == 200)
+
+    cached = server.cache.get('/NY/log_WRITE')
+
+    assert(cached == None)
 
 # ----------------------------------
 # ----------------------------------
