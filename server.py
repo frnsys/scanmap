@@ -8,6 +8,7 @@ from flask_caching import Cache
 from flask import Flask, abort, request, render_template, jsonify
 from flask_sse import sse
 from datetime import datetime, timezone
+import tweepy
 
 app = Flask(__name__)
 app.config.from_object(config)
@@ -16,6 +17,12 @@ app.register_blueprint(sse, url_prefix='/location-stream')
 kr = KeyRing(config.KEYS_FILE)
 db = Database(config.DB_PATH)
 cache = Cache(app)
+
+auth = tweepy.OAuthHandler(config.TWITTER['NY']['CONSUMER_KEY'], config.TWITTER['NY']['CONSUMER_SECRET'])
+
+auth.set_access_token(config.TWITTER['NY']['ACCESS_TOKEN'], config.TWITTER['NY']['ACCESS_TOKEN_SECRET'])
+
+api = tweepy.API(auth)
 
 
 def get_conf(loc):
@@ -66,6 +73,7 @@ def log(location):
             abort(401)
         data = request.get_json()
         db.add(location, key, data)
+        api.update_status('LOCATION: ' + data['location'] + ' | MESSAGE: ' + data['text'])
         timestamp = datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()
         cache.clear()
         sse.publish(json.dumps(
