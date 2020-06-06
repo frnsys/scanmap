@@ -19,7 +19,7 @@ const LABELS = {
   'injury': '🩹',
   'barricade': '🚧',
   'aviation': '🚁',
-  'other': ''
+  'other': '🔹'
 };
 const labelsEl = document.getElementById('label');
 const legendEl = document.getElementById('legend');
@@ -31,9 +31,8 @@ Object.keys(LABELS).forEach((label) => {
   labelsEl.appendChild(el);
 
   // Legend
-  let icon = label == 'other' ? '🔴' : LABELS[label];
   el = document.createElement('span');
-  el.innerText = `${icon} ${label}`;
+  el.innerText = `${LABELS[label]} ${label}`;
   legendEl.appendChild(el);
 });
 
@@ -68,6 +67,7 @@ function addOrUpdateMarker(log, map) {
     // if so, append log
     log.coords.reverse();
     let key = `${log.coords[0]}_${log.coords[1]}`;
+    logMarkers[log.elId] = key;
     if (key in markers) {
       // Update marker icon to latest event's icon
       let markerEl = markers[key].marker.getElement();
@@ -103,7 +103,6 @@ function addOrUpdateMarker(log, map) {
         lastUpdate: log.timestamp*1000,
         marker: map.addMarker(log.coords, {element, icon})
       };
-      logMarkers[log.elId] = key;
     }
   }
 }
@@ -182,7 +181,60 @@ function showLogs(logs, map, form) {
             className: 'logitem-meta',
             children: [{
               tag: 'span',
-              innerText: log.label && log.label !== 'other' ? `${LABELS[log.label]} ${log.label} @ ` : ''
+              className: 'logitem-label',
+              innerText: log.label ? `${LABELS[log.label]} ${log.label} @ ` : '',
+              dataset: {
+                label: log.label
+              },
+              on: {
+                dblclick: (ev) => {
+                  if (ev.target.closest('.logitem').dataset.permit == 'true') {
+                    let inp = ev.target.parentNode.querySelector('.logitem-label-input');
+                    inp.style.display = 'flex';
+                    ev.target.style.display = 'none';
+                  }
+                }
+              }
+            }, {
+              tag: 'div',
+              className: 'logitem-label-input',
+              children: [{
+                tag: 'select',
+                children: Object.keys(LABELS).map((label) => ({
+                  tag: 'option',
+                  innerText: `${LABELS[label]} ${label}`,
+                  value: label,
+                  selected: label == log.label
+                })),
+                on: {
+                  input: (ev) => {
+                    let newLabel = ev.target.value;
+                    post('log/edit', {
+                      timestamp: log.id,
+                      action: 'update',
+                      changes: {
+                        label: ev.target.value
+                      }
+                    }, () => {
+                      let text = newLabel && newLabel !== 'other' ? `${LABELS[newLabel]} ${newLabel} @ ` : '';
+                      let labelEl = ev.target.closest('.logitem').querySelector('.logitem-label');
+                      labelEl.innerText = text;
+                      labelEl.style.display = 'inline';
+                      ev.target.closest('.logitem-label-input').style.display = 'none';
+                    }, form.authKey);
+                  }
+                }
+              }, {
+                tag: 'span',
+                innerText: ' cancel',
+                className: 'action logitem-label-edit-cancel',
+                on: {
+                  click: (ev) => {
+                    ev.target.closest('.logitem-label-input').style.display = 'none';
+                    ev.target.closest('.logitem').querySelector('.logitem-label').style.display = 'inline';
+                  }
+                }
+              }]
             }, {
               tag: 'span',
               className: 'logitem-location',
@@ -191,7 +243,7 @@ function showLogs(logs, map, form) {
                 dblclick: (ev) => {
                   if (ev.target.closest('.logitem').dataset.permit == 'true') {
                     let inp = ev.target.parentNode.querySelector('.logitem-location-input');
-                    let can = ev.target.parentNode.querySelector('.logitem-edit-cancel');
+                    let can = ev.target.parentNode.querySelector('.logitem-location-edit-cancel');
                     let coords = ev.target.parentNode.querySelector('.logitem-coords');
                     map.addClickListener(log.id, (coord) => {
                       coords.value = `${coord.lat},${coord.lng}`;
@@ -216,7 +268,7 @@ function showLogs(logs, map, form) {
                   if (ev.key == 'Enter') {
                     let inp = ev.target;
                     let el = inp.parentNode.querySelector('.logitem-location');
-                    let can = inp.parentNode.querySelector('.logitem-edit-cancel');
+                    let can = inp.parentNode.querySelector('.logitem-location-edit-cancel');
                     let coords = inp.parentNode.querySelector('.logitem-coords');
                     inp.style.display = 'none';
                     can.style.display = 'none';
@@ -240,7 +292,7 @@ function showLogs(logs, map, form) {
             }, {
               tag: 'span',
               innerText: ' cancel',
-              className: 'action logitem-edit-cancel',
+              className: 'action logitem-location-edit-cancel',
               on: {
                 click: (ev) => {
                   let can = ev.target;
@@ -343,6 +395,36 @@ function showLogs(logs, map, form) {
         el = logItem.querySelector('.logitem-location');
         if (el.innerText != log.location) {
           el.innerText = log.location;
+        }
+
+        el = logItem.querySelector('.logitem-label');
+        if (el.dataset.label != log.label) {
+          el.dataset.label = log.label;
+          el.innerText = log.label ? `${LABELS[log.label]} ${log.label} @ ` : '';
+
+          // Change marker icon if necessary
+          let key = logMarkers[log.elId];
+          if (markers[key]) {
+            let {marker} = markers[key];
+            let markerEl = marker.getElement();
+            let popupEl = marker.getPopup()._content;
+
+            let mostRecent = popupEl.querySelector('.popup-log');
+            if (mostRecent.id == `popup-${log.elId}`) {
+              let icon = LABELS[log.label];
+              mostRecent.dataset.icon = icon;
+              if (icon) {
+                markerEl.innerText = icon;
+                markerEl.style.background = 'none';
+              } else {
+                markerEl.innerText = '';
+                markerEl.style.background = 'red';
+              }
+            }
+            let popupItem = popupEl.querySelector(`#popup-${log.elId} .popup-label`);
+            let labelText = log.label ? `${LABELS[log.label]} ${log.label}` : '';
+            popupItem.innerText = labelText;
+          }
         }
 
         // Move marker if necessary

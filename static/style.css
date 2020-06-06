@@ -248,9 +248,16 @@ select {
   width: 100%;
 }
 .logitem-text-input,
+.logitem-label-input,
 .logitem-location-input,
-.logitem-edit-cancel {
+.logitem-location-edit-cancel {
   display: none;
+}
+.logitem-label-input {
+  margin-right: 5em;
+}
+.logitem-label-edit-cancel {
+  padding: 0.75em 0.5em;
 }
 .logitem-location-input {
   font-size: 0.8em;
