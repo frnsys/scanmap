@@ -1,6 +1,3 @@
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
-
 class Map {
   constructor(conf, onClick) {
     this.map = new mapboxgl.Map(conf);
