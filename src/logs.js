@@ -379,7 +379,9 @@ function showLogs(logs, map, form) {
 
       if (log.coords.length == 2) {
         logItem.addEventListener('click', () => {
-          map.jumpTo(log.coords);
+          let coords = logItem.dataset.coords.split(',').map((c) => parseFloat(c));
+          coords.reverse();
+          map.jumpTo(coords);
         });
       }
       lastSeen = log.timestamp;
