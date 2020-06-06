@@ -1,20 +1,27 @@
 from app.db import Database
+from app.keys import KeyRing
 from datetime import datetime, timezone
 import pytest
+import server
 import tempfile
 
 @pytest.fixture()
 def client(monkeypatch):
-    import config
+    with monkeypatch.context() as test_ctxt:
+        with tempfile.NamedTemporaryFile() as keyf:
+            # Copy over the test keys to the temporary key file
+            with open('tests/app/data/keys.yml', mode='rb') as testkeyf:
+                keyf.write(testkeyf.read())
+                keyf.flush()
 
-    with tempfile.NamedTemporaryFile() as dbf:
-        monkeypatch.setattr(config, 'DB_PATH', dbf.name)
+            with tempfile.NamedTemporaryFile() as dbf:
+                # Stub key ring and database
+                test_ctxt.setattr(server, 'kr', KeyRing(keyf.name))
+                test_ctxt.setattr(server, 'db', Database(dbf.name))
 
-        from server import app
+                server.app.config['TESTING'] = True
 
-        app.config['TESTING'] = True
-
-        yield app.test_client()
+                yield server.app.test_client()
 
 def test_get_version(client):
     """Tests version route to ensure json body is expected"""

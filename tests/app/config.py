@@ -9,7 +9,7 @@ MAX_LOGS = 200
 
 # Where the database and keys files are located
 DB_PATH = '<STUB>'
-KEYS_FILE = 'tests/app/data/keys.yml'
+KEYS_FILE = '<STUB>'
 
 # For querying coordinates for locations
 GOOGLE_PLACES_API_KEY = '<STUB>'
