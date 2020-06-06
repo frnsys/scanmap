@@ -1,4 +1,4 @@
-# config.py
+import os
 
 # Version timestamp, which can be used
 # to get frontend clients to reload for an update
@@ -8,8 +8,8 @@ VERSION = 'TEST'
 MAX_LOGS = 200
 
 # Where the database and keys files are located
-DB_PATH = '<STUB>'
-KEYS_FILE = '<STUB>'
+DB_PATH = ':memory:'   # Hack to prevent creating a dummy DB file
+KEYS_FILE = os.devnull # Hack to prevent creating a dummy key file
 
 # For querying coordinates for locations
 GOOGLE_PLACES_API_KEY = '<STUB>'
