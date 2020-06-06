@@ -14,6 +14,34 @@ class MockResponse:
         with open(self.response_path, mode='r') as f:
             return json.load(f)
 
+class MockSSE:
+    def __init__(self):
+        self.publish_called = 0
+
+    def publish(self, *args, **kwargs):
+        self.publish_called += 1
+
+@pytest.fixture
+def log_in_db():
+    import server
+
+    server.db.add(
+        'NY',
+        'WRITE',
+        {'text': 'TEST', 'location': 'X AND Y ST', 'coordinates': '0,0', 'label': 'other'})
+
+    yield server.db.logs('NY', 1)[0]
+
+@pytest.fixture
+def sse(monkeypatch):
+    import server
+
+    mock = MockSSE()
+
+    monkeypatch.setattr(server, 'sse', mock)
+
+    yield mock
+
 @pytest.fixture()
 def client(monkeypatch):
     with tempfile.NamedTemporaryFile() as keyf:
@@ -91,6 +119,51 @@ def test_get_cams_unknown_location(client):
     cams_response = client.get('/YN/cams')
 
     assert(cams_response.status_code == 404)
+
+# ----------------------------------
+# ----------------------------------
+# ---  POST /<location>/log/edit ---
+# ----------------------------------
+# ----------------------------------
+
+def test_edit_log_unauthorized_key(client, sse, log_in_db):
+    """Tests editing a log file with an unauthorized key"""
+
+    edit_log_response = client.post('/NY/log/edit', headers={'X-AUTH': 'BOGUS'})
+
+    assert(edit_log_response.status_code == 401)
+
+def test_edit_log_bad_payload(client, sse, log_in_db):
+    """Tests edit log route with badly formed payload"""
+
+    with pytest.raises(KeyError):
+        edit_log_response = client.post(
+            '/NY/log/edit',
+            headers={'X-AUTH': 'PRIME'},
+            json={'bogus': ''})
+
+def test_edit_log_unknown_action(client, sse, log_in_db):
+    """Tests edit log with an unknown action"""
+
+    edit_log_response = client.post(
+        '/NY/log/edit',
+        headers={'X-AUTH': 'PRIME'},
+        json={'action': 'bogus', 'timestamp': log_in_db['timestamp']})
+
+    assert(edit_log_response.status_code == 200)
+    assert(edit_log_response.get_json() == {'success': False, 'error': 'Unknown action'})
+
+def test_edit_log_delete(client, sse, log_in_db):
+    """Tests deleting a log record"""
+
+    edit_log_response = client.post(
+        '/NY/log/edit',
+        headers={'X-AUTH': 'PRIME'},
+        json={'action': 'delete', 'timestamp': log_in_db['timestamp']})
+
+    assert(edit_log_response.status_code == 200)
+    assert(edit_log_response.get_json() == {'success': True})
+    assert(sse.publish_called)
 
 # ----------------------------------
 # ----------------------------------
