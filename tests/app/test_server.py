@@ -165,6 +165,49 @@ def test_edit_log_delete(client, sse, log_in_db):
     assert(edit_log_response.get_json() == {'success': True})
     assert(sse.publish_called)
 
+def test_edit_log_update(client, sse, log_in_db):
+    """Tests updating a log record"""
+
+    import server
+
+    request_body = {
+        'action': 'update',
+        'timestamp': log_in_db['timestamp'],
+        'changes': {'location': 'NEW ADDRESS'}
+    }
+
+    edit_log_response = client.post(
+        '/NY/log/edit',
+        headers={'X-AUTH': 'WRITE'},
+        json=request_body)
+
+    assert(edit_log_response.status_code == 200)
+    assert(edit_log_response.get_json() == {'success': True})
+    assert(sse.publish_called)
+    assert(
+        server.db.log('NY', log_in_db['timestamp'])['data']['location'] == 'NEW ADDRESS'
+    )
+
+def test_edit_log_editor_is_not_submitter(client, sse, log_in_db):
+    """Tests updating a log record with a key that differs from the submitter's key"""
+
+    import server
+
+    server.kr.add_key('NY', 'write', 'WRITE_2')
+
+    request_body = {
+        'action': 'update',
+        'timestamp': log_in_db['timestamp'],
+        'changes': {'location': 'NEW ADDRESS'}
+    }
+
+    edit_log_response = client.post(
+        '/NY/log/edit',
+        headers={'X-AUTH': 'WRITE_2'},
+        json=request_body)
+
+    assert(edit_log_response.status_code == 401)
+
 # ----------------------------------
 # ----------------------------------
 # ---  POST /<location>/location ---
