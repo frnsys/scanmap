@@ -8,8 +8,12 @@ function get(url, onSuccess, authKey) {
     method: 'GET'
   })
     .then((res) => {
-      if (res.status == 401) {
-        throw new Error('Unauthorized');
+      if (!res.ok) {
+        if (res.status == 401) {
+          throw new Error('Unauthorized');
+        } else {
+          throw new Error(`Response ${res.status}`);
+        }
       }
       return res.json();
     })
@@ -27,8 +31,12 @@ function post(url, data, onSuccess, authKey) {
     body: JSON.stringify(data)
   })
     .then((res) => {
-      if (res.status == 401) {
-        throw new Error('Unauthorized');
+      if (!res.ok) {
+        if (res.status == 401) {
+          throw new Error('Unauthorized');
+        } else {
+          throw new Error(`Response ${res.status}`);
+        }
       }
       return res.json();
     })
