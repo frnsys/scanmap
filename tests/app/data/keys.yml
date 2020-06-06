@@ -1,0 +1,6 @@
+# keys.yml
+NY:
+  prime: # admin keys
+  - 'PRIME'
+  write: # regular write access keys
+  - 'WRITE'

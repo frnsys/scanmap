@@ -1,0 +1,33 @@
+{
+  "html_attributions": [],
+  "results": [
+    {
+      "formatted_address": "4th Ave & Bergen St, Brooklyn, NY 11217, USA",
+      "geometry": {
+        "location": {
+          "lat": 40.6824634,
+          "lng": -73.97953930000001
+        },
+        "viewport": {
+          "northeast": {
+            "lat": 40.68381322989272,
+            "lng": -73.97818947010728
+          },
+          "southwest": {
+            "lat": 40.68111357010728,
+            "lng": -73.98088912989273
+          }
+        }
+      },
+      "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/geocode-71.png",
+      "id": "c5376bf1a8b664a34e6f5eebef5f5a185a288bfd",
+      "name": "4th Ave & Bergen St",
+      "place_id": "Eiw0dGggQXZlICYgQmVyZ2VuIFN0LCBCcm9va2x5biwgTlkgMTEyMTcsIFVTQSJmImQKFAoSCckYIFGsW8KJEbjb7TYYq7MUEhQKEgnJGCBRrFvCiRG42-02GKuzFBoUChIJY9tXJ8hawokRGYwdUTXKrHsaFAoSCdMniIaaW8KJEaeWl-oPu7j-IgoNuqY_GBU_nufT",
+      "reference": "Eiw0dGggQXZlICYgQmVyZ2VuIFN0LCBCcm9va2x5biwgTlkgMTEyMTcsIFVTQSJmImQKFAoSCckYIFGsW8KJEbjb7TYYq7MUEhQKEgnJGCBRrFvCiRG42-02GKuzFBoUChIJY9tXJ8hawokRGYwdUTXKrHsaFAoSCdMniIaaW8KJEaeWl-oPu7j-IgoNuqY_GBU_nufT",
+      "types": [
+        "intersection"
+      ]
+    }
+  ],
+  "status": "OK"
+}

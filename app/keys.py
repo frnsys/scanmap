@@ -42,7 +42,7 @@ class KeyRing:
             return False
 
     def load_keys(self):
-        return yaml.load(open(self.path))
+        return yaml.load(open(self.path), Loader=yaml.SafeLoader) or {}
 
     def save_keys(self, keys):
         yaml.dump(keys,
