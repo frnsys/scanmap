@@ -323,7 +323,6 @@ function showLogs(logs, map, form) {
                 if (ev.target.closest('.logitem').dataset.permit == 'true') {
                   let inp = ev.target.parentNode.querySelector('.logitem-text-input');
                   inp.style.display = 'block';
-                  inp.value = log.text;
                   inp.focus();
                   ev.target.style.display = 'none';
                 }
