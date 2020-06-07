@@ -57,9 +57,15 @@ class Map {
   }
 
   jumpTo(coords) {
+    // Only zoom in, never out
+    let zoom = this.map.getZoom();
+    if (zoom < 14) {
+      zoom = 14;
+    }
+
     this.map.jumpTo({
       center: coords,
-      zoom: 14,
+      zoom: zoom,
     });
   }
 }
