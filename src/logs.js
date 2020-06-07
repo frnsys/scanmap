@@ -104,6 +104,8 @@ function addOrUpdateMarker(log, map) {
         marker: map.addMarker(log.coords, {element, icon})
       };
     }
+
+    return key;
   }
 }
 
@@ -381,6 +383,7 @@ function showLogs(logs, map, form) {
           let coords = logItem.dataset.coords.split(',').map((c) => parseFloat(c));
           coords.reverse();
           map.jumpTo(coords);
+          showPopup(markers[key].marker);
         });
       }
       lastSeen = log.timestamp;
@@ -452,6 +455,25 @@ function showLogs(logs, map, form) {
       removeLogFromMarker(key, elId);
     });
   });
+}
+
+// Display one popup and hide the rest
+function showPopup(marker) {
+  closePopups();
+  const popup = marker.getPopup();
+  if (!popup.isOpen()) {
+    marker.togglePopup();
+  }
+}
+
+// Hide all markers
+function closePopups() {
+  for (const marker of Object.values(markers)) {
+    let popup = marker.marker.getPopup();
+    if (popup.isOpen()) {
+      marker.marker.togglePopup();
+    }
+  }
 }
 
 function fadeMarkers() {
