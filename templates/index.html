@@ -1,0 +1,12 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div id="listing">
+    <h1>Choose your city:</h1>
+    <ul>
+        {% for loc in locations %}
+            <li><a href="{{ url_for('map', location=loc) }}">{{ loc }}</a></li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

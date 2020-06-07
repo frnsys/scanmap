@@ -1,0 +1,364 @@
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #222;
+  font-family: monospace;
+  color: #fff;
+}
+
+#stage {
+  display: flex;
+}
+
+#listing {
+  max-width: 320px;
+  margin: 0 auto;
+  text-align: center;
+}
+#listing li {
+  font-size: 2em;
+  margin-bottom: 1em;
+}
+
+#overlay {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  z-index: 20;
+}
+#intro {
+  margin: 2em auto;
+  max-width: 480px;
+  background: #fff;
+  color: #000;
+  padding: 1em 2em;
+  max-height: 80vh;
+  overflow-y: scroll;
+}
+#intro li {
+  list-style-type: disc;
+  margin: 0.5em 0 0 1em;
+}
+.help li {
+  list-style-type: none !important;
+  margin: 0.5em 0 0 0 !important;
+}
+#intro ul {
+  margin-bottom: 2em;
+}
+#intro button {
+  margin: 0 auto;
+  display: block;
+}
+#intro a, #intro a:visited {
+  color: blue;
+}
+
+#map {
+  height: 100vh;
+  flex: 1;
+}
+
+#bar {
+  height: 100vh;
+  width: 320px;
+  background: #222;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+}
+#log {
+  flex: 1;
+  overflow-y: scroll;
+}
+#info {
+  font-size: 0.8em;
+  padding: 0 1em 0.25em 1em;
+  border-top: 1px solid #444;
+}
+#info div {
+  margin: 0.7em 0px;
+}
+#info #info-toggle {
+  margin: 0;
+  line-height: 1;
+  text-align: center;
+  padding: 0.25em 0;
+  color: #ccc;
+  cursor: pointer;
+}
+#info #info-toggle:hover {
+  background: #333;
+}
+a, a:visited {
+  color: #aaa;
+}
+
+#add {
+  text-decoration: underline;
+  color: #43CC70;
+  cursor: pointer;
+}
+
+#append {
+  position: fixed;
+  bottom: 1em;
+  left: 1em;
+  display: none;
+  min-width: 280px;
+  z-index: 10;
+}
+#append-form {
+  background: #fff;
+  padding: 0.5em;
+}
+#append-form input {
+  display: block;
+  margin: 0.5em 0;
+  width: 100%;
+}
+#location-search-field {
+  display: flex;
+}
+#location-search-field input {
+  flex: 1;
+  margin-bottom: 0;
+}
+#location-search {
+  cursor: pointer;
+  padding: 0.35em;
+  margin-top: 0.5em;
+}
+#coord-results {
+  color: #000;
+  font-size: 0.8em;
+}
+#coord-results li {
+  cursor: pointer;
+}
+#coord-results .selected {
+  color: blue;
+}
+#coordinates {
+  font-size: 0.6em;
+  border: none;
+  margin-top: 0;
+}
+
+#show-help {
+  text-align: right;
+  font-size: 0.75em;
+  text-decoration: underline;
+  cursor: pointer;
+  color: #000;
+}
+
+#error {
+  background: red;
+  color: #fff;
+  padding: 0.25em 0.5em;
+  font-size: 0.8em;
+  display: none;
+}
+#status {
+  background: #303030;
+  color: #fff;
+  padding: 0.25em 0.5em;
+  font-size: 0.8em;
+  display: none;
+}
+
+#auth-status {
+  background: red;
+  color: #fff;
+  padding: 1.25em 1.5em;
+  font-size: 0.8em;
+  display: none;
+  position: fixed;
+  top: 20px;
+  height: auto;
+  width: 100%;
+  text-align: center;
+  width: 30%;
+  left: 50%;
+  margin-left: -15%;
+}
+
+ul, li {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+select {
+  width: 100%;
+}
+
+.marker {
+  background-color: red;
+  min-width: 12px;
+  min-height: 12px;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #000;
+  font-size: 1.75em;
+}
+.marker-preview {
+  width: 16px;
+  height: 16px;
+  background-color: yellow;
+  border: 4px solid black;
+}
+.marker-camera {
+  background-color: transparent;
+  width: 18px;
+  height: 18px;
+  background-image: url('/static/camera.png');
+  background-size: cover;
+}
+
+.logitem {
+  display: flex;
+  padding: 0.5em 1em;
+}
+.logitem-log {
+  flex: 1;
+}
+.logitem-when {
+  font-size: 0.8em;
+  text-decoration: underline;
+}
+.logitem-meta {
+  font-size: 0.8em;
+}
+.logitem-coords {
+  display: none;
+  font-size: 0.7em;
+  border: none;
+  background: none;
+  color: yellow;
+  width: 100%;
+}
+.logitem-text-input,
+.logitem-label-input,
+.logitem-location-input,
+.logitem-location-edit-cancel {
+  display: none;
+}
+.logitem-label-input {
+  margin-right: 5em;
+}
+.logitem-label-edit-cancel {
+  padding: 0.75em 0.5em;
+}
+.logitem-location-input {
+  font-size: 0.8em;
+}
+.logitem .delete-log {
+  display: none;
+  cursor: pointer;
+}
+.logitem[data-permit=true] .delete-log {
+  display: block;
+}
+.logitem[data-permit=true]:hover {
+  background: #2f2f2f;
+}
+
+.popup-location {
+  font-size: 0.8em;
+  text-decoration: underline;
+}
+.popup-label {
+  font-size: 0.9em;
+  line-height: 1.1;
+}
+.popup-when {
+  font-size: 0.9em;
+  line-height: 1;
+}
+.popup-log h3 {
+  margin: 0;
+  font-weight: normal;
+}
+.popup-log {
+  margin-bottom: 1em;
+}
+.popup-log:last-child {
+  margin-bottom: 0;
+}
+
+.mapboxgl-popup-content {
+  color: #000;
+}
+
+#panel {
+  max-width: 640px;
+  margin: 0 auto;
+}
+#panel #key {
+  display: block;
+  margin: 1em auto;
+}
+#panel #manage-keys {
+  text-align: center;
+}
+#panel #keys {
+  padding: 2em;
+}
+#panel-main {
+  display: none;
+}
+.revoke-key {
+  margin-left: 0.5em;
+  display: inline-block;
+}
+.action {
+  cursor: pointer;
+}
+.action:hover {
+  text-decoration: underline
+}
+#panel-errors {
+  display: none;
+  background: red;
+  color: #fff;
+  text-align: center;
+  width: 100%;
+  padding: 0.5em 1em;
+}
+
+#legend {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+}
+
+@media only screen and (max-width: 680px) {
+  #stage {
+    display: block;
+  }
+  #map {
+    height: 50vh;
+  }
+  #bar {
+    width: 100%;
+    max-width: 100%;
+    height: 50vh;
+  }
+  #log {
+    width: 100%;
+  }
+
+  .mapboxgl-popup-content img {
+    max-height: 30vh;
+  }
+}

@@ -1,0 +1,71 @@
+{% extends 'layout.html' %}
+{% block head %}
+<script src="https://api.mapbox.com/mapbox-gl-js/v1.10.1/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v1.10.1/mapbox-gl.css" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+<div id="stage">
+    <div id="map"></div>
+    <div id="bar">
+        <div id="log"></div>
+        <div id="info">
+            <div id="info-toggle">▼</div>
+            <div id="info-body">
+                <div>{{ conf.INFO | safe }}</div>
+                <div id="toggle-cams"><input type="checkbox" autocomplete="off" id="cam-toggle-input"> <label for="cam-toggle-input">Toggle cams</label></div>
+                <div id="add">If you have a key, click here to start adding.</div>
+                <div id="legend"></div>
+            </div>
+        </div>
+    </div>
+    <div id="overlay">
+        <div id="intro">
+            <h2>How to help</h2>
+            <ul class="help">
+                <li>1. Add a note describing the report, with relevant details. For example, if people are arrested ("under"), note how many. <b>Verify as much as you can, especially if it involves shooting.</b> We don't want to spread misinformation or incite panic.</li>
+                <li>2. Add a location. Add cross streets if possible.</li>
+                <li>3a. Click the search icon to find possible coordinates for the location. Click on one of the results to set it.</li>
+                <li>3b. Alternatively, click on the map to set the location.</li>
+                <li>4. Add a label/icon so we can easily identify the activity.</li>
+                <li>5. Submit. There may be a short delay before your submission appears on the map.</li>
+            </ul>
+
+            <ul>
+                <li><b>Please limit to information that is useful for people on the ground.</b> We are trying to ensure that people remain safe and unharmed.</li>
+                <li><b>Please keep the information related to the protests.</b> You may hear 911 chatter, which is not necessarily useful for people on the ground.</li>
+                <li><b>Try to confirm information before reporting, if possible.</b> Reports of "shots fired" for instance can cause panic and need additional verification.</li>
+                <li><b>Avoid mentioning identifying information about protestors.</b></li>
+                <li><b>Avoid using police jargon/language and framing.</b></li>
+            </p>
+
+            <div>{{ conf.INFO | safe }}</div>
+            <button id="ready">Got it</button>
+        </div>
+    </div>
+    <div id="auth-status"></div>
+    <div id="append">
+        <div id="append-form">
+            <input id="text" type="text" placeholder="Note" />
+            <div id="location-search-field">
+                <input id="location" type="text" placeholder="Location" />
+                <div id="location-search">🔍</div>
+            </div>
+            <input id="coordinates" type="text" readonly />
+            <ul id="coord-results"></ul>
+            <select id="label"></select>
+            <input id="submit" type="submit" value="Submit" />
+            <div id="show-help">Help</div>
+        </div>
+        <div id="error"></div>
+        <div id="status"></div>
+    </div>
+</div>
+<script>
+const MAP_CENTER = {{ conf.MAP['CENTER'] }};
+const MAP_ZOOM = {{ conf.MAP['ZOOM'] }};
+const VERSION = '{{ config.VERSION }}';
+const SSE_URL = '{{url_for("sse.stream", channel=location)}}'
+</script>
+<script src="{{ url_for('static', filename='dist/main.js') }}?{{config.VERSION}}"></script>
+{% endblock %}

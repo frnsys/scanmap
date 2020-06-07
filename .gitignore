@@ -1,0 +1,13 @@
+.DS_Store
+__pycache__/
+config.js
+/config.py
+data/logs.db
+data/keys.yml
+static/dist/
+node_modules/
+venv/
+env/
+.venv
+.vscode
+stats.json
