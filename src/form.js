@@ -1,4 +1,4 @@
-import {post} from './util';
+import {post, debounce} from './util';
 
 const fields = ['text', 'location', 'coordinates', 'label'];
 const overlay = document.getElementById('overlay');
@@ -17,14 +17,16 @@ class Form {
     document.getElementById('ready').addEventListener('click', () => {
         overlay.style.display = 'none';
     });
+
     document.getElementById('show-help').addEventListener('click', () => {
       overlay.style.display = 'block';
     });
-    document.getElementById('location').addEventListener('keydown', (ev) => {
-      if (ev.key == 'Enter') {
-        this.queryLocation(ev.target.value);
-      }
-    });
+
+    // autocomplete location search every 250ms
+    document.getElementById('location').addEventListener('keydown', debounce((ev) => {
+      this.queryLocation(ev.target.value);
+    }, 250));
+
     document.getElementById('location-search').addEventListener('click', () => {
       this.queryLocation(document.getElementById('location').value);
     });
@@ -33,8 +35,7 @@ class Form {
   }
 
   queryLocation(query) {
-    statusEl.innerText = 'Searching...';
-    statusEl.style.display = 'block';
+    if (query.trim() == "") return;
 
     // Search for possible coordinates
     // based on inputted location
@@ -44,20 +45,17 @@ class Form {
       // Display search results to choose from
       resultsEl.innerHTML = '';
       if (json.results.length > 0) {
-        // Choose first result by default
-        let res = json.results[0];
-        coordsEl.value = res.coordinates;
-        this.previewCoords([res.coordinates[1], res.coordinates[0]], true);
-
         // Only show first 5 results
         json.results.slice(0, 5).forEach((res) => {
           let li = document.createElement('li');
-          li.innerText = `${res.name} (${res.coordinates.map((c) => c.toFixed(4))})`
+          li.innerText = res.name;
           li.addEventListener('click', () => {
             // Visual selection
             let selected = resultsEl.querySelector('.selected');
             if (selected) selected.classList.remove('selected');
             li.classList.add('selected');
+
+            document.getElementById('location').value = res.name;
 
             coordsEl.value = res.coordinates;
             this.previewCoords([res.coordinates[1], res.coordinates[0]], true);

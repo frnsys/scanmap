@@ -73,4 +73,12 @@ function el(spec) {
   return pa;
 }
 
-export {get, post, el};
+function debounce (fn, ms) {
+  let timeoutId;
+  return function(...args) {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => fn.apply(this, args), ms);
+  };
+};
+
+export {get, post, el, debounce};
