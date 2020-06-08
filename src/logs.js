@@ -87,6 +87,9 @@ function addOrUpdateMarker(log, map) {
       popupEl.querySelector('.popup-logs').prepend(newLog);
 
       markers[key].lastUpdate = log.timestamp*1000;
+
+      // Reset fade
+      markerEl.style.opacity = 1;
     } else {
       // Create new marker
       let element = el({
