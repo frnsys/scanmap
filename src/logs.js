@@ -19,7 +19,9 @@ const LABELS = {
   'injury': '🩹',
   'barricade': '🚧',
   'aviation': '🚁',
-  'other': '🔹'
+  'aid': '⛑️',
+  'protestor_barricade': '🛡️',
+  'other': '🔹',
 };
 const labelsEl = document.getElementById('label');
 const legendEl = document.getElementById('legend');
