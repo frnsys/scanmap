@@ -76,6 +76,7 @@ Run `PYTHONPATH="$(pwd)/tests/app:$(pwd)" pytest` from the project root
 # Deployment notes
 
 - Ensure that proper permissions/ownership are set for files that are written to (e.g. `data/keys.yml`)
+- Setup a service to run `keepalive.py`, which will periodically publish a keepalive SSE message. Otherwise the SSE connections may be closed if there are no messages within the server's configured timeout interval.
 
 ---
 
