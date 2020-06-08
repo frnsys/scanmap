@@ -17,18 +17,33 @@ function fetchLogs() {
   });
 }
 
-/* server sent events coooooode */
-const logSource = new EventSource(SSE_URL);
-logSource.onmessage = function(event) {
-  // const log = JSON.parse(event.data);
-  // showLogs([log], map, form);
+let logSource;
+function initEventSource() {
+  console.log('Initializing event source');
+  /* server sent events coooooode */
+  logSource = new EventSource(SSE_URL);
+  logSource.onmessage = function(ev) {
+    // const log = JSON.parse(ev.data);
+    // showLogs([log], map, form);
 
-  // For now just reloading logs,
-  // for compatibility with how the editing system works.
-  // TODO: properly integrate updates
-  fetchLogs();
-};
-/* end server sent events coooooode */
+    // For now just reloading logs,
+    // for compatibility with how the editing system works.
+    // TODO: properly integrate updates
+    fetchLogs();
+  };
+  // Reconnect on error
+  logSource.addEventListener('error', (ev) => {
+    console.log('Connection error');
+    logSource.close();
+    initEventSource();
+  });
+  /* end server sent events coooooode */
+}
+window.onbeforeunload = () => {
+  logSource.close();
+}
+initEventSource();
+
 
 mapboxgl.accessToken = config.MAPBOX_TOKEN;
 const map = new Map(
