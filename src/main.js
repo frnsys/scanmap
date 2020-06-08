@@ -2,6 +2,7 @@ import Map from './map';
 import Form from './form';
 import config from '../config';
 import setupCams from './cams';
+import setupHelicopters from './helicopters';
 import { get } from './util';
 import { showLogs, fadeMarkers } from './logs';
 
@@ -102,3 +103,4 @@ setInterval(() => {
   fadeMarkers();
 }, 5000);
 setupCams(map);
+setupHelicopters(map);

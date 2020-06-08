@@ -2,6 +2,7 @@ import json
 import config
 from app.db import Database
 from app.cams import cameras
+from app.helicopters import get_helicopter_locations
 from app.keys import KeyRing
 from app.geo import search_places
 from flask_caching import Cache
@@ -49,6 +50,15 @@ def cams(location):
     cams = cameras.get(location, [])
     conf = get_conf(location)
     return jsonify(cams=cams)
+
+
+# cache timeout matches flightradar24 frontend
+@app.route('/<location>/helicopters')
+@cache.cached(timeout=8)
+def helicopters(location):
+    conf = get_conf(location)
+    items = get_helicopter_locations(location)
+    return jsonify(helicopters=items)
 
 
 @app.route('/<location>/log', methods=['GET', 'POST'])

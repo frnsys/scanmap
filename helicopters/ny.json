@@ -1,0 +1,37 @@
+{
+    "bounds": "41.09,40.39,-74.61,-73.41",
+    "tails": {
+        "N412PD": {
+            "owner": "NYPD",
+            "img_url": "https://cdn.jetphotos.com/400/6/47587_1570828795.jpg"
+        },
+        "N414PD": {
+            "owner": "NYPD",
+            "img_url": "https://cdn.jetphotos.com/400/6/93090_1525055952.jpg"
+        },
+        "N422PD": {
+            "owner": "NYPD",
+            "img_url": "https://cdn.jetphotos.com/400/5/74490_1587510269.jpg"
+        },
+        "N917PD": {
+            "owner": "NYPD",
+            "img_url": "https://cdn.jetphotos.com/400/5/73578_1490309867.jpg"
+        },
+        "N918PD": {
+            "owner": "NYPD",
+            "img_url": "https://cdn.jetphotos.com/400/5/24261_1553150140.jpg"
+        },
+        "N919PD": {
+            "owner": "NYPD",
+            "img_url": "https://cdn.jetphotos.com/400/5/73524_1474894565.jpg"
+        },
+        "N920PD": {
+            "owner": "NYPD",
+            "img_url": "https://cdn.jetphotos.com/400/5/16645_1540324262.jpg"
+        },
+        "N407NY": {
+            "owner": "NYPD",
+            "img_url": "https://cdn.jetphotos.com/400/5/76099_1591485611.jpg"
+        }
+    }
+}
