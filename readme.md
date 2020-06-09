@@ -4,7 +4,7 @@ You need three files to configure the application:
 
 - `config.py`: general app/maps configuration options
 - `config.js`: mostly for setting up mapbox
-- `keys.yml`: adding/revoking keys for adding to maps
+- `data/keys.yml`: adding/revoking keys for adding to maps
 
 Notation here is `<description:example value>`.
 
@@ -44,7 +44,7 @@ LOCATIONS = {
 ```
 
 ```
-# keys.yml
+# data/keys.yml
 <location key:NY>:
     prime: # admin keys
         - <auth key>
@@ -90,11 +90,13 @@ KEYS_FILE = 'data/keys.yml'
 GOOGLE_PLACES_API_KEY = '<KEY>'
 REDIS_URL = 'redis://localhost'
 DEBUG = False
+CACHE_TYPE = 'simple'
 
 LOCATIONS = {
     'NY': {
         'LIVE': True,
         'CAMERAS': 'cams/ny.json',
+        'HELICOPTERS': 'helicopters/ny.json',
         'MAP': {
             'CENTER': [-73.96161699999999, 40.678806],
             'ZOOM': 12

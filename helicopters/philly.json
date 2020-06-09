@@ -1,0 +1,21 @@
+{
+    "bounds": "40.24,39.64,-75.79,-74.79",
+    "tails": {
+        "N296PD": {
+            "owner": "PPD",
+            "img_url": "https://photos-e1.flightcdn.com/photos/retriever/25a448077aa3d6dc616b43ac1880746ac0e3244b"
+        },
+        "N297PD": {
+            "owner": "PPD",
+            "img_url": "https://photos-e1.flightcdn.com/photos/retriever/680d5eb214e97e736cff77633a22383117e39b3d"
+        },
+        "N94PD": {
+            "owner": "PPD",
+            "img_url": "https://photos-e1.flightcdn.com/photos/retriever/9347bdec715bba3a1b0338308db92097c6171509"
+        },
+        "N95PD": {
+            "owner": "PPD",
+            "img_url": "https://photos-e1.flightcdn.com/photos/retriever/3248a572bfeeea190580cf3198013e0050bda3a3"
+        }
+    }
+}

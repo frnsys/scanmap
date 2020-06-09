@@ -224,6 +224,13 @@ select {
   background-image: url('/static/camera.png');
   background-size: cover;
 }
+.marker-helicopter {
+  background-color: transparent;
+  width: 28px;
+  height: 28px;
+  background-image: url('/static/helicopter.png');
+  background-size: cover;
+}
 
 .logitem {
   display: flex;
@@ -340,6 +347,10 @@ select {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr 1fr;
+}
+
+.mapboxgl-popup-content img {
+  max-height: 50vh;
 }
 
 @media only screen and (max-width: 680px) {

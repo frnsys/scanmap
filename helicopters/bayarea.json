@@ -1,0 +1,17 @@
+{
+    "bounds": "38.14,37.31,-123.26,-121.78",
+    "tails": {
+        "N996PD": {
+            "owner": "Regional Park Police",
+            "img_url": "https://photos-e1.flightcdn.com/photos/retriever/71b11958c8b838929223ed1a020866fdf3fb0d45"
+        },
+        "N981HP": {
+            "owner": "California Highway Patrol",
+            "img_url": "https://photos-e1.flightcdn.com/photos/retriever/92b6f2826f51942d488e1d8bf9fd1504d5e5bbde"
+        },
+        "N982HP": {
+            "owner": "California Highway Patrol",
+            "img_url": "https://photos-e1.flightcdn.com/photos/retriever/9b9538da36eebbf8f70753b77b4b7353815de311"
+        }
+    }
+}
