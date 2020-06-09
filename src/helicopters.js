@@ -2,17 +2,20 @@ import {get, el} from './util';
 
 const toggleEl = document.getElementById('toggle-helicopters');
 
-function makeMarkers(map, items) {
-  let markers = [];
+let markers = {};
+
+function updateMarkers(map, items) {
   if (items.length == 0) {
     toggleEl.innerHTML = 'No helicopters for this region';
-
   } else {
+    let tails = new Set();
     items.forEach((item) => {
-      if (item.url) {
-        // Set up map marker for helicopter
-        let coords = [item['lng'], item['lat']];
-        let marker = map.addMarker(coords, {
+      let coords = [item['lng'], item['lat']];
+      let tail = item['tail'];
+      tails.add(tail);
+      if (!(tail in markers)) {
+        // Set up map marker for helicopter first time
+        markers[tail] = map.addMarker(coords, {
           element: el({
             tag: 'img',
             src: item.url
@@ -22,34 +25,40 @@ function makeMarkers(map, items) {
             maxWidth: 'none'
           }
         });
-        markers.push(marker);
+      } else {
+        // update marker for helicopters that already exists
+        markers[tail].setLngLat(coords);
       }
     });
+    // delete any leftover markers
+    // if this code causes problems it can be safely deleted
+    // because helicopters land much more rarely than page refreshes
+    Object.keys(markers).forEach((tail) => {
+      if (!tails.has(tail)) {
+        delete markers[tail];
+      }
+    })
   }
-  return markers;
 }
 
-let markers = [];
-
-function addHelicopters(map) {
+function updateHelicopters(map) {
   get('helicopters', (json) => {
-    markers = makeMarkers(map, json.helicopters);
+    updateMarkers(map, json.helicopters);
   });
 }
 
-function removeHelicopters(map) {
-  markers.forEach((m) => m.remove());
+function removeHelicopters() {
+  Object.values(markers).forEach((m) => m.remove());
+  markers = {};
 }
 
 function setupHelicopters(map) {
-  let markers = [];
   let interval;
   toggleEl.addEventListener('click', (ev) => {
     if (ev.target.checked) {
-      addHelicopters(map);
+      updateHelicopters(map);
       interval = setInterval(() => {
-        removeHelicopters();
-        addHelicopters(map);
+        updateHelicopters(map);
       }, 10000); // slightly slower than cache to guarantee update
     } else {
       removeHelicopters();
