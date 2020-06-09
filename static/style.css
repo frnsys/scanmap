@@ -2,11 +2,22 @@
   box-sizing: border-box;
 }
 
+@font-face {
+  font-family: 'Fantasque Sans Mono';
+  src: url('/static/fonts/FantasqueSansMono-Regular.woff2') format('woff2'),
+       url('/static/fonts/FantasqueSansMono-Regular.woff') format('woff'), /* Firefox >= 3.6, any other modern browser */
+       url('/static/fonts/FantasqueSansMono-Regular.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('/static/fonts/FantasqueSansMono-Regular.svg#FantasqueSansMono-Regular') format('svg'); /* Chrome < 4, Legacy iOS */
+  font-weight: 400;
+  font-style: normal;
+}
+
 html, body {
   margin: 0;
   padding: 0;
   background: #222;
-  font-family: monospace;
+  font-size: 0.85em;
+  font-family: 'Fantasque Sans Mono', monospace;
   color: #fff;
 }
 
