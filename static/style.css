@@ -307,6 +307,16 @@ select {
   color: #000;
 }
 
+#toggles > div {
+  display: inline-block;
+  padding: 2px;
+  border: 1px solid #414141;
+}
+#toggles input {
+  margin: 0;
+  vertical-align: middle;
+}
+
 #panel {
   max-width: 640px;
   margin: 0 auto;
