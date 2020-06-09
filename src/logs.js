@@ -20,6 +20,8 @@ const LABELS = {
   'barricade': '🚧',
   'aviation': '🚁',
   'aid': '⛑️',
+  'military': '💂',
+  'jail': '🔒',
   'protestor_barricade': '🛡️',
   'other': '🔹',
 };
