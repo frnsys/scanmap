@@ -95,8 +95,8 @@ CACHE_TYPE = 'simple'
 LOCATIONS = {
     'NY': {
         'LIVE': True,
-        'CAMERAS': 'cams/ny.json',
-        'HELICOPTERS': 'helicopters/ny.json',
+        'CAMERAS': 'data/cams/ny.json',
+        'HELICOPTERS': 'data/helis/ny.json',
         'MAP': {
             'CENTER': [-73.96161699999999, 40.678806],
             'ZOOM': 12

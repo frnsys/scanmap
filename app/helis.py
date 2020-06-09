@@ -12,12 +12,20 @@ for loc, conf in config.LOCATIONS.items():
 def get_helicopter_locations(location):
     if location not in helicopters_config:
         return []
+
+    tails = helicopters_config[location]['tails']
+    results = {
+        tail: {
+            'tail': tail,
+            'url': meta['img_url'],
+            'owner': meta['owner']
+        } for tail, meta in tails.items()}
+
     url = 'https://data-live.flightradar24.com/zones/fcgi/feed.js'
     params = { 'bounds': helicopters_config[location]['bounds'] }
     headers = { 'User-Agent': 'Mozilla/5.0' }
     resp = requests.get(url, params=params, headers=headers)
     data = resp.json()
-    results = []
     for key, value in data.items():
         if not isinstance(value, list):
             continue
@@ -25,11 +33,6 @@ def get_helicopter_locations(location):
         if tail not in helicopters_config[location]['filter']:
             continue
         meta = helicopters_config[location]['tails'][tail]
-        results.append({
-            'tail': tail,
-            'lat': lat,
-            'lng': lng,
-            'url': meta['img_url'],
-            'owner': meta['owner']
-        })
-    return results
+        results[tail]['lat'] = lat
+        results[tail]['lng'] = lng
+    return list(results.values())

@@ -2,7 +2,7 @@ import Map from './map';
 import Form from './form';
 import config from '../config';
 import setupCams from './cams';
-import setupHelicopters from './helicopters';
+import setupHelicopters from './helis';
 import { get } from './util';
 import { showLogs, fadeMarkers } from './logs';
 
