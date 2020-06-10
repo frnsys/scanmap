@@ -18,6 +18,11 @@ VERSION = '1591117380'
 # Maximum amount of logs to send
 MAX_LOGS = 200
 
+# Show only logs from within the past
+LOGS_AFTER = {
+    'days': 1
+}
+
 # Where the database and keys files are located
 DB_PATH = 'data/logs.db'
 KEYS_FILE = 'data/keys.yml'
@@ -84,7 +89,12 @@ Example `config.py`:
 
 ```
 VERSION = '1591117380'
+
 MAX_LOGS = 200
+LOGS_AFTER = {
+    'days': 1
+}
+
 DB_PATH = 'data/logs.db'
 KEYS_FILE = 'data/keys.yml'
 GOOGLE_PLACES_API_KEY = '<KEY>'

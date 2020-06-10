@@ -25,7 +25,7 @@ class Database:
             (timestamp, location, submitter, json.dumps(log)))
         con.commit()
 
-    def logs(self, location, n):
+    def logs(self, location, n, after=None):
         con, cur = self._con()
         rows = cur.execute(
                 'SELECT timestamp, submitter, data FROM logs WHERE location == ? ORDER BY timestamp DESC LIMIT ?',
@@ -34,7 +34,8 @@ class Database:
             'timestamp': timestamp,
             'data': json.loads(data),
             'submitter': submitter[:8] if submitter else None
-        } for timestamp, submitter, data in rows][::-1]
+        } for timestamp, submitter, data in rows
+            if after is None or float(timestamp) > after][::-1]
 
     def log(self, location, timestamp):
         con, cur = self._con()

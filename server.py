@@ -8,7 +8,7 @@ from app.geo import search_places
 from flask_caching import Cache
 from flask import Flask, abort, request, render_template, jsonify
 from flask_sse import sse
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 app = Flask(__name__)
 app.config.from_object(config)
@@ -83,7 +83,9 @@ def log(location):
         return jsonify(success=True)
     else:
         # Limit amount of logs sent
-        logs = db.logs(location, n=config.MAX_LOGS)
+        now = datetime.utcnow().replace(tzinfo=timezone.utc)
+        interval = (now - timedelta(**config.LOGS_AFTER)).timestamp()
+        logs = db.logs(location, n=config.MAX_LOGS, after=interval)
 
         # Strip submitter info
         # Check permissions

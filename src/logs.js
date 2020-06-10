@@ -153,6 +153,13 @@ function showLogs(logs, map, form) {
   // Track what log entries we have
   let logIds = new Set([...document.querySelectorAll('.logitem')].map((el) => el.id));
 
+  let noLogs = document.getElementById('no-log');
+  if (logs.length == 0) {
+    noLogs.style.display = 'block';
+  } else {
+    noLogs.style.display = 'none';
+  }
+
   logs.forEach((l) => {
     let log = {
       id: l.timestamp.toString(),

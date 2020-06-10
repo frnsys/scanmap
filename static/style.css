@@ -90,6 +90,11 @@ html, body {
   flex: 1;
   overflow-y: scroll;
 }
+#no-log {
+  text-align: center;
+  padding: 1em 0.5em;
+  display: none;
+}
 #info {
   font-size: 0.8em;
   padding: 0 1em 0.25em 1em;

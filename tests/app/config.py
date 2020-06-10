@@ -10,6 +10,11 @@ VERSION = 'TEST'
 # Maximum amount of logs to send
 MAX_LOGS = 200
 
+# Show only logs from within the past
+LOGS_AFTER = {
+    'days': 1
+}
+
 # Where the database and keys files are located
 DB_PATH = ':memory:'   # Hack to prevent creating a dummy DB file
 KEYS_FILE = os.devnull # Hack to prevent creating a dummy key file
