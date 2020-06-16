@@ -20,6 +20,7 @@ function makeMarkers(map, cams) {
           element: el({
             tag: 'img',
             src: '#',
+            referrerPolicy: 'no-referrer',
             dataset: {
               src: cam.url
             }
