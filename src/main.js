@@ -88,7 +88,7 @@ setInterval(() => {
 
 fetchLogs('event', map, form, true);
 setInterval(() => {
-  fadeMarkers();
+  fadeMarkers('event');
 }, 5000);
 setupCams(map);
 setupHelicopters(map);

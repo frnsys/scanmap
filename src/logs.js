@@ -15,7 +15,10 @@ let lastSeen = {
 // When markers expire
 let expireTime = 60 * 60 * 1000; // in ms. One hour
 const minMarkerOpacity = 0.25;
-const markers = {};
+const markers = {
+  event: {},
+  static: {}
+};
 const logMarkers = {};
 
 const ALL_LABELS = {};
@@ -67,7 +70,7 @@ function addOrUpdateMarker(log, map) {
     logMarkers[log.elId] = key;
     if (key in markers) {
       // Update marker icon to latest event's icon
-      let markerEl = markers[key].marker.getElement();
+      let markerEl = markers[log.type][key].marker.getElement();
       if (icon) {
         markerEl.innerText = icon;
         markerEl.style.background = 'none';
@@ -77,11 +80,11 @@ function addOrUpdateMarker(log, map) {
       }
 
       // Add to popup list
-      let popup = markers[key].marker.getPopup();
+      let popup = markers[log.type][key].marker.getPopup();
       let popupEl = popup._content;
       popupEl.querySelector('.popup-logs').prepend(newLog);
 
-      markers[key].lastUpdate = log.timestamp*1000;
+      markers[log.type][key].lastUpdate = log.timestamp*1000;
 
       // Reset fade
       markerEl.style.opacity = 1;
@@ -99,7 +102,7 @@ function addOrUpdateMarker(log, map) {
           children: [newLog]
         }]
       });
-      markers[key] = {
+      markers[log.type][key] = {
         lastUpdate: log.timestamp*1000,
         marker: map.addMarker(log.coords, {element, icon})
       };
@@ -109,9 +112,9 @@ function addOrUpdateMarker(log, map) {
   }
 }
 
-function removeLogFromMarker(key, elId) {
-  if (markers[key]) {
-    let {marker} = markers[key];
+function removeLogFromMarker(key, logType, elId) {
+  if (markers[logType][key]) {
+    let {marker} = markers[logType][key];
     let markerEl = marker.getElement();
     let popupEl = marker.getPopup()._content;
 
@@ -119,8 +122,8 @@ function removeLogFromMarker(key, elId) {
     let events = popupEl.querySelectorAll('.popup-log');
     let popupItem = popupEl.querySelector(`#popup-${elId}`);
     if (events.length == 1) {
-      markers[key].marker.remove();
-      delete markers[key];
+      markers[logType][key].marker.remove();
+      delete markers[logType][key];
 
     // Otherwise, only remove that event
     } else {
@@ -380,7 +383,7 @@ function showLogs(logType, logs, map, form, showMarkers) {
                   }, () => {
                     logItem.parentNode.removeChild(logItem);
                     let key = logMarkers[log.elId];
-                    removeLogFromMarker(key, log.elId);
+                    removeLogFromMarker(key, log.type, log.elId);
                   }, form.authKey);
                 }
               }
@@ -394,7 +397,7 @@ function showLogs(logType, logs, map, form, showMarkers) {
             let coords = logItem.dataset.coords.split(',').map((c) => parseFloat(c));
             coords.reverse();
             map.jumpTo(coords);
-            showPopup(markers[key].marker);
+            showPopup(markers[log.type][key].marker);
           });
         }
       }
@@ -420,8 +423,8 @@ function showLogs(logType, logs, map, form, showMarkers) {
 
           // Change marker icon if necessary
           let key = logMarkers[log.elId];
-          if (markers[key]) {
-            let {marker} = markers[key];
+          if (markers[log.type][key]) {
+            let {marker} = markers[log.type][key];
             let markerEl = marker.getElement();
             let popupEl = marker.getPopup()._content;
 
@@ -448,7 +451,7 @@ function showLogs(logType, logs, map, form, showMarkers) {
           // Get existing marker
           let coords = logItem.dataset.coords.split(',').map((c) => parseFloat(c));
           let key = `${coords[1]}_${coords[0]}`;
-          removeLogFromMarker(key, log.elId);
+          removeLogFromMarker(key, log.type, log.elId);
           addOrUpdateMarker(log, map);
           logItem.dataset.coords = log.coordinates;
         }
@@ -464,7 +467,7 @@ function showLogs(logType, logs, map, form, showMarkers) {
         el.parentNode.removeChild(el);
       }
       let key = logMarkers[elId];
-      removeLogFromMarker(key, elId);
+      removeLogFromMarker(key, logType, elId);
     });
   });
 
@@ -493,11 +496,11 @@ function closePopups() {
   }
 }
 
-function fadeMarkers() {
+function fadeMarkers(logType) {
   // Fade out markers
   let now = new Date().getTime();
-  Object.keys(markers).forEach((k) => {
-    let {marker, lastUpdate} = markers[k];
+  Object.keys(markers[logType]).forEach((k) => {
+    let {marker, lastUpdate} = markers[logType][k];
     let fade = Math.max(0, 1 - (now - lastUpdate)/expireTime);
     if (fade < 0.1)
     marker.getElement().style.opacity = Math.max(fade, minMarkerOpacity);
@@ -521,7 +524,7 @@ function fetchLogs(logType, map, form, showMarkers) {
 function clearMarkers(logType) {
   logElIds[logType].forEach((elId) => {
     let key = logMarkers[elId];
-    removeLogFromMarker(key, elId);
+    removeLogFromMarker(key, logType, elId);
   });
   // TODO Not an ideal way of doing this
   lastSeen[logType] = 0;
