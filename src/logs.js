@@ -142,7 +142,7 @@ function removeLogFromMarker(key, elId) {
   }
 }
 
-function showLogs(logType, logs, map, form) {
+function showLogs(logType, logs, map, form, showMarkers) {
   // Track what log entries we have
   let logIds = new Set([...document.querySelectorAll(`#${logType}-logs .logitem`)].map((el) => el.id));
 
@@ -467,6 +467,11 @@ function showLogs(logType, logs, map, form) {
       removeLogFromMarker(key, elId);
     });
   });
+
+  // TODO Not ideal
+  if (!showMarkers) {
+    clearMarkers(logType);
+  }
 }
 
 // Display one popup and hide the rest
@@ -500,11 +505,11 @@ function fadeMarkers() {
 }
 
 
-function fetchLogs(logType, map, form) {
+function fetchLogs(logType, map, form, showMarkers) {
   get(
     `log/${logType}`,
     ({ logs }) => {
-      showLogs(logType, logs, map, form);
+      showLogs(logType, logs, map, form, showMarkers);
     },
     form.authKey
   ).catch((err) => {
