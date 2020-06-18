@@ -1,17 +1,22 @@
 import LABELS from './labels';
-import {post, el} from './util';
+import {get, post, el} from './util';
+
+const logElIds = {
+  event: [],
+  static: []
+};
 
 // Last seen log timestamp
-let lastSeen = 0;
+let lastSeen = {
+  event: 0,
+  static: 0
+};
 
 // When markers expire
 let expireTime = 60 * 60 * 1000; // in ms. One hour
 const minMarkerOpacity = 0.25;
 const markers = {};
 const logMarkers = {};
-
-// TODO?
-let logType = 'event';
 
 const ALL_LABELS = {};
 Object.values(LABELS).forEach((labels) => {
@@ -137,17 +142,18 @@ function removeLogFromMarker(key, elId) {
   }
 }
 
-function showLogs(logs, map, form) {
+function showLogs(logType, logs, map, form) {
   // Track what log entries we have
-  let logIds = new Set([...document.querySelectorAll('.logitem')].map((el) => el.id));
+  let logIds = new Set([...document.querySelectorAll(`#${logType}-logs .logitem`)].map((el) => el.id));
 
-  let noLogs = document.getElementById('no-log');
+  let noLogs = document.querySelector(`#${logType}-logs .no-log`);
   if (logs.length == 0) {
     noLogs.style.display = 'block';
   } else {
     noLogs.style.display = 'none';
   }
 
+  logElIds[log.type] = [];
   logs.forEach((l) => {
     let log = {
       id: l.timestamp.toString(),
@@ -156,107 +162,180 @@ function showLogs(logs, map, form) {
       coords: l.data.coordinates.split(',').map((c) => parseFloat(c)),
       ...l.data, ...l
     };
+    logElIds[log.type].push(log.elId);
 
     // Track which log entries are still present
     logIds.delete(log.elId);
 
-    if (log.timestamp > lastSeen) {
+    if (log.timestamp > lastSeen[log.type]) {
       let key = addOrUpdateMarker(log, map);
 
       // Add to log sidebar
-      let logEl = document.getElementById('log');
-      let logItem = el({
-        id: log.elId,
-        tag: 'div',
-        className: 'logitem',
-        dataset: {
-          permit: log.permit || false,
-          coords: log.coordinates
-        },
-        children: [{
+      let logEl = document.getElementById(`${logType}-logs`);
+      let logItem = document.getElementById(log.elId);
+      if (!logItem) {
+        let logItem = el({
+          id: log.elId,
           tag: 'div',
-          className: 'logitem-log',
+          className: 'logitem',
+          dataset: {
+            permit: log.permit || false,
+            coords: log.coordinates
+          },
           children: [{
             tag: 'div',
-            className: 'logitem-when',
-            innerText: log.dt,
-          }, {
-            tag: 'div',
-            className: 'logitem-meta',
+            className: 'logitem-log',
             children: [{
-              tag: 'span',
-              className: 'logitem-label',
-              innerText: log.label ? `${LABELS[log.type][log.label]} ${log.label} @ ` : '',
-              dataset: {
-                label: log.label
-              },
-              on: {
-                dblclick: (ev) => {
-                  if (ev.target.closest('.logitem').dataset.permit == 'true') {
-                    let inp = ev.target.parentNode.querySelector('.logitem-label-input');
-                    inp.style.display = 'flex';
-                    ev.target.style.display = 'none';
-                  }
-                }
-              }
+              tag: 'div',
+              className: 'logitem-when',
+              innerText: log.dt,
             }, {
               tag: 'div',
-              className: 'logitem-label-input',
+              className: 'logitem-meta',
               children: [{
-                tag: 'select',
-                children: Object.keys(LABELS[log.type]).map((label) => ({
-                  tag: 'option',
-                  innerText: `${LABELS[log.type][label]} ${label}`,
-                  value: label,
-                  selected: label == log.label
-                })),
+                tag: 'span',
+                className: 'logitem-label',
+                innerText: log.label ? `${LABELS[log.type][log.label]} ${log.label} @ ` : '',
+                dataset: {
+                  label: log.label
+                },
                 on: {
-                  input: (ev) => {
-                    let newLabel = ev.target.value;
-                    post('log/edit', {
-                      timestamp: log.id,
-                      action: 'update',
-                      changes: {
-                        label: ev.target.value
-                      }
-                    }, () => {
-                      let text = newLabel && newLabel !== 'other' ? `${LABELS[log.type][newLabel]} ${newLabel} @ ` : '';
-                      let labelEl = ev.target.closest('.logitem').querySelector('.logitem-label');
-                      labelEl.innerText = text;
-                      labelEl.style.display = 'inline';
+                  dblclick: (ev) => {
+                    if (ev.target.closest('.logitem').dataset.permit == 'true') {
+                      let inp = ev.target.parentNode.querySelector('.logitem-label-input');
+                      inp.style.display = 'flex';
+                      ev.target.style.display = 'none';
+                    }
+                  }
+                }
+              }, {
+                tag: 'div',
+                className: 'logitem-label-input',
+                children: [{
+                  tag: 'select',
+                  children: Object.keys(LABELS[log.type]).map((label) => ({
+                    tag: 'option',
+                    innerText: `${LABELS[log.type][label]} ${label}`,
+                    value: label,
+                    selected: label == log.label
+                  })),
+                  on: {
+                    input: (ev) => {
+                      let newLabel = ev.target.value;
+                      post('log/edit', {
+                        timestamp: log.id,
+                        action: 'update',
+                        changes: {
+                          label: ev.target.value
+                        }
+                      }, () => {
+                        let text = newLabel && newLabel !== 'other' ? `${LABELS[log.type][newLabel]} ${newLabel} @ ` : '';
+                        let labelEl = ev.target.closest('.logitem').querySelector('.logitem-label');
+                        labelEl.innerText = text;
+                        labelEl.style.display = 'inline';
+                        ev.target.closest('.logitem-label-input').style.display = 'none';
+                      }, form.authKey);
+                    }
+                  }
+                }, {
+                  tag: 'span',
+                  innerText: ' cancel',
+                  className: 'action logitem-label-edit-cancel',
+                  on: {
+                    click: (ev) => {
                       ev.target.closest('.logitem-label-input').style.display = 'none';
-                    }, form.authKey);
+                      ev.target.closest('.logitem').querySelector('.logitem-label').style.display = 'inline';
+                    }
+                  }
+                }]
+              }, {
+                tag: 'span',
+                className: 'logitem-location',
+                innerText: log.location,
+                on: {
+                  dblclick: (ev) => {
+                    if (ev.target.closest('.logitem').dataset.permit == 'true') {
+                      let inp = ev.target.parentNode.querySelector('.logitem-location-input');
+                      let can = ev.target.parentNode.querySelector('.logitem-location-edit-cancel');
+                      let coords = ev.target.parentNode.querySelector('.logitem-coords');
+                      map.addClickListener(log.id, (coord) => {
+                        coords.value = `${coord.lat},${coord.lng}`;
+                        form.previewCoords([coord.lng, coord.lat]);
+                      });
+                      inp.style.display = 'inline';
+                      can.style.display = 'inline';
+                      coords.style.display = 'block';
+                      inp.value = log.location;
+                      inp.focus();
+                      ev.target.style.display = 'none';
+                    }
+                  }
+                }
+              }, {
+                tag: 'input',
+                type: 'text',
+                className: 'logitem-location-input',
+                value: log.location,
+                on: {
+                  keydown: (ev) => {
+                    if (ev.key == 'Enter') {
+                      let inp = ev.target;
+                      let el = inp.parentNode.querySelector('.logitem-location');
+                      let can = inp.parentNode.querySelector('.logitem-location-edit-cancel');
+                      let coords = inp.parentNode.querySelector('.logitem-coords');
+                      inp.style.display = 'none';
+                      can.style.display = 'none';
+                      coords.style.display = 'none';
+                      el.style.display = 'inline';
+                      map.removeClickListener(log.id);
+
+                      post('log/edit', {
+                        timestamp: log.id,
+                        action: 'update',
+                        changes: {
+                          location: inp.value,
+                          coordinates: coords.value
+                        }
+                      }, () => {
+                        el.innerText = inp.value;
+                      }, form.authKey);
+                    }
                   }
                 }
               }, {
                 tag: 'span',
                 innerText: ' cancel',
-                className: 'action logitem-label-edit-cancel',
+                className: 'action logitem-location-edit-cancel',
                 on: {
                   click: (ev) => {
-                    ev.target.closest('.logitem-label-input').style.display = 'none';
-                    ev.target.closest('.logitem').querySelector('.logitem-label').style.display = 'inline';
+                    let can = ev.target;
+                    let inp = ev.target.parentNode.querySelector('.logitem-location-input');
+                    let el = inp.parentNode.querySelector('.logitem-location');
+                    let coords = inp.parentNode.querySelector('.logitem-coords');
+                    coords.value = log.coordinates,
+                    inp.style.display = 'none';
+                    can.style.display = 'none';
+                    coords.style.display = 'none';
+                    el.style.display = 'inline';
+                    map.removeClickListener(log.id);
                   }
                 }
+              }, {
+                tag: 'input',
+                type: 'text',
+                readonly: true,
+                className: 'logitem-coords',
+                value: log.coordinates
               }]
             }, {
-              tag: 'span',
-              className: 'logitem-location',
-              innerText: log.location,
+              tag: 'div',
+              className: 'logitem-text',
+              innerText: log.text,
               on: {
                 dblclick: (ev) => {
                   if (ev.target.closest('.logitem').dataset.permit == 'true') {
-                    let inp = ev.target.parentNode.querySelector('.logitem-location-input');
-                    let can = ev.target.parentNode.querySelector('.logitem-location-edit-cancel');
-                    let coords = ev.target.parentNode.querySelector('.logitem-coords');
-                    map.addClickListener(log.id, (coord) => {
-                      coords.value = `${coord.lat},${coord.lng}`;
-                      form.previewCoords([coord.lng, coord.lat]);
-                    });
-                    inp.style.display = 'inline';
-                    can.style.display = 'inline';
-                    coords.style.display = 'block';
-                    inp.value = log.location;
+                    let inp = ev.target.parentNode.querySelector('.logitem-text-input');
+                    inp.style.display = 'block';
                     inp.focus();
                     ev.target.style.display = 'none';
                   }
@@ -265,27 +344,21 @@ function showLogs(logs, map, form) {
             }, {
               tag: 'input',
               type: 'text',
-              className: 'logitem-location-input',
-              value: log.location,
+              className: 'logitem-text-input',
+              value: log.text,
               on: {
                 keydown: (ev) => {
                   if (ev.key == 'Enter') {
-                    let inp = ev.target;
-                    let el = inp.parentNode.querySelector('.logitem-location');
-                    let can = inp.parentNode.querySelector('.logitem-location-edit-cancel');
-                    let coords = inp.parentNode.querySelector('.logitem-coords');
+                    let inp = ev.target
+                    let el = inp.parentNode.querySelector('.logitem-text');
                     inp.style.display = 'none';
-                    can.style.display = 'none';
-                    coords.style.display = 'none';
-                    el.style.display = 'inline';
-                    map.removeClickListener(log.id);
+                    el.style.display = 'block';
 
                     post('log/edit', {
                       timestamp: log.id,
                       action: 'update',
                       changes: {
-                        location: inp.value,
-                        coordinates: coords.value
+                        text: inp.value
                       }
                     }, () => {
                       el.innerText = inp.value;
@@ -293,102 +366,39 @@ function showLogs(logs, map, form) {
                   }
                 }
               }
-            }, {
-              tag: 'span',
-              innerText: ' cancel',
-              className: 'action logitem-location-edit-cancel',
-              on: {
-                click: (ev) => {
-                  let can = ev.target;
-                  let inp = ev.target.parentNode.querySelector('.logitem-location-input');
-                  let el = inp.parentNode.querySelector('.logitem-location');
-                  let coords = inp.parentNode.querySelector('.logitem-coords');
-                  coords.value = log.coordinates,
-                  inp.style.display = 'none';
-                  can.style.display = 'none';
-                  coords.style.display = 'none';
-                  el.style.display = 'inline';
-                  map.removeClickListener(log.id);
-                }
-              }
-            }, {
-              tag: 'input',
-              type: 'text',
-              readonly: true,
-              className: 'logitem-coords',
-              value: log.coordinates
             }]
           }, {
             tag: 'div',
-            className: 'logitem-text',
-            innerText: log.text,
+            className: 'delete-log',
+            innerText: '❌',
             on: {
-              dblclick: (ev) => {
-                if (ev.target.closest('.logitem').dataset.permit == 'true') {
-                  let inp = ev.target.parentNode.querySelector('.logitem-text-input');
-                  inp.style.display = 'block';
-                  inp.focus();
-                  ev.target.style.display = 'none';
-                }
-              }
-            }
-          }, {
-            tag: 'input',
-            type: 'text',
-            className: 'logitem-text-input',
-            value: log.text,
-            on: {
-              keydown: (ev) => {
-                if (ev.key == 'Enter') {
-                  let inp = ev.target
-                  let el = inp.parentNode.querySelector('.logitem-text');
-                  inp.style.display = 'none';
-                  el.style.display = 'block';
-
+              click: () => {
+                if (confirm('Are you sure you want to delete this?')) {
                   post('log/edit', {
                     timestamp: log.id,
-                    action: 'update',
-                    changes: {
-                      text: inp.value
-                    }
+                    action: 'delete'
                   }, () => {
-                    el.innerText = inp.value;
+                    logItem.parentNode.removeChild(logItem);
+                    let key = logMarkers[log.elId];
+                    removeLogFromMarker(key, log.elId);
                   }, form.authKey);
                 }
               }
             }
           }]
-        }, {
-          tag: 'div',
-          className: 'delete-log',
-          innerText: '❌',
-          on: {
-            click: () => {
-              if (confirm('Are you sure you want to delete this?')) {
-                post('log/edit', {
-                  timestamp: log.id,
-                  action: 'delete'
-                }, () => {
-                  logItem.parentNode.removeChild(logItem);
-                  let key = logMarkers[log.elId];
-                  removeLogFromMarker(key, log.elId);
-                }, form.authKey);
-              }
-            }
-          }
-        }]
-      });
-      logEl.prepend(logItem);
-
-      if (log.coords.length == 2) {
-        logItem.addEventListener('click', () => {
-          let coords = logItem.dataset.coords.split(',').map((c) => parseFloat(c));
-          coords.reverse();
-          map.jumpTo(coords);
-          showPopup(markers[key].marker);
         });
+        logEl.prepend(logItem);
+
+        if (log.coords.length == 2) {
+          logItem.addEventListener('click', () => {
+            let coords = logItem.dataset.coords.split(',').map((c) => parseFloat(c));
+            coords.reverse();
+            map.jumpTo(coords);
+            showPopup(markers[key].marker);
+          });
+        }
       }
-      lastSeen = log.timestamp;
+      lastSeen[log.type] = log.timestamp;
     } else {
       // See if we need to update the entry
       let logItem = document.getElementById(log.elId);
@@ -489,4 +499,27 @@ function fadeMarkers() {
   });
 }
 
-export {showLogs, fadeMarkers};
+
+function fetchLogs(logType, map, form) {
+  get(
+    `log/${logType}`,
+    ({ logs }) => {
+      showLogs(logType, logs, map, form);
+    },
+    form.authKey
+  ).catch((err) => {
+    console.log(err);
+  });
+}
+
+
+function clearMarkers(logType) {
+  logElIds[logType].forEach((elId) => {
+    let key = logMarkers[elId];
+    removeLogFromMarker(key, elId);
+  });
+  // TODO Not an ideal way of doing this
+  lastSeen[logType] = 0;
+}
+
+export {fetchLogs, fadeMarkers, clearMarkers};

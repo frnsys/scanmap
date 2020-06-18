@@ -90,7 +90,30 @@ html, body {
   flex: 1;
   overflow-y: scroll;
 }
-#no-log {
+.logs {
+  display: none;
+}
+.logs.selected {
+  display: block;
+}
+#log-tabs {
+  display: none;
+  /* display: flex; */
+  margin-bottom: 0.5em;
+}
+.log-tab {
+  flex: 1;
+  text-align: center;
+  padding: 0.25em;
+  background: #3c3c3c;
+  color: #989898;
+  cursor: pointer;
+}
+.log-tab.selected {
+  background: #222222;
+  color: #fff;
+}
+.no-log {
   text-align: center;
   padding: 1em 0.5em;
   display: none;

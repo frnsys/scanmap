@@ -26,7 +26,7 @@ class Database:
             (timestamp, type, location, submitter, json.dumps(log)))
         con.commit()
 
-    def logs(self, location, n=0, after=None, type='event'):
+    def logs(self, location, n=-1, after=None, type='event'):
         con, cur = self._con()
         rows = cur.execute(
                 'SELECT timestamp, submitter, data FROM logs WHERE location == ? AND type == ? ORDER BY timestamp DESC LIMIT ?',

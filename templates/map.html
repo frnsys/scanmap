@@ -9,15 +9,25 @@
     <div id="map"></div>
     <div id="bar">
         <div id="log">
-            <div id="no-log">No recent posts</div>
+            <div id="log-tabs">
+                <div data-type="event" class="log-tab selected">Events</div>
+                <div data-type="static" class="log-tab">Static</div>
+            </div>
+            <div id="event-logs" class="logs selected">
+                <div class="no-log">No recent posts</div>
+            </div>
+            <div id="static-logs" class="logs">
+                <div class="no-log">No recent posts</div>
+            </div>
         </div>
         <div id="info">
             <div id="info-toggle">▼</div>
             <div id="info-body">
                 <div>{{ conf.INFO | safe }}</div>
                 <div id="toggles">
-                    <div id="toggle-cams"><input type="checkbox" autocomplete="off" id="cam-toggle-input"> <label for="cam-toggle-input">Toggle cams</label></div>
-                    <div id="toggle-helicopters"><input type="checkbox" autocomplete="off" id="helicopters-toggle-input"> <label for="helicopters-toggle-input">Toggle helicopters</label></div>
+                    <div id="toggle-cams"><input type="checkbox" autocomplete="off" id="cam-toggle-input"> <label for="cam-toggle-input">Traffic cams</label></div>
+                    <div id="toggle-helicopters"><input type="checkbox" autocomplete="off" id="helicopters-toggle-input"> <label for="helicopters-toggle-input">Helicopters</label></div>
+                    <div id="toggle-static"><input type="checkbox" autocomplete="off" id="static-toggle-input"> <label for="static-toggle-input">Static layer</label></div>
                 </div>
                 <div id="add">If you have a key, click here to start adding.</div>
                 <div id="legend"></div>

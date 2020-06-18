@@ -45,6 +45,16 @@ class Form {
         tab.classList.add('selected');
       });
     });
+
+    [...document.querySelectorAll('.log-tab')].forEach((tab) => {
+      let type = tab.dataset.type;
+      tab.addEventListener('click', () => {
+        document.querySelector('.log-tab.selected').classList.remove('selected');
+        document.querySelector('.logs.selected').classList.remove('selected');
+        document.getElementById(`${type}-logs`).classList.add('selected');
+        tab.classList.add('selected');
+      });
+    });
   }
 
   setLabels(logType) {
@@ -121,6 +131,7 @@ class Form {
 
         // Show form
         document.getElementById('append').style.display = 'block';
+        document.getElementById('log-tabs').style.display = 'flex';
         onActivate();
       } else {
         authStatusEl.innerText = 'Invalid key';

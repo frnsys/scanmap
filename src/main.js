@@ -4,47 +4,7 @@ import config from '../config';
 import setupCams from './cams';
 import setupHelicopters from './helis';
 import { get } from './util';
-import { showLogs, fadeMarkers } from './logs';
-
-function fetchLogs() {
-  get(
-    'log/event',
-    ({ logs }) => {
-      showLogs(logs, map, form);
-    },
-    form.authKey
-  ).catch((err) => {
-    console.log(err);
-  });
-}
-
-let logSource;
-function initEventSource() {
-  console.log('Initializing event source');
-  /* server sent events coooooode */
-  logSource = new EventSource(SSE_URL);
-  logSource.onmessage = function(ev) {
-    // const log = JSON.parse(ev.data);
-    // showLogs([log], map, form);
-
-    // For now just reloading logs,
-    // for compatibility with how the editing system works.
-    // TODO: properly integrate updates
-    fetchLogs();
-  };
-  // Reconnect on error
-  logSource.addEventListener('error', (ev) => {
-    console.log('Connection error');
-    logSource.close();
-    initEventSource();
-  });
-  /* end server sent events coooooode */
-}
-window.onbeforeunload = () => {
-  logSource.close();
-}
-initEventSource();
-
+import { fetchLogs, fadeMarkers, clearMarkers } from './logs';
 
 mapboxgl.accessToken = config.MAPBOX_TOKEN;
 const map = new Map(
@@ -67,6 +27,32 @@ const map = new Map(
 );
 const form = new Form(map);
 
+let logSource;
+function initEventSource() {
+  console.log('Initializing event source');
+  /* server sent events coooooode */
+  logSource = new EventSource(SSE_URL);
+  logSource.onmessage = function(ev) {
+    // For now just reloading logs,
+    // for compatibility with how the editing system works.
+    // TODO: properly integrate updates
+    fetchLogs('event', map, form);
+
+    // const log = JSON.parse(ev.data);
+  };
+  // Reconnect on error
+  logSource.addEventListener('error', (ev) => {
+    console.log('Connection error');
+    logSource.close();
+    initEventSource();
+  });
+  /* end server sent events coooooode */
+}
+window.onbeforeunload = () => {
+  logSource.close();
+}
+initEventSource();
+
 // For getting current map zoom/center
 window.queryMap = () => {
   console.log(`Zoom:${map.map.getZoom()}`);
@@ -78,7 +64,9 @@ document.getElementById('add').addEventListener('click', () => {
   form.activate(authKey, () => {
     // Re-fetch logs on success,
     // to show edit UI if necessary
-    fetchLogs();
+    fetchLogs('event', map, form);
+    fetchLogs('static', map, form);
+    toggleEl.checked = true;
   });
 });
 document.getElementById('info-toggle').addEventListener('click', () => {
@@ -98,9 +86,18 @@ setInterval(() => {
   });
 }, 5*60*1000);
 
-fetchLogs();
+fetchLogs('event', map, form);
 setInterval(() => {
   fadeMarkers();
 }, 5000);
 setupCams(map);
 setupHelicopters(map);
+
+const toggleEl = document.getElementById('static-toggle-input');
+toggleEl.addEventListener('change', (ev) => {
+  if (ev.target.checked) {
+    fetchLogs('static', map, form);
+  } else {
+    clearMarkers('static');
+  }
+});
