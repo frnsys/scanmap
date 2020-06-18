@@ -1,4 +1,5 @@
 import {post} from './util';
+import LABELS from './labels';
 
 const fields = ['text', 'location', 'coordinates', 'label'];
 const overlay = document.getElementById('overlay');
@@ -7,12 +8,15 @@ const statusEl = document.getElementById('status');
 const resultsEl = document.getElementById('coord-results');
 const coordsEl = document.getElementById('coordinates');
 const authStatusEl = document.getElementById('auth-status');
+const labelsEl = document.getElementById('label');
+
 
 class Form {
   constructor(map) {
     this.map = map;
     this.authKey = '';
     this.marker = null;
+    this.logType = 'event';
 
     document.getElementById('ready').addEventListener('click', () => {
         overlay.style.display = 'none';
@@ -30,6 +34,28 @@ class Form {
     });
 
     document.getElementById('submit').addEventListener('click', () => this.submit());
+
+    this.setLabels(this.logType);
+    [...document.querySelectorAll('.append-tab')].forEach((tab) => {
+      let type = tab.dataset.type;
+      tab.addEventListener('click', () => {
+        this.logType = type;
+        this.setLabels(this.logType);
+        document.querySelector('.append-tab.selected').classList.remove('selected');
+        tab.classList.add('selected');
+      });
+    });
+  }
+
+  setLabels(logType) {
+    labelsEl.innerHTML = '';
+    Object.keys(LABELS[logType]).forEach((label) => {
+      // Form dropdown
+      let el = document.createElement('option');
+      el.innerText = `${LABELS[logType][label]} ${label}`
+      el.value = label;
+      labelsEl.appendChild(el);
+    });
   }
 
   queryLocation(query) {

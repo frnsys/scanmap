@@ -32,6 +32,7 @@ class Database:
                 'SELECT timestamp, submitter, data FROM logs WHERE location == ? AND type == ? ORDER BY timestamp DESC LIMIT ?',
                 (location, type, n)).fetchall()
         return [{
+            'type': type,
             'timestamp': timestamp,
             'data': json.loads(data),
             'submitter': submitter[:8] if submitter else None

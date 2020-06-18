@@ -131,6 +131,22 @@ a, a:visited {
   display: none;
   min-width: 280px;
   z-index: 10;
+  border: 1px solid black;
+}
+#append-tabs {
+  display: flex;
+}
+.append-tab {
+  flex: 1;
+  padding: 0.5em;
+  text-align: center;
+  background: #EAE6E0;
+  color: #969696;
+  cursor: pointer;
+}
+.append-tab.selected {
+  background: #fff;
+  color: #000;
 }
 #append-form {
   background: #fff;

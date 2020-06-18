@@ -1,3 +1,4 @@
+import LABELS from './labels';
 import {post, el} from './util';
 
 // Last seen log timestamp
@@ -9,40 +10,27 @@ const minMarkerOpacity = 0.25;
 const markers = {};
 const logMarkers = {};
 
-const LABELS = {
-  'alert': '⚠',
-  'police_presence':'👮',
-  'units_requested':'🚓',
-  'fire': '🔥',
-  'prisoner_van': '🚐',
-  'group': '🚩',
-  'injury': '🩹',
-  'barricade': '🚧',
-  'aviation': '🚁',
-  'aid': '⛑️',
-  'military': '💂',
-  'jail': '🔒',
-  'protestor_barricade': '🛡️',
-  'other': '🔹',
-};
-const labelsEl = document.getElementById('label');
-const legendEl = document.getElementById('legend');
-Object.keys(LABELS).forEach((label) => {
-  // Form dropdown
-  let el = document.createElement('option');
-  el.innerText = `${LABELS[label]} ${label}`
-  el.value = label;
-  labelsEl.appendChild(el);
+// TODO?
+let logType = 'event';
 
+const ALL_LABELS = {};
+Object.values(LABELS).forEach((labels) => {
+  Object.keys(labels).forEach((k) => {
+    ALL_LABELS[k] = labels[k];
+  });
+});
+
+const legendEl = document.getElementById('legend');
+Object.keys(ALL_LABELS).forEach((label) => {
   // Legend
-  el = document.createElement('span');
-  el.innerText = `${LABELS[label]} ${label}`;
+  let el = document.createElement('span');
+  el.innerText = `${ALL_LABELS[label]} ${label}`;
   legendEl.appendChild(el);
 });
 
 function addOrUpdateMarker(log, map) {
-  let icon = log.label ? LABELS[log.label] : null;
-  let labelText = log.label ? `${LABELS[log.label]} ${log.label}` : '';
+  let icon = log.label ? LABELS[log.type][log.label] : null;
+  let labelText = log.label ? `${LABELS[log.type][log.label]} ${log.label}` : '';
 
   // Add marker to map
   if (log.coords.length == 2) {
@@ -198,7 +186,7 @@ function showLogs(logs, map, form) {
             children: [{
               tag: 'span',
               className: 'logitem-label',
-              innerText: log.label ? `${LABELS[log.label]} ${log.label} @ ` : '',
+              innerText: log.label ? `${LABELS[log.type][log.label]} ${log.label} @ ` : '',
               dataset: {
                 label: log.label
               },
@@ -216,9 +204,9 @@ function showLogs(logs, map, form) {
               className: 'logitem-label-input',
               children: [{
                 tag: 'select',
-                children: Object.keys(LABELS).map((label) => ({
+                children: Object.keys(LABELS[log.type]).map((label) => ({
                   tag: 'option',
-                  innerText: `${LABELS[label]} ${label}`,
+                  innerText: `${LABELS[log.type][label]} ${label}`,
                   value: label,
                   selected: label == log.label
                 })),
@@ -232,7 +220,7 @@ function showLogs(logs, map, form) {
                         label: ev.target.value
                       }
                     }, () => {
-                      let text = newLabel && newLabel !== 'other' ? `${LABELS[newLabel]} ${newLabel} @ ` : '';
+                      let text = newLabel && newLabel !== 'other' ? `${LABELS[log.type][newLabel]} ${newLabel} @ ` : '';
                       let labelEl = ev.target.closest('.logitem').querySelector('.logitem-label');
                       labelEl.innerText = text;
                       labelEl.style.display = 'inline';
@@ -418,7 +406,7 @@ function showLogs(logs, map, form) {
         el = logItem.querySelector('.logitem-label');
         if (el.dataset.label != log.label) {
           el.dataset.label = log.label;
-          el.innerText = log.label ? `${LABELS[log.label]} ${log.label} @ ` : '';
+          el.innerText = log.label ? `${LABELS[log.type][log.label]} ${log.label} @ ` : '';
 
           // Change marker icon if necessary
           let key = logMarkers[log.elId];
@@ -429,7 +417,7 @@ function showLogs(logs, map, form) {
 
             let mostRecent = popupEl.querySelector('.popup-log');
             if (mostRecent.id == `popup-${log.elId}`) {
-              let icon = LABELS[log.label];
+              let icon = LABELS[log.type][log.label];
               mostRecent.dataset.icon = icon;
               if (icon) {
                 markerEl.innerText = icon;
@@ -440,7 +428,7 @@ function showLogs(logs, map, form) {
               }
             }
             let popupItem = popupEl.querySelector(`#popup-${log.elId} .popup-label`);
-            let labelText = log.label ? `${LABELS[log.label]} ${log.label}` : '';
+            let labelText = log.label ? `${LABELS[log.type][log.label]} ${log.label}` : '';
             popupItem.innerText = labelText;
           }
         }
