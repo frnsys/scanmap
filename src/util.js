@@ -20,15 +20,18 @@ function get(url, onSuccess, authKey) {
     .then(onSuccess);
 }
 
-function post(url, data, onSuccess, authKey) {
-  return fetch(url, {
-    headers: {
+function post(url, data, onSuccess, authKey, form) {
+  let headers = {
       'X-AUTH': authKey,
       'Accept': 'application/json',
-      'Content-Type': 'application/json'
-    },
+  };
+  if (!form) {
+      headers['Content-Type'] = 'application/json';
+  }
+  return fetch(url, {
+    headers: headers,
     method: 'POST',
-    body: JSON.stringify(data)
+    body: form ? data : JSON.stringify(data)
   })
     .then((res) => {
       if (!res.ok) {

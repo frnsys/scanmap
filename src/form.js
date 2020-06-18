@@ -1,4 +1,5 @@
 import {post} from './util';
+import LABELS from './labels';
 
 const fields = ['text', 'location', 'coordinates', 'label'];
 const overlay = document.getElementById('overlay');
@@ -7,12 +8,14 @@ const statusEl = document.getElementById('status');
 const resultsEl = document.getElementById('coord-results');
 const coordsEl = document.getElementById('coordinates');
 const authStatusEl = document.getElementById('auth-status');
+const labelsEl = document.getElementById('label');
 
 class Form {
   constructor(map) {
     this.map = map;
     this.authKey = '';
     this.marker = null;
+    this.logType = 'event';
 
     document.getElementById('ready').addEventListener('click', () => {
         overlay.style.display = 'none';
@@ -30,6 +33,38 @@ class Form {
     });
 
     document.getElementById('submit').addEventListener('click', () => this.submit());
+
+    this.setLabels(this.logType);
+    [...document.querySelectorAll('.append-tab')].forEach((tab) => {
+      let type = tab.dataset.type;
+      tab.addEventListener('click', () => {
+        this.logType = type;
+        this.setLabels(this.logType);
+        document.querySelector('.append-tab.selected').classList.remove('selected');
+        tab.classList.add('selected');
+      });
+    });
+
+    [...document.querySelectorAll('.log-tab')].forEach((tab) => {
+      let type = tab.dataset.type;
+      tab.addEventListener('click', () => {
+        document.querySelector('.log-tab.selected').classList.remove('selected');
+        document.querySelector('.logs.selected').classList.remove('selected');
+        document.getElementById(`${type}-logs`).classList.add('selected');
+        tab.classList.add('selected');
+      });
+    });
+  }
+
+  setLabels(logType) {
+    labelsEl.innerHTML = '';
+    Object.keys(LABELS[logType]).forEach((label) => {
+      // Form dropdown
+      let el = document.createElement('option');
+      el.innerText = `${LABELS[logType][label]} ${label}`
+      el.value = label;
+      labelsEl.appendChild(el);
+    });
   }
 
   queryLocation(query) {
@@ -95,6 +130,7 @@ class Form {
 
         // Show form
         document.getElementById('append').style.display = 'block';
+        document.getElementById('log-tabs').style.display = 'flex';
         onActivate();
       } else {
         authStatusEl.innerText = 'Invalid key';
@@ -117,8 +153,16 @@ class Form {
       alert('Please fill in the note, location, and coordinates');
 
     } else {
-      console.log(data);
-      this.post('log', data, (json) => {
+      let img = document.getElementById('image').files[0];
+      let formData = new FormData();
+      if (img) {
+        formData.append('image', img);
+      }
+      Object.keys(data).forEach((k) => {
+        formData.set(k, data[k]);
+      });
+
+      this.post(`log/${this.logType}`, formData, (json) => {
         // Reset fields
         resultsEl.innerHTML = '';
         fields.forEach((k) => {
@@ -128,14 +172,14 @@ class Form {
           }
         });
         if (this.marker) this.marker.remove();
-      });
+      }, true);
     }
   }
 
-  post(url, data, onSuccess) {
+  post(url, data, onSuccess, form) {
     // Reset error
     errEl.style.display = 'none';
-    post(url, data, onSuccess, this.authKey)
+    post(url, data, onSuccess, this.authKey, form)
       .catch((err) => {
         errEl.innerText = err;
         errEl.style.display = 'block';

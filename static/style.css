@@ -90,7 +90,30 @@ html, body {
   flex: 1;
   overflow-y: scroll;
 }
-#no-log {
+.logs {
+  display: none;
+}
+.logs.selected {
+  display: block;
+}
+#log-tabs {
+  display: none;
+  /* display: flex; */
+  margin-bottom: 0.5em;
+}
+.log-tab {
+  flex: 1;
+  text-align: center;
+  padding: 0.25em;
+  background: #3c3c3c;
+  color: #989898;
+  cursor: pointer;
+}
+.log-tab.selected {
+  background: #222222;
+  color: #fff;
+}
+.no-log {
   text-align: center;
   padding: 1em 0.5em;
   display: none;
@@ -131,15 +154,39 @@ a, a:visited {
   display: none;
   min-width: 280px;
   z-index: 10;
+  border: 1px solid black;
+}
+#append-tabs {
+  display: flex;
+}
+.append-tab {
+  flex: 1;
+  padding: 0.5em;
+  text-align: center;
+  background: #EAE6E0;
+  color: #969696;
+  cursor: pointer;
+}
+.append-tab.selected {
+  background: #fff;
+  color: #000;
 }
 #append-form {
   background: #fff;
+  color: #000;
   padding: 0.5em;
 }
 #append-form input {
   display: block;
   margin: 0.5em 0;
   width: 100%;
+}
+#append-form input[type=file] {
+  width: auto;
+  display: inline-block;
+}
+#append-form label {
+  display: inline-block;
 }
 #location-search-field {
   display: flex;
@@ -318,9 +365,14 @@ select {
 .popup-log:last-child {
   margin-bottom: 0;
 }
+.popup-log img {
+  max-width: 100%;
+}
 
 .mapboxgl-popup-content {
   color: #000;
+  max-height: 50vh;
+  overflow-y: auto;
 }
 
 #toggles > div {
