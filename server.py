@@ -5,10 +5,11 @@ from app.cams import cameras
 from app.helis import get_helicopter_locations
 from app.keys import KeyRing
 from app.geo import search_places
+from app.image import save_image
 from flask_caching import Cache
-from flask import Flask, abort, request, render_template, jsonify
 from flask_sse import sse
 from datetime import datetime, timezone, timedelta
+from flask import Flask, abort, request, render_template, jsonify, send_from_directory
 
 app = Flask(__name__)
 app.config.from_object(config)
@@ -38,6 +39,9 @@ def index():
 def version():
     return jsonify(version=config.VERSION)
 
+@app.route('/img/<fname>')
+def image(fname):
+    return send_from_directory(config.UPLOAD_PATH, fname)
 
 @app.route('/<location>/')
 def map(location):
@@ -74,7 +78,12 @@ def log(location, type):
     if request.method == 'POST':
         if not auth:
             abort(401)
-        data = request.get_json()
+        data = request.form.to_dict()
+        if request.files.get('image'):
+            filename = save_image(request.files['image'])
+            if filename is None:
+                abort(400)
+            data['image'] = filename
         db.add(type, location, key, data)
         timestamp = datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()
         cache.clear()

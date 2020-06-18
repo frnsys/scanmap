@@ -10,7 +10,6 @@ const coordsEl = document.getElementById('coordinates');
 const authStatusEl = document.getElementById('auth-status');
 const labelsEl = document.getElementById('label');
 
-
 class Form {
   constructor(map) {
     this.map = map;
@@ -154,7 +153,16 @@ class Form {
       alert('Please fill in the note, location, and coordinates');
 
     } else {
-      this.post(`log/${this.logType}`, data, (json) => {
+      let img = document.getElementById('image').files[0];
+      let formData = new FormData();
+      if (img) {
+        formData.append('image', img);
+      }
+      Object.keys(data).forEach((k) => {
+        formData.set(k, data[k]);
+      });
+
+      this.post(`log/${this.logType}`, formData, (json) => {
         // Reset fields
         resultsEl.innerHTML = '';
         fields.forEach((k) => {
@@ -164,14 +172,14 @@ class Form {
           }
         });
         if (this.marker) this.marker.remove();
-      });
+      }, true);
     }
   }
 
-  post(url, data, onSuccess) {
+  post(url, data, onSuccess, form) {
     // Reset error
     errEl.style.display = 'none';
-    post(url, data, onSuccess, this.authKey)
+    post(url, data, onSuccess, this.authKey, form)
       .catch((err) => {
         errEl.innerText = err;
         errEl.style.display = 'block';

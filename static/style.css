@@ -173,12 +173,20 @@ a, a:visited {
 }
 #append-form {
   background: #fff;
+  color: #000;
   padding: 0.5em;
 }
 #append-form input {
   display: block;
   margin: 0.5em 0;
   width: 100%;
+}
+#append-form input[type=file] {
+  width: auto;
+  display: inline-block;
+}
+#append-form label {
+  display: inline-block;
 }
 #location-search-field {
   display: flex;
@@ -357,9 +365,14 @@ select {
 .popup-log:last-child {
   margin-bottom: 0;
 }
+.popup-log img {
+  max-width: 100%;
+}
 
 .mapboxgl-popup-content {
   color: #000;
+  max-height: 50vh;
+  overflow-y: auto;
 }
 
 #toggles > div {

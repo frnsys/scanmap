@@ -42,6 +42,24 @@ function addOrUpdateMarker(log, map) {
 
   // Add marker to map
   if (log.coords.length == 2) {
+    let ch = [{
+      tag: 'div',
+      className: 'popup-label',
+      innerText: labelText,
+    }, {
+      tag: 'div',
+      className: 'popup-when',
+      innerText: log.dt,
+    }, {
+      tag: 'h3',
+      innerText: log.text
+    }];
+    if (log.image) {
+      ch.push({
+        tag: 'img',
+        src: `/img/${log.image}`
+      });
+    }
     let newLog = el({
       id: `popup-${log.elId}`,
       tag: 'div',
@@ -49,18 +67,7 @@ function addOrUpdateMarker(log, map) {
         icon: icon
       },
       className: 'popup-log',
-      children: [{
-        tag: 'div',
-        className: 'popup-label',
-        innerText: labelText,
-      }, {
-        tag: 'div',
-        className: 'popup-when',
-        innerText: log.dt,
-      }, {
-        tag: 'h3',
-        innerText: log.text
-      }]
+      children: ch
     });
 
     // Check if marker exists for this location,
@@ -488,10 +495,12 @@ function showPopup(marker) {
 
 // Hide all markers
 function closePopups() {
-  for (const marker of Object.values(markers)) {
-    let popup = marker.marker.getPopup();
-    if (popup.isOpen()) {
-      marker.marker.togglePopup();
+  for (const logType of Object.keys(markers)) {
+    for (const marker of Object.values(markers[logType])) {
+      let popup = marker.marker.getPopup();
+      if (popup.isOpen()) {
+        marker.marker.togglePopup();
+      }
     }
   }
 }
