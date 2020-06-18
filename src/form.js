@@ -9,6 +9,7 @@ const resultsEl = document.getElementById('coord-results');
 const coordsEl = document.getElementById('coordinates');
 const authStatusEl = document.getElementById('auth-status');
 const labelsEl = document.getElementById('label');
+const imagesEl = document.getElementById('image');
 
 class Form {
   constructor(map) {
@@ -153,11 +154,10 @@ class Form {
       alert('Please fill in the note, location, and coordinates');
 
     } else {
-      let img = document.getElementById('image').files[0];
+      // Prep data
+      let img = imagesEl.files[0];
       let formData = new FormData();
-      if (img) {
-        formData.append('image', img);
-      }
+      if (img) formData.append('image', img);
       Object.keys(data).forEach((k) => {
         formData.set(k, data[k]);
       });
@@ -171,15 +171,16 @@ class Form {
             inp.value = '';
           }
         });
+        imagesEl.value = '';
         if (this.marker) this.marker.remove();
-      }, true);
+      });
     }
   }
 
-  post(url, data, onSuccess, form) {
+  post(url, data, onSuccess) {
     // Reset error
     errEl.style.display = 'none';
-    post(url, data, onSuccess, this.authKey, form)
+    post(url, data, onSuccess, this.authKey)
       .catch((err) => {
         errEl.innerText = err;
         errEl.style.display = 'block';

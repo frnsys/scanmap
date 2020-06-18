@@ -20,14 +20,13 @@ function get(url, onSuccess, authKey) {
     .then(onSuccess);
 }
 
-function post(url, data, onSuccess, authKey, form) {
+function post(url, data, onSuccess, authKey) {
+  let form = data instanceof FormData;
   let headers = {
       'X-AUTH': authKey,
       'Accept': 'application/json',
   };
-  if (!form) {
-      headers['Content-Type'] = 'application/json';
-  }
+  if (!form) headers['Content-Type'] = 'application/json';
   return fetch(url, {
     headers: headers,
     method: 'POST',
