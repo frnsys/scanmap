@@ -29,6 +29,7 @@ def get_conf(loc):
 
 @app.route('/')
 def index():
+    # List all live locations
     return render_template('index.html',
             locations=[k for k in config.LOCATIONS.keys()
                 if config.LOCATIONS[k]['LIVE']])
@@ -39,9 +40,6 @@ def index():
 def version():
     return jsonify(version=config.VERSION)
 
-@app.route('/img/<fname>')
-def image(fname):
-    return send_from_directory(config.UPLOAD_PATH, fname)
 
 @app.route('/<location>/')
 def map(location):
@@ -56,7 +54,7 @@ def cams(location):
     return jsonify(cams=cams)
 
 
-# cache timeout matches flightradar24 frontend
+# Cache timeout matches flightradar24 frontend
 @app.route('/<location>/helis')
 @cache.cached(timeout=8)
 def helis(location):
@@ -75,24 +73,34 @@ def log(location, type):
     conf = get_conf(location)
     key = request.headers.get('X-AUTH')
     auth = kr.check_key(key, location)
+
     if request.method == 'POST':
-        if not auth:
-            abort(401)
+        if not auth: abort(401)
+
+        # Grab submitted log data
         data = request.form.to_dict()
+
+        # If an image was submitted, save it
         if request.files.get('image'):
             filename = save_image(request.files['image'])
             if filename is None:
                 abort(400)
             data['image'] = filename
+
+        # Add the log data
         db.add(type, location, key, data)
-        timestamp = datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()
+
+        # Clear cache so new requests get latest data
         cache.clear()
+
+        # Ping clients to grab latest data
+        timestamp = datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()
         sse.publish(json.dumps(
             {'data': data, 'timestamp': timestamp}), channel=location)
         return jsonify(success=True)
     else:
         if type == 'event':
-            # Limit amount of logs sent
+            # Limit amount of event logs that are sent
             now = datetime.utcnow().replace(tzinfo=timezone.utc)
             interval = (now - timedelta(**config.LOGS_AFTER)).timestamp()
             logs = db.logs(location, n=config.MAX_LOGS, after=interval, type='event')
@@ -121,9 +129,10 @@ def edit_log(location):
         data = request.get_json()
         action = data['action']
         timestamp = data['timestamp']
+
+        # See if a log matches the request
         log = db.log(location, timestamp)
-        if log is None:
-            abort(404)
+        if log is None: abort(404)
 
         # Abort if not prime key or not submitter
         if auth == 'prime' or key == log['submitter']:
@@ -132,6 +141,7 @@ def edit_log(location):
                 cache.clear()
                 sse.publish('delete' , channel=location)
                 return jsonify(success=True)
+
             elif action == 'update':
                 for k, v in data['changes'].items():
                     log['data'][k] = v
@@ -144,7 +154,7 @@ def edit_log(location):
             abort(401)
     return jsonify(success=False)
 
-
+# Get a list of possible lat/lngs for a location query
 @app.route('/<location>/location', methods=['POST'])
 def query_location(location):
     conf = get_conf(location)
@@ -155,14 +165,16 @@ def query_location(location):
     results = search_places(data['query'], conf)
     return jsonify(results=results)
 
-# Panel
+@app.route('/img/<fname>')
+def image(fname):
+    return send_from_directory(config.UPLOAD_PATH, fname)
 
 
+# Panel (key management backend)
 @app.route('/<location>/panel')
 def panel(location):
     conf = get_conf(location)
     return render_template('panel.html', conf=conf)
-
 
 @app.route('/<location>/keys', methods=['GET', 'POST'])
 def keys(location):
@@ -184,7 +196,6 @@ def keys(location):
 
     keys = kr.get_keys(location).get('write')
     return jsonify(keys=keys)
-
 
 @app.route('/<location>/checkauth', methods=['POST'])
 def check_auth(location):
