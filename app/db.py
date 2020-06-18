@@ -8,6 +8,7 @@ class Database:
         _, cur = self._con()
         cur.execute('CREATE TABLE IF NOT EXISTS logs \
                 (timestamp text primary key,\
+                type text,\
                 location text,\
                 submitter text,\
                 data json not null)')
@@ -17,19 +18,19 @@ class Database:
         cur = con.cursor()
         return con, cur
 
-    def add(self, location, submitter, log):
+    def add(self, type, location, submitter, log):
         timestamp = datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()
         con, cur = self._con()
         cur.execute(
-            'INSERT INTO logs(timestamp, location, submitter, data) VALUES (?,?,?,?)',
-            (timestamp, location, submitter, json.dumps(log)))
+            'INSERT INTO logs(timestamp, type, location, submitter, data) VALUES (?,?,?,?,?)',
+            (timestamp, type, location, submitter, json.dumps(log)))
         con.commit()
 
-    def logs(self, location, n, after=None):
+    def logs(self, location, n=0, after=None, type='event'):
         con, cur = self._con()
         rows = cur.execute(
-                'SELECT timestamp, submitter, data FROM logs WHERE location == ? ORDER BY timestamp DESC LIMIT ?',
-                (location, n)).fetchall()
+                'SELECT timestamp, submitter, data FROM logs WHERE location == ? AND type == ? ORDER BY timestamp DESC LIMIT ?',
+                (location, type, n)).fetchall()
         return [{
             'timestamp': timestamp,
             'data': json.loads(data),

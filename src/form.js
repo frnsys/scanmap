@@ -117,8 +117,7 @@ class Form {
       alert('Please fill in the note, location, and coordinates');
 
     } else {
-      console.log(data);
-      this.post('log', data, (json) => {
+      this.post('log/event', data, (json) => {
         // Reset fields
         resultsEl.innerHTML = '';
         fields.forEach((k) => {

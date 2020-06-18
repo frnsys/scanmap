@@ -8,7 +8,7 @@ import { showLogs, fadeMarkers } from './logs';
 
 function fetchLogs() {
   get(
-    'log',
+    'log/event',
     ({ logs }) => {
       showLogs(logs, map, form);
     },

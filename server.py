@@ -61,13 +61,13 @@ def helis(location):
     return jsonify(helis=items)
 
 
-@app.route('/<location>/log', methods=['GET', 'POST'])
+@app.route('/<location>/log/<type>', methods=['GET', 'POST'])
 @cache.cached(timeout=5,
               unless=lambda: request.method != 'GET',
               make_cache_key=lambda *args, **kwargs: '{}_{}'.format(
                   request.path,
                   request.headers.get('X-AUTH', 'noauth')))
-def log(location):
+def log(location, type):
     conf = get_conf(location)
     key = request.headers.get('X-AUTH')
     auth = kr.check_key(key, location)
@@ -75,17 +75,20 @@ def log(location):
         if not auth:
             abort(401)
         data = request.get_json()
-        db.add(location, key, data)
+        db.add(type, location, key, data)
         timestamp = datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()
         cache.clear()
         sse.publish(json.dumps(
             {'data': data, 'timestamp': timestamp}), channel=location)
         return jsonify(success=True)
     else:
-        # Limit amount of logs sent
-        now = datetime.utcnow().replace(tzinfo=timezone.utc)
-        interval = (now - timedelta(**config.LOGS_AFTER)).timestamp()
-        logs = db.logs(location, n=config.MAX_LOGS, after=interval)
+        if type == 'event':
+            # Limit amount of logs sent
+            now = datetime.utcnow().replace(tzinfo=timezone.utc)
+            interval = (now - timedelta(**config.LOGS_AFTER)).timestamp()
+            logs = db.logs(location, n=config.MAX_LOGS, after=interval, type='event')
+        else:
+            logs = db.logs(location, type=type)
 
         # Strip submitter info
         # Check permissions
