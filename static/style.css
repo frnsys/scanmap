@@ -223,6 +223,14 @@ a, a:visited {
   cursor: pointer;
   color: #000;
 }
+.extra-info {
+  display: flex;
+}
+.hint {
+  display: none;
+  font-size: 0.8em;
+  flex: 1;
+}
 
 #error {
   background: red;

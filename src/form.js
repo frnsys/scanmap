@@ -36,6 +36,7 @@ class Form {
     document.getElementById('submit').addEventListener('click', () => this.submit());
 
     this.setLabels(this.logType);
+    document.getElementById(`${this.logType}-hint`).style.display = 'block';
     [...document.querySelectorAll('.append-tab')].forEach((tab) => {
       let type = tab.dataset.type;
       tab.addEventListener('click', () => {
@@ -43,6 +44,9 @@ class Form {
         this.setLabels(this.logType);
         document.querySelector('.append-tab.selected').classList.remove('selected');
         tab.classList.add('selected');
+
+        [...document.querySelectorAll('.hint')].forEach((el) => el.style.display = 'none');
+        document.getElementById(`${this.logType}-hint`).style.display = 'block';
       });
     });
 
