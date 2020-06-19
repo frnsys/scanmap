@@ -18,6 +18,8 @@ const LABELS = {
     'jail': '🔒',
     'camera': '📸',
     'phone': '☎️',
+    'police_bldg': '🛂',
+    'military_bldg': '🏰',
     'other': '🔹',
   }
 };
