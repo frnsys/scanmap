@@ -75,7 +75,7 @@ function addOrUpdateMarker(log, map) {
     log.coords.reverse();
     let key = `${log.coords[0]}_${log.coords[1]}`;
     logMarkers[log.elId] = key;
-    if (key in markers) {
+    if (key in markers[log.type]) {
       // Update marker icon to latest event's icon
       let markerEl = markers[log.type][key].marker.getElement();
       if (icon) {
@@ -163,7 +163,7 @@ function showLogs(logType, logs, map, form, showMarkers) {
     noLogs.style.display = 'none';
   }
 
-  logElIds[log.type] = [];
+  logElIds[logType] = [];
   logs.forEach((l) => {
     let log = {
       id: l.timestamp.toString(),
@@ -528,7 +528,6 @@ function fetchLogs(logType, map, form, showMarkers) {
     console.log(err);
   });
 }
-
 
 function clearMarkers(logType) {
   logElIds[logType].forEach((elId) => {
