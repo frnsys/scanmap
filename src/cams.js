@@ -35,7 +35,7 @@ function makeMarkers(map, cams) {
               let src = img.dataset.src;
               img.src = src;
               interval = setInterval(() => {
-                img.src = `${src}#${new Date().getTime()}`;
+                img.src = `${src}?${new Date().getTime()}`;
               }, 5000);
             }
           },
