@@ -12,6 +12,7 @@ const LABELS = {
     'aid': '⛑️',
     'military': '💂',
     'protestor_barricade': '🛡️',
+    'arrests': '🚨',
     'other': '🔹',
   },
   'static': {
