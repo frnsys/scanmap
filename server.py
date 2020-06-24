@@ -116,6 +116,19 @@ def log(location, type):
         return jsonify(logs=logs)
 
 
+@app.route('/<location>/log/<type>/all')
+@cache.cached(timeout=5)
+def all_logs(location, type):
+    conf = get_conf(location)
+    logs = db.logs(location, type=type)
+
+    # Strip submitter info
+    # Check permissions
+    for l in logs:
+        l.pop('submitter')
+    return jsonify(logs=logs)
+
+
 @app.route('/<location>/log/edit', methods=['POST'])
 def edit_log(location):
     key = request.headers.get('X-AUTH')
