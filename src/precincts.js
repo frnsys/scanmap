@@ -1,4 +1,5 @@
 const toggleEl = document.getElementById('toggle-precincts');
+const layers = ['precincts', 'precincts-labels', 'precincts-outlines'];
 
 function setupPrecincts(map) {
   map = map.map;
@@ -6,20 +7,7 @@ function setupPrecincts(map) {
     'type': 'geojson',
     'data': 'precincts'
   };
-  let layer = {
-    'id': 'precincts',
-    'type': 'fill',
-    'source': 'precincts',
-    'paint': {
-      'fill-color': 'rgba(66,133,244,0.2)',
-      'fill-outline-color': '#0000ff'
-    }
-  };
   let sourceLoaded = false;
-
-  map.on('click', 'precincts', function(ev) {
-    console.log(ev);
-  });
 
   map.on('error', (ev) => {
     if (ev.error.status == 404) {
@@ -35,9 +23,18 @@ function setupPrecincts(map) {
       // only load precincts once
       if (!sourceLoaded) {
         map.addSource('precincts', source);
-        map.addLayer(layer);
         map.addLayer({
-          'id': 'precinct-labels',
+          'id': 'precincts',
+          'type': 'fill',
+          'source': 'precincts',
+          'paint': {
+            'fill-color': ['get', 'fill'],
+            'fill-opacity': 0.5,
+            'fill-outline-color': '#ffffff'
+          }
+        });
+        map.addLayer({
+          'id': 'precincts-labels',
           'type': 'symbol',
           'source': 'precincts',
           'layout': {
@@ -46,14 +43,21 @@ function setupPrecincts(map) {
             'text-justify': 'auto'
           }
         });
+        map.addLayer({
+          'id': 'precinct-outlines',
+          'type': 'line',
+          'source': 'precincts',
+          'paint': {
+            'line-width': 2,
+            'line-color': '#ffffff'
+          }
+        });
         sourceLoaded = true;
       } else {
-        map.setLayoutProperty('precincts', 'visibility', 'visible');
-        map.setLayoutProperty('precinct-labels', 'visibility', 'visible');
+        layers.forEach((l) => map.setLayoutProperty(l, 'visibility', 'visible'));
       }
     } else {
-      map.setLayoutProperty('precincts', 'visibility', 'none');
-      map.setLayoutProperty('precinct-labels', 'visibility', 'none');
+      layers.forEach((l) => map.setLayoutProperty(l, 'visibility', 'none'));
     }
   });
 }
