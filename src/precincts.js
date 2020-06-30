@@ -40,7 +40,8 @@ function setupPrecincts(map) {
           'layout': {
             'text-field': ['get', 'Precinct'],
             'text-radial-offset': 0.5,
-            'text-justify': 'auto'
+            'text-justify': 'auto',
+            'text-size': 32
           }
         });
         map.addLayer({
