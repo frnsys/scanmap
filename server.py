@@ -53,6 +53,10 @@ def cams(location):
     conf = get_conf(location)
     return jsonify(cams=cams)
 
+@app.route('/<location>/precincts')
+def precincts(location):
+    loc = location.lower()
+    return send_from_directory('data/precincts', '{}.geojson'.format(loc))
 
 # Cache timeout matches flightradar24 frontend
 @app.route('/<location>/helis')

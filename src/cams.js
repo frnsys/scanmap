@@ -54,7 +54,7 @@ function setupCams(map) {
   let cams = [];
   let markers = [];
   let camsLoaded = false;
-  toggleEl.addEventListener('click', (ev) => {
+  toggleEl.addEventListener('change', (ev) => {
     if (ev.target.checked) {
       // Minimize network traffic,
       // only load cams once

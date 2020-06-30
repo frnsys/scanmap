@@ -55,7 +55,7 @@ function removeHelicopters() {
 
 function setupHelicopters(map) {
   let interval;
-  toggleEl.addEventListener('click', (ev) => {
+  toggleEl.addEventListener('change', (ev) => {
     if (ev.target.checked) {
       updateHelicopters(map);
       interval = setInterval(() => {

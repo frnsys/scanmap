@@ -2,6 +2,7 @@ import Map from './map';
 import Form from './form';
 import config from '../config';
 import setupCams from './cams';
+import setupPrecincts from './precincts';
 import setupHelicopters from './helis';
 import { get } from './util';
 import { fetchLogs, fadeMarkers, clearMarkers } from './logs';
@@ -91,6 +92,7 @@ setInterval(() => {
   fadeMarkers('event');
 }, 5000);
 setupCams(map);
+setupPrecincts(map);
 setupHelicopters(map);
 
 const toggleEl = document.getElementById('static-toggle-input');
