@@ -21,6 +21,14 @@ function setupPrecincts(map) {
     console.log(ev);
   });
 
+  map.on('error', (ev) => {
+    if (ev.error.status == 404) {
+      if (ev.sourceId == 'precincts') {
+        toggleEl.innerHTML = 'No precinct data for this region';
+      }
+    }
+  });
+
   toggleEl.addEventListener('change', (ev) => {
     if (ev.target.checked) {
       // Minimize network traffic,
