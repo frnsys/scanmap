@@ -37,7 +37,7 @@ function setupPrecincts(map) {
         map.addSource('precincts', source);
         map.addLayer(layer);
         map.addLayer({
-          'id': 'poi-labels',
+          'id': 'precinct-labels',
           'type': 'symbol',
           'source': 'precincts',
           'layout': {
@@ -49,9 +49,11 @@ function setupPrecincts(map) {
         sourceLoaded = true;
       } else {
         map.setLayoutProperty('precincts', 'visibility', 'visible');
+        map.setLayoutProperty('precinct-labels', 'visibility', 'visible');
       }
     } else {
       map.setLayoutProperty('precincts', 'visibility', 'none');
+      map.setLayoutProperty('precinct-labels', 'visibility', 'none');
     }
   });
 }
