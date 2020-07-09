@@ -3,22 +3,24 @@ import requests
 
 def search_places(query, conf):
     """Reference: <https://developers.google.com/places/web-service/search?hl=ru#nearby-search-and-text-search-responses>"""
+    point = [str(p) for p in conf['SEARCH']['CENTER']]
     params = {
         'key': config.GOOGLE_PLACES_API_KEY,
-        'query': query,
+        'input': query,
+        'inputtype': 'textquery',
+        'fields': ','.join(['formatted_address','name','geometry']),
 
         # Influence results
-        'location': conf['SEARCH']['CENTER'],
-        'radius': conf['SEARCH']['RADIUS']
+        'locationbias': 'point:{}'.format(','.join(point))
     }
 
     # Not paginating results because we
     # only will show a few
     resp = requests.get(
-            'https://maps.googleapis.com/maps/api/place/textsearch/json',
+            'https://maps.googleapis.com/maps/api/place/findplacefromtext/json',
             params=params)
     data = resp.json()
-    results = data['results']
+    results = data['candidates']
 
     # Hard filter to keep search results relevant to the region
     results = [r for r in results
