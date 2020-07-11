@@ -5,7 +5,7 @@ import setupCams from './cams';
 import setupPrecincts from './precincts';
 import setupHelicopters from './helis';
 import { get } from './util';
-import { fetchLogs, fadeMarkers, clearMarkers } from './logs';
+import { fetchLogs, fetchPinned, fadeMarkers, clearMarkers } from './logs';
 
 mapboxgl.accessToken = config.MAPBOX_TOKEN;
 const map = new Map(
@@ -76,6 +76,9 @@ document.getElementById('info-toggle').addEventListener('click', () => {
   b.style.display = open ? 'none' : 'block';
   document.getElementById('info-toggle').innerText = open ? '▲' : '▼';
 });
+document.getElementById('pinned-hide').addEventListener('click', () => {
+  document.getElementById('pinned-log').style.display = 'none';
+});
 
 // Check for updates
 setInterval(() => {
@@ -85,9 +88,11 @@ setInterval(() => {
       location.reload();
     }
   });
+  fetchPinned();
 }, 5*60*1000);
 
 fetchLogs('event', map, form, true);
+fetchPinned();
 setInterval(() => {
   fadeMarkers('event');
 }, 5000);

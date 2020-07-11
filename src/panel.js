@@ -45,6 +45,12 @@ function loadKeys() {
   get('keys', (json) => {
     json.keys.forEach((k) => keyItem(k));
     document.getElementById('panel-main').style.display = 'block';
+
+    get('log/pinned', (json) => {
+      if (json.logs.length > 0) {
+        document.getElementById('pinned').value = json.logs[0].data.text;
+      }
+    });
   }, KEY).catch((err) => {
     showError(err);
   });
@@ -61,4 +67,22 @@ document.getElementById('key').addEventListener('keydown', (ev) => {
 
 document.getElementById('add-key').addEventListener('click', () => {
   addKey();
+});
+
+document.getElementById('set-pinned').addEventListener('click', () => {
+  let text = document.getElementById('pinned').value;
+  if (text.length > 0) {
+    let formData = new FormData();
+    formData.set('text', text);
+    post('log/pinned', formData, (json) => {
+      if (json.success) {
+        // Janky, but fine for now
+        let el = document.getElementById('set-pinned-status');
+        el.innerText = 'Updated';
+        setTimeout(() => {
+          el.innerText = '';
+        }, 1000);
+      }
+    }, KEY).catch((err) => showError(err));
+  }
 });

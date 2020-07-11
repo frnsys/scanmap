@@ -529,6 +529,24 @@ function fetchLogs(logType, map, form, showMarkers) {
   });
 }
 
+function fetchPinned() {
+  get('log/pinned', ({ logs }) => {
+    if (logs.length > 0) {
+      let el = document.getElementById('pinned-log');
+      let textEl = document.getElementById('pinned-log-text');
+      let log = logs[0];
+      let ts = el.dataset.timestamp;
+      if (log.data.text.length > 0 && ts != log.timestamp) {
+        el.style.display = 'block';
+        el.dataset.timestamp = log.timestamp;
+      } else {
+        el.style.display = 'none';
+      }
+      textEl.innerText = log.data.text;
+    }
+  });
+}
+
 function clearMarkers(logType) {
   logElIds[logType].forEach((elId) => {
     let key = logMarkers[elId];
@@ -538,4 +556,4 @@ function clearMarkers(logType) {
   lastSeen[logType] = 0;
 }
 
-export {fetchLogs, fadeMarkers, clearMarkers};
+export {fetchLogs, fetchPinned, fadeMarkers, clearMarkers};

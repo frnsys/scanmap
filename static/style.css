@@ -113,6 +113,25 @@ html, body {
   background: #222222;
   color: #fff;
 }
+#pinned-log {
+  display: none;
+  position: relative;
+  border-bottom: 1px solid #444;
+}
+#pinned-log-text {
+  padding: 1em;
+}
+#pinned-hide {
+  position: absolute;
+  top: 0.5em;
+  right: 0.5em;
+  cursor: pointer;
+  font-size: 1.2em;
+}
+#pinned-hide:hover {
+  text-decoration: underline;
+}
+
 .no-log {
   text-align: center;
   padding: 1em 0.5em;
@@ -414,8 +433,16 @@ select {
   margin-left: 0.5em;
   display: inline-block;
 }
+#pinned {
+  width: 50%;
+  display: block;
+  margin: 3em auto 1em auto;
+  min-height: 100px;
+  padding: 0.5em;
+}
 .action {
   cursor: pointer;
+  text-align: center;
 }
 .action:hover {
   text-decoration: underline
@@ -427,6 +454,9 @@ select {
   text-align: center;
   width: 100%;
   padding: 0.5em 1em;
+}
+#set-pinned-status {
+  text-align: center;
 }
 
 #legend {
