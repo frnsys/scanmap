@@ -11,6 +11,7 @@ const LABELS = {
     'aviation': '🚁',
     'aid': '⛑️',
     'military': '💂',
+    'staging_area': '📡',
     'protestor_barricade': '🛡️',
     'arrests': '🚨',
     'other': '🔹',
@@ -21,6 +22,7 @@ const LABELS = {
     'phone': '☎️',
     'police_bldg': '🛂',
     'military_bldg': '🏰',
+    'staging_area': '📡',
     'other': '🔹',
   }
 };

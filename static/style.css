@@ -406,6 +406,7 @@ select {
   display: inline-block;
   padding: 2px;
   border: 1px solid #414141;
+  margin: 0.25em 0;
 }
 #toggles input {
   margin: 0;
