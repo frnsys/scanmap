@@ -14,6 +14,7 @@ const LABELS = {
     'staging_area': '📡',
     'protestor_barricade': '🛡️',
     'arrests': '🚨',
+    'far_right_group': '🐍',
     'other': '🔹',
   },
   'static': {
