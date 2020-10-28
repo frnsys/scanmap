@@ -1,7 +1,8 @@
 import {post} from './util';
-import LABELS from './labels';
+import LABELS from '../static/labels.json';
 
 const fields = ['text', 'location', 'coordinates', 'label'];
+const metaFields = ['tweet'];
 const overlay = document.getElementById('overlay');
 const errEl = document.getElementById('error');
 const statusEl = document.getElementById('status');
@@ -150,6 +151,12 @@ class Form {
   submit() {
     let data = {};
     fields.forEach((k) => {
+      data[k] = document.getElementById(k).value;
+    });
+
+    // Meta fields
+    // Not saved to DB but affect server-side processing
+    metaFields.forEach((k) => {
       data[k] = document.getElementById(k).value;
     });
 
