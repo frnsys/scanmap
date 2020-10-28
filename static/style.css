@@ -200,7 +200,8 @@ a, a:visited {
   margin: 0.5em 0;
   width: 100%;
 }
-#append-form input[type=file] {
+#append-form input[type=file],
+#append-form input[type=checkbox] {
   width: auto;
   display: inline-block;
 }

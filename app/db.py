@@ -18,13 +18,18 @@ class Database:
         cur = con.cursor()
         return con, cur
 
-    def add(self, type, location, submitter, log):
+    def add(self, type, location, submitter, data):
         timestamp = datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()
         con, cur = self._con()
         cur.execute(
             'INSERT INTO logs(timestamp, type, location, submitter, data) VALUES (?,?,?,?,?)',
-            (timestamp, type, location, submitter, json.dumps(log)))
+            (timestamp, type, location, submitter, json.dumps(data)))
         con.commit()
+        return {
+            'type': type,
+            'timestamp': timestamp,
+            'data': data
+        }
 
     def logs(self, location, n=-1, after=None, type='event'):
         con, cur = self._con()

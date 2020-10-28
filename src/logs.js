@@ -1,5 +1,5 @@
-import LABELS from './labels';
 import {get, post, el} from './util';
+import LABELS from '../static/labels.json';
 
 const logElIds = {
   event: [],

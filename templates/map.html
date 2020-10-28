@@ -82,6 +82,11 @@
                 <label for="image">Photo</label>
                 <input id="image" type="file" />
             </div>
+            {% if (conf.TWITTER|default({})).ENABLED %}
+                <div>
+                    <input type="checkbox" autocomplete="off" id="tweet"> <label for="tweet">Tweet</label>
+                </div>
+            {% endif %}
             <input id="submit" type="submit" value="Submit" />
             <div class="extra-info">
                 <div id="event-hint" class="hint">Events disappear from the map after 24 hours</div>

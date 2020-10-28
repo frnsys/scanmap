@@ -6,6 +6,7 @@ from app.helis import get_helicopter_locations
 from app.keys import KeyRing
 from app.geo import search_places
 from app.image import save_image
+from app.twitter import Twitter
 from flask_caching import Cache
 from flask_sse import sse
 from datetime import datetime, timezone, timedelta
@@ -18,7 +19,11 @@ app.register_blueprint(sse, url_prefix='/location-stream')
 kr = KeyRing(config.KEYS_FILE)
 db = Database(config.DB_PATH)
 cache = Cache(app)
-
+twitters = {
+    loc: Twitter(*conf['TWITTER']['AUTH'])
+    for loc, conf in config.LOCATIONS.items()
+    if 'TWITTER' in conf
+}
 
 def get_conf(loc):
     try:
@@ -84,6 +89,9 @@ def log(location, type):
         # Grab submitted log data
         data = request.form.to_dict()
 
+        # Get and remove extraneous meta data
+        should_tweet = data.pop('tweet', False)
+
         # If an image was submitted, save it
         if request.files.get('image'):
             filename = save_image(request.files['image'])
@@ -92,7 +100,7 @@ def log(location, type):
             data['image'] = filename
 
         # Add the log data
-        db.add(type, location, key, data)
+        log = db.add(type, location, key, data)
 
         # Clear cache so new requests get latest data
         cache.clear()
@@ -101,6 +109,15 @@ def log(location, type):
         timestamp = datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()
         sse.publish(json.dumps(
             {'data': data, 'timestamp': timestamp}), channel=location)
+
+        # Tweet if twitter is enabled for the location
+        # and the update is marked for tweeting
+        if conf.get('TWITTER', {}).get('ENABLED', False) and should_tweet:
+            twitter = twitters.get(location)
+            try:
+                if twitter: twitter.tweet(log)
+            except Exception as e:
+                print('Exception while tweeting: {}'.format(e))
         return jsonify(success=True)
     else:
         if type == 'event':
