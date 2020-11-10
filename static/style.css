@@ -378,6 +378,12 @@ select {
 .popup-label {
   font-size: 0.9em;
   line-height: 1.1;
+  background: #222222;
+  color: #fff;
+  padding: 0.25em;
+  display: inline-block;
+  border-radius: 0.2em;
+  margin: 0.25em 0;
 }
 .popup-when {
   font-size: 0.9em;
