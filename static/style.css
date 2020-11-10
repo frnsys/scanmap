@@ -373,6 +373,7 @@ select {
 .popup-location {
   font-size: 0.8em;
   text-decoration: underline;
+  line-height: 1.2;
 }
 .popup-label {
   font-size: 0.9em;

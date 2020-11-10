@@ -19,7 +19,7 @@ const LABELS = {
   },
   'static': {
     'jail': '🔒',
-    'camera': '📸',
+    'camera': '👁️',
     'phone': '☎️',
     'police_bldg': '🛂',
     'military_bldg': '🏰',

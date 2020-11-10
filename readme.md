@@ -275,3 +275,27 @@ server {
 ## Deployment notes
 
 - Ensure that proper permissions/ownership are set for files that are written to (primarily `data/keys.yml` and `data/logs.db`)
+
+# Other tips
+
+Surveillance camera data from OpenStreetMap:
+
+- First install
+
+```
+from OSMPythonTools.nominatim import Nominatim
+from OSMPythonTools.overpass import Overpass, overpassQueryBuilder
+
+overpass = Overpass()
+nominatim = Nominatim()
+
+nyc = nominatim.query('NYC')
+query = overpassQueryBuilder(area=nyc.areaId(), elementType='node', selector='"man_made"="surveillance"', out='body')
+results = overpass.query(query)
+print(results.toJSON())
+```
+
+There are scripts that help you do this in `scripts/`:
+
+1. Get data from OSM: `python osm_surveillance.py NYC NY`, which creates `output/surveillance__NYC_NY_....json`
+2. Load data into scanmap: `python ingest_pois.py output/surveillance__NYC_NY_....json`
