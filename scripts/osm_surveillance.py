@@ -37,7 +37,7 @@ for el in data['elements']:
     text = '\n'.join(
             '{}={}'.format(k, v)
             for k, v in el['tags'].items())
-    text = '{}\nosm_id={}'.format(text, el['id'])
+    text = '{}\nosm_id={}'.format(text, el['id']).strip('\n')
     loc = nominatim.query(el['lat'], el['lon'], reverse=True)
     pois.append({
         'location': location,

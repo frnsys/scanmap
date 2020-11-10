@@ -37,10 +37,15 @@ print('Database backed up to {}'.format(backup_fname))
 db = Database('../data/logs.db')
 con, cur = db._con()
 submitter = 'script'
+n_added = 0
 for row in rows:
     timestamp = datetime.utcnow().timestamp()
+    data = json.dumps(row['data'])
+    existing = cur.execute('SELECT * FROM logs WHERE location == ? AND data == ?', (row['location'], data)).fetchall()
+    if existing: continue
     cur.execute(
         'INSERT INTO logs(timestamp, type, location, submitter, data) VALUES (?,?,?,?,?)',
-        (timestamp, 'static', row['location'], submitter, json.dumps(row['data'])))
+        (timestamp, 'static', row['location'], submitter, data))
+    n_added += 1
 con.commit()
-print('Finished')
+print('Finished. Added {} new entries.'.format(n_added))
