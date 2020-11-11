@@ -19,6 +19,7 @@ def test_add(database):
     """Tests an add then fetch"""
 
     database.add(
+        'event',
         'NY',
         'WRITEKEY',
         { 'text': 'TEST', 'location': 'LOCATION', 'coordinates': '0,0', 'label': 'other' })
@@ -37,6 +38,7 @@ def test_delete(database):
     """Tests an add then delete"""
 
     database.add(
+        'event',
         'NY',
         'WRITEKEY',
         { 'text': 'TEST', 'location': 'LOCATION', 'coordinates': '0,0', 'label': 'other' })
@@ -53,11 +55,13 @@ def test_get_different_locations(database):
     """Tests adding multiple locations and fetching from one"""
 
     database.add(
+        'event',
         'NY',
         'WRITEKEY',
         { 'text': 'NY TEST', 'location': 'NY LOCATION', 'coordinates': '0,0', 'label': 'other' })
 
     database.add(
+        'event',
         'PA',
         'WRITEKEY',
         { 'text': 'PA TEST', 'location': 'PA LOCATION', 'coordinates': '0,0', 'label': 'other' })
@@ -69,6 +73,7 @@ def test_get_specific(database):
     """Tests getting a specific log record"""
 
     database.add(
+        'event',
         'NY',
         'WRITEKEY',
         { 'text': 'TEST', 'location': 'LOCATION', 'coordinates': '0,0', 'label': 'other' })
@@ -82,6 +87,7 @@ def test_update(database):
     """Tests update"""
 
     database.add(
+        'event',
         'NY',
         'WRITEKEY',
         { 'text': 'TEST', 'location': 'LOCATION', 'coordinates': '0,0', 'label': 'other' })
