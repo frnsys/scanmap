@@ -15,25 +15,6 @@ App is broken down by location, which is just a key identifying a location, e.g.
         - Only the latest one is shown
 - Adding to the map requires an authentication key (which are kept in `data/keys.yml`).
 
-# Adapting to other uses
-
-You can adapt scanmap for other uses too. At its core scanmap is a real-time collaborative mapping system with a few extra things for how it is currently used (scanner tracking).
-
-For the backend these extra parts are contained entirely in `server.py`. So to adapt the backend, you only need to change this file to suit your needs.
-
-For the frontend these extra parts are defined in `src/extra` and loaded in `src/main.js`. You'll probably also want to update `src/labels.js` for whatever you need. This file not only defines icons for labels but also what labels can be used in the first place. The `LABELS` constant in the file is structured like so:
-
-```
-{
-    <event type>: {
-        <label>: <label icon>,
-        ...
-    },
-    ...
-}
-```
-
-
 ---
 
 # Configuration
@@ -358,3 +339,23 @@ There are scripts that help you do this in `scripts/`:
 
 1. Get data from OSM: `python osm_surveillance.py NYC NY`, which creates `output/surveillance__NYC_NY_....json`
 2. Load data into scanmap: `python ingest_pois.py output/surveillance__NYC_NY_....json`
+
+---
+
+# Adapting to other uses
+
+You can adapt scanmap for other uses too. At its core scanmap is a real-time collaborative mapping system with a few extra things for how it is currently used (scanner tracking).
+
+For the backend these extra parts are contained entirely in `server.py`. So to adapt the backend, you only need to change this file to suit your needs.
+
+For the frontend these extra parts are defined in `src/extra` and loaded in `src/main.js`. You'll probably also want to update `src/labels.js` for whatever you need. This file not only defines icons for labels but also what labels can be used in the first place. The `LABELS` constant in the file is structured like so:
+
+```
+{
+    <event type>: {
+        <label>: <label icon>,
+        ...
+    },
+    ...
+}
+```
