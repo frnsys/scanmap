@@ -23,22 +23,23 @@ class MockSSE:
 
 @pytest.fixture
 def log_in_db():
-    import server
+    from app import routes
 
-    server.db.add(
+    routes.db.add(
+        'event',
         'NY',
         'WRITE',
         {'text': 'TEST', 'location': 'X AND Y ST', 'coordinates': '0,0', 'label': 'other'})
 
-    yield server.db.logs('NY', 1)[0]
+    yield routes.db.logs('NY', 1)[0]
 
 @pytest.fixture
 def sse(monkeypatch):
-    import server
+    from app import routes
 
     mock = MockSSE()
 
-    monkeypatch.setattr(server, 'sse', mock)
+    monkeypatch.setattr(routes, 'sse', mock)
 
     yield mock
 
@@ -51,14 +52,14 @@ def client(monkeypatch):
             keyf.flush()
 
         with tempfile.NamedTemporaryFile() as dbf:
-            import server
+            from app import routes, create_app
 
             # Stub key ring and database
-            monkeypatch.setattr(server, 'kr', KeyRing(keyf.name))
-            monkeypatch.setattr(server, 'db', Database(dbf.name))
+            monkeypatch.setattr(routes, 'kr', KeyRing(keyf.name))
+            monkeypatch.setattr(routes, 'db', Database(dbf.name))
 
+            import server
             server.app.config['TESTING'] = True
-
             yield server.app.test_client()
 
 # ---------------------
@@ -129,7 +130,7 @@ def test_get_cams_unknown_location(client):
 def test_get_log(client, log_in_db):
     """Tests getting logs without auth"""
 
-    log_response = client.get('/NY/log')
+    log_response = client.get('/NY/log/event')
 
     assert(log_response.status_code == 200)
     assert(len(log_response.get_json()['logs']) == 1)
@@ -137,20 +138,20 @@ def test_get_log(client, log_in_db):
 def test_get_log_unknown_location(client, log_in_db):
     """Tests getting logs with unknown location"""
 
-    log_response = client.get('/YN/log')
+    log_response = client.get('/YN/log/event')
 
     assert(log_response.status_code == 404)
 
 def test_get_log_hit_cache(client, sse, log_in_db):
     """Tests getting logs populated cache"""
 
-    import server
+    from app import routes
 
-    log_response = client.get('/NY/log')
+    log_response = client.get('/NY/log/event')
 
     assert(log_response.status_code == 200)
 
-    cached = server.cache.get('/NY/log_noauth')
+    cached = routes.cache.get('/NY/log/event_noauth')
 
     assert(cached.status_code == 200)
     assert(len(cached.get_json()['logs']) == 1)
@@ -158,38 +159,38 @@ def test_get_log_hit_cache(client, sse, log_in_db):
 def test_new_log_unauthorized(client, log_in_db):
     """Tests adding log without a key"""
 
-    log_response = client.post('/NY/log')
+    log_response = client.post('/NY/log/event')
 
     assert(log_response.status_code == 401)
 
 def test_new_log_ok(client, sse, log_in_db):
     """Tests adding a new log record"""
 
-    import server
+    from app import routes
 
     log_response = client.post(
-        '/NY/log',
+        '/NY/log/event',
         headers={'X-AUTH': 'WRITE'},
         json={'text': 'TEST', 'location': 'A AND B ST', 'coordinates': '0,0', 'label': 'other'})
 
     assert(log_response.status_code == 200)
     assert(log_response.get_json() == {'success': True})
     assert(sse.publish_called)
-    assert(len(server.db.logs('NY', 10)) == 2)
+    assert(len(routes.db.logs('NY', 10)) == 2)
 
 def test_new_log_no_cache(client, sse, log_in_db):
     """Tests adding a new log doesn't populate cache"""
 
-    import server
+    from app import routes
 
     log_response = client.post(
-        '/NY/log',
+        '/NY/log/event',
         headers={'X-AUTH': 'WRITE'},
         json={'text': 'TEST', 'location': 'A AND B ST', 'coordinates': '0,0', 'label': 'other'})
 
     assert(log_response.status_code == 200)
 
-    cached = server.cache.get('/NY/log_WRITE')
+    cached = routes.cache.get('/NY/log/event_WRITE')
 
     assert(cached == None)
 
@@ -241,7 +242,7 @@ def test_edit_log_delete(client, sse, log_in_db):
 def test_edit_log_update(client, sse, log_in_db):
     """Tests updating a log record"""
 
-    import server
+    from app import routes
 
     request_body = {
         'action': 'update',
@@ -258,15 +259,15 @@ def test_edit_log_update(client, sse, log_in_db):
     assert(edit_log_response.get_json() == {'success': True})
     assert(sse.publish_called)
     assert(
-        server.db.log('NY', log_in_db['timestamp'])['data']['location'] == 'NEW ADDRESS'
+        routes.db.log('NY', log_in_db['timestamp'])['data']['location'] == 'NEW ADDRESS'
     )
 
 def test_edit_log_editor_is_not_submitter(client, sse, log_in_db):
     """Tests updating a log record with a key that differs from the submitter's key"""
 
-    import server
+    from app import routes
 
-    server.kr.add_key('NY', 'write', 'WRITE_2')
+    routes.kr.add_key('NY', 'write', 'WRITE_2')
 
     request_body = {
         'action': 'update',
@@ -329,22 +330,6 @@ def test_get_location_cross_streets(client, monkeypatch):
     assert(location_response.status_code == 200)
     assert(any(location_response.get_json()['results']))
 
-def test_get_location_ambiguous(client, monkeypatch):
-    """Tests searching for a term that has multiple results"""
-
-    monkeypatch.setattr(
-        requests,
-        'get',
-        lambda *args, **kwargs: MockResponse('google_places_ok_2_ambiguous'))
-
-    location_response = client.post(
-        '/NY/location',
-        headers={'X-AUTH': 'WRITE'},
-        json={'query': 'bergen'})
-
-    assert(location_response.status_code == 200)
-    assert(len(location_response.get_json()['results']) == 4)
-
 # ------------------------------
 # ------------------------------
 # ---  GET /<location>/panel ---
@@ -405,7 +390,7 @@ def test_keys_new_key_unauthorized(client):
 def test_keys_new_key_ok(client):
     """Tests add a key with a prime key"""
 
-    import server
+    from app import routes
 
     keys_response = client.post(
         '/NY/keys',
@@ -413,7 +398,7 @@ def test_keys_new_key_ok(client):
         json={'action': 'create'})
 
     assert(keys_response.status_code == 200)
-    assert(len(server.kr.get_keys('NY')['write']) == 2)
+    assert(len(routes.kr.get_keys('NY')['write']) == 2)
 
 def test_keys_revoke_key_unauthorized(client):
     """Tests revoking a key with an unauthorized key"""
@@ -428,7 +413,7 @@ def test_keys_revoke_key_unauthorized(client):
 def test_keys_revoke_key_ok(client):
     """Tests revoking a key with a prime key"""
 
-    import server
+    from app import routes
 
     keys_response = client.post(
         '/NY/keys',
@@ -436,7 +421,7 @@ def test_keys_revoke_key_ok(client):
         json={'action': 'revoke', 'key': 'WRITE'})
 
     assert(keys_response.status_code == 200)
-    assert(len(server.kr.get_keys('NY')['write']) == 0)
+    assert(len(routes.kr.get_keys('NY')['write']) == 0)
 
 # -----------------------------------
 # -----------------------------------
