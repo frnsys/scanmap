@@ -120,7 +120,10 @@ KEYS_FILE = 'data/keys.yml'
 GOOGLE_PLACES_API_KEY = '<KEY>'
 REDIS_URL = 'redis://localhost'
 DEBUG = False
-CACHE_TYPE = 'simple'
+
+CACHE = {
+    'CACHE_TYPE': 'simple'
+}
 
 LOCATIONS = {
     'NY': {
