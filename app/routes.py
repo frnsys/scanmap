@@ -1,3 +1,4 @@
+import os
 import json
 import config
 from app.db import Database
@@ -162,7 +163,7 @@ def query_location(location):
 
 @bp.route('/img/<fname>')
 def image(fname):
-    return send_from_directory(config.UPLOAD_PATH, fname)
+    return send_from_directory(os.path.join('..', config.UPLOAD_PATH), fname)
 
 
 # Panel (key management backend)
