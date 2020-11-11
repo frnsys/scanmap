@@ -14,6 +14,7 @@ App is broken down by location, which is just a key identifying a location, e.g.
         - A pinned announcement message
         - Only the latest one is shown
 - Adding to the map requires an authentication key (which are kept in `data/keys.yml`).
+    - There are two types of keys: write keys, which let the bearer add to the map; and admin keys, which can be used to create write keys.
 
 ---
 
