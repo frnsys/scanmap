@@ -1,4 +1,4 @@
-import {get, el} from './util';
+import {get, el} from '../util';
 
 const toggleEl = document.getElementById('toggle-helicopters');
 
