@@ -42,12 +42,13 @@ class Database:
     def log(self, location, timestamp):
         con, cur = self._con()
         res = cur.execute(
-                'SELECT submitter, data FROM logs WHERE location == ? AND timestamp == ?',
+                'SELECT type, submitter, data FROM logs WHERE location == ? AND timestamp == ?',
                 (location, timestamp)).fetchone()
         if res:
             return {
-                'submitter': res[0],
-                'data': json.loads(res[1])
+                'type': res[0],
+                'submitter': res[1],
+                'data': json.loads(res[2])
             }
 
     def delete(self, location, timestamp):
