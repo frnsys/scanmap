@@ -34,6 +34,19 @@ def log_in_db():
     yield routes.db.logs('NY', 1)[0]
 
 @pytest.fixture
+def admin_log_in_db():
+    from app import routes
+
+    routes.db.add(
+        'admin',
+        'NY',
+        'WRITE',
+        {'text': 'TEST', 'location': 'X AND Y ST', 'coordinates': '0,0', 'label': 'other'})
+
+    yield routes.db.logs('NY', 1, type='admin')[0]
+
+
+@pytest.fixture
 def sse(monkeypatch):
     from app import routes
 
@@ -194,6 +207,28 @@ def test_new_log_no_cache(client, sse, log_in_db):
 
     assert(cached == None)
 
+def test_get_log_admin(client, log_in_db):
+    """Tests getting admin logs"""
+
+    log_response = client.get('/NY/log/admin')
+    assert(log_response.status_code == 400)
+
+    log_response = client.get('/NY/log/admin/all')
+    assert(log_response.status_code == 400)
+
+def test_new_log_admin(client, sse, log_in_db):
+    """Tests adding a new admin log record"""
+
+    from app import routes
+
+    log_response = client.post(
+        '/NY/log/admin',
+        headers={'X-AUTH': 'WRITE'},
+        json={'text': 'TEST', 'location': 'A AND B ST', 'coordinates': '0,0', 'label': 'other'})
+
+    assert(log_response.status_code == 400)
+
+
 # ----------------------------------
 # ----------------------------------
 # ---  POST /<location>/log/edit ---
@@ -281,6 +316,31 @@ def test_edit_log_editor_is_not_submitter(client, sse, log_in_db):
         json=request_body)
 
     assert(edit_log_response.status_code == 401)
+
+def test_edit_admin_log_delete(client, sse, admin_log_in_db):
+    """Tests deleting an admin log record"""
+
+    edit_log_response = client.post(
+        '/NY/log/edit',
+        headers={'X-AUTH': 'PRIME'},
+        json={'action': 'delete', 'timestamp': admin_log_in_db['timestamp']})
+
+    assert(edit_log_response.status_code == 400)
+
+def test_edit_admin_log_update(client, sse, admin_log_in_db):
+    """Tests updating an admin log record"""
+
+    edit_log_response = client.post(
+        '/NY/log/edit',
+        headers={'X-AUTH': 'PRIME'},
+        json={
+            'action': 'update',
+            'timestamp': admin_log_in_db['timestamp'],
+            'changes': {'location': 'NEW ADDRESS'}
+        })
+
+    assert(edit_log_response.status_code == 400)
+
 
 # ----------------------------------
 # ----------------------------------
