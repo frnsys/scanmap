@@ -455,8 +455,8 @@ select {
   padding: 2em;
 }
 #panel-logs #logs li p {
-	text-indent: -0.5em;
-	padding-left: 0.75em;
+	text-indent: -1.5em;
+	padding-left: 1em;
 	margin: 0 0 0.5em;
 }
 #panel-logs h4 {
