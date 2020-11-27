@@ -23,7 +23,7 @@ class KeyRing:
         return ''.join(random.choices(
             string.ascii_letters + string.digits, k=32))
 
-    def add_key(self, loc, typ, key):
+    def add_key(self, loc, key, typ):
         keys = self.load_keys()
         try:
             keys[loc][typ].append(key)
@@ -32,10 +32,15 @@ class KeyRing:
         except KeyError:
             return False
 
-    def del_key(self, loc, typ, key):
+    def del_key(self, loc, key, typ=None):
         keys = self.load_keys()
+        if typ is None: # Revoke all instances of key
+            typs = list(keys[loc].keys())
+        else:
+            typs = [typ]
         try:
-            keys[loc][typ] = [k for k in keys[loc][typ] if k != key]
+            for typ in typs:
+                keys[loc][typ] = [k for k in keys[loc][typ] if k != key]
             self.save_keys(keys)
             return True
         except KeyError:

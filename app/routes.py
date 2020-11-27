@@ -182,15 +182,16 @@ def keys(location):
         data = request.get_json()
         action = data['action']
         if action == 'revoke':
-            kr.del_key(location, 'write', data['key'])
+            kr.del_key(location, data['key'])
             return jsonify(success=True)
         elif action == 'create':
             key = kr.new_key()
-            kr.add_key(location, 'write', key)
+            typ = data.get('type', 'write')
+            kr.add_key(location, key, typ)
             return jsonify(success=True, key=key)
         return jsonify(success=False)
 
-    keys = kr.get_keys(location).get('write')
+    keys = kr.get_keys(location)
     return jsonify(keys=keys)
 
 @bp.route('/<location>/checkauth', methods=['POST'])

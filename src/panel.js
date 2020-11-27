@@ -6,19 +6,25 @@ function showError(err) {
   errEl.style.display = 'block';
 }
 
-function addKey() {
+function addKey(type) {
   post('keys', {
-    action: 'create'
+    action: 'create',
+    type: type
   }, (json) => {
-    keyItem(json.key);
+    keyItem(json.key, type);
   }, KEY);
 }
 
 const keysEl = document.getElementById('keys');
-function keyItem(key) {
+const typeNames = {
+  'write': 'write',
+  'prime': 'admin'
+};
+function keyItem(key, type) {
   let li = el({
     tag: 'li',
-    innerText: key,
+    innerText: `[${typeNames[type]}] ${key}`,
+    className: `key-${type}`,
     children: [{
       tag: 'span',
       className: 'revoke-key action',
@@ -43,7 +49,7 @@ function keyItem(key) {
 
 function loadKeys() {
   get('keys', (json) => {
-    json.keys.forEach((k) => keyItem(k));
+    Object.keys(json.keys).forEach((type) => json.keys[type].forEach((k) => keyItem(k, type)));
     document.getElementById('panel-main').style.display = 'block';
 
     get('log/pinned', (json) => {
@@ -66,7 +72,11 @@ document.getElementById('key').addEventListener('keydown', (ev) => {
 });
 
 document.getElementById('add-key').addEventListener('click', () => {
-  addKey();
+  addKey('write');
+});
+
+document.getElementById('add-prime-key').addEventListener('click', () => {
+  addKey('prime');
 });
 
 document.getElementById('set-pinned').addEventListener('click', () => {
