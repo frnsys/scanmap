@@ -434,6 +434,9 @@ select {
 #panel #keys {
   padding: 2em;
 }
+#panel .key-prime {
+  color: #ffcb00;
+}
 #panel-main {
   display: none;
 }
@@ -448,12 +451,40 @@ select {
   min-height: 100px;
   padding: 0.5em;
 }
+#panel-logs #logs {
+  padding: 2em;
+}
+#panel-logs #logs li p {
+	text-indent: -1.5em;
+	padding-left: 1em;
+	margin: 0 0 0.5em;
+}
+#panel-logs h4 {
+  text-align: center;
+  margin: 2em 0 0 0;
+  border-top: 1px solid #fcb;
+  padding-top: 2em;
+  color: #43CC70;
+}
+.actions {
+  text-align: center;
+}
 .action {
   cursor: pointer;
   text-align: center;
+  color: #888;
 }
 .action:hover {
-  text-decoration: underline
+  color: #43CC70;
+}
+.actions .action {
+  color: #fff;
+  margin: 0 0.5em;
+  border-bottom: 1px solid #fff;
+}
+.actions .action:hover {
+  color: #fff;
+  border-bottom: 1px solid #43CC70;
 }
 #panel-errors {
   display: none;

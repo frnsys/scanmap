@@ -26,13 +26,13 @@ def test_get_keys_empty(empty_keys):
 def test_add_prime_key(keys):
     """Tests adding a key"""
 
-    assert(keys.add_key('NY', 'prime', 'WRITE'))
+    assert(keys.add_key('NY', 'WRITE', 'prime'))
     assert(any(keys.get_keys('NY')['prime']))
 
 def test_add_unknown_type_key(keys):
     """Tests adding a key of an unknown type"""
 
-    assert(not keys.add_key('NY', 'bogus', 'WRITE'))
+    assert(not keys.add_key('NY', 'WRITE', 'bogus'))
     assert(not any(keys.get_keys('NY')['prime']))
 
 def test_add_unknown_location_key(keys):
@@ -45,22 +45,22 @@ def test_add_then_check_key(keys):
 
     assert(not keys.check_key('WRITE', 'NY'))
 
-    keys.add_key('NY', 'prime', 'WRITE')
+    keys.add_key('NY', 'WRITE', 'prime')
 
     assert(keys.check_key('WRITE', 'NY'))
 
 def test_add_then_check_different_key(keys):
     """Tests adding a key then checking if a different key is present"""
 
-    assert(keys.add_key('NY', 'prime', 'WRITE'))
+    assert(keys.add_key('NY', 'WRITE', 'prime'))
     assert(not keys.check_key('WRITE_2', 'NY'))
 
 def test_delete_key(keys):
     """Tests adding a key then deleting it"""
 
-    assert(keys.add_key('NY', 'prime', 'WRITE'))
+    assert(keys.add_key('NY', 'WRITE', 'prime'))
     assert(keys.check_key('WRITE', 'NY'))
-    assert(keys.del_key('NY', 'prime', 'WRITE'))
+    assert(keys.del_key('NY', 'WRITE', 'prime'))
 
 def test_delete_unknown_key(keys):
     """Tests deleting an unknown key"""

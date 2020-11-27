@@ -57,6 +57,9 @@ def log(location, type):
     if request.method == 'POST':
         if not auth: abort(401)
 
+        # Admin logs can't be updated this way
+        if type == 'admin': abort(400)
+
         # Grab submitted log data
         data = request.form.to_dict()
 
@@ -79,7 +82,11 @@ def log(location, type):
             {'data': data, 'timestamp': timestamp}), channel=location)
         return jsonify(success=True)
     else:
-        if type == 'event':
+
+        # Admin logs can't be updated this way
+        if type == 'admin':
+            abort(400)
+        elif type == 'event':
             # Limit amount of event logs that are sent
             now = datetime.utcnow().replace(tzinfo=timezone.utc)
             interval = (now - timedelta(**config.LOGS_AFTER)).timestamp()
@@ -103,6 +110,10 @@ def log(location, type):
 @cache.cached(timeout=5)
 def all_logs(location, type):
     conf = get_conf(location)
+
+    # Admin logs can't be read this way
+    if type == 'admin': abort(400)
+
     logs = db.logs(location, type=type)
 
     # Strip submitter info
@@ -129,6 +140,9 @@ def edit_log(location):
         # See if a log matches the request
         log = db.log(location, timestamp)
         if log is None: abort(404)
+
+        # Admin logs can't be edited
+        if log['type'] == 'admin': abort(400)
 
         # Abort if not prime key or not submitter
         if auth == 'prime' or key == log['submitter']:
@@ -172,6 +186,18 @@ def panel(location):
     conf = get_conf(location)
     return render_template('panel.html', conf=conf)
 
+
+@bp.route('/<location>/panel/logs')
+def admin_logs(location):
+    key = request.headers.get('X-AUTH')
+    if not kr.check_key(key, location) == 'prime':
+        abort(401)
+    admin_logs = db.logs(location, type='admin')
+    pinned_logs = db.logs(location, type='pinned')
+    logs = sorted(admin_logs + pinned_logs, key=lambda l: l['timestamp'])
+    return jsonify(logs=logs)
+
+
 @bp.route('/<location>/keys', methods=['GET', 'POST'])
 def keys(location):
     key = request.headers.get('X-AUTH')
@@ -182,15 +208,31 @@ def keys(location):
         data = request.get_json()
         action = data['action']
         if action == 'revoke':
-            kr.del_key(location, 'write', data['key'])
+            kr.del_key(location, data['key'])
+            db.add('admin', location, key, {
+                'type': 'keys',
+                'action': action,
+                'target': {
+                    'key': data['key'],
+                }
+            })
             return jsonify(success=True)
         elif action == 'create':
-            key = kr.new_key()
-            kr.add_key(location, 'write', key)
-            return jsonify(success=True, key=key)
+            new_key = kr.new_key()
+            typ = data.get('type', 'write')
+            kr.add_key(location, new_key, typ)
+            db.add('admin', location, key, {
+                'type': 'keys',
+                'action': action,
+                'target': {
+                    'type': typ,
+                    'key': new_key,
+                }
+            })
+            return jsonify(success=True, key=new_key)
         return jsonify(success=False)
 
-    keys = kr.get_keys(location).get('write')
+    keys = kr.get_keys(location)
     return jsonify(keys=keys)
 
 @bp.route('/<location>/checkauth', methods=['POST'])
