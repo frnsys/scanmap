@@ -28,4 +28,24 @@ const LABELS = {
   }
 };
 
+function showLegend() {
+  // Merge labels that have the same key,
+  // to avoid duplicates
+  const all_labels = {};
+  Object.values(LABELS).forEach((labels) => {
+    Object.keys(labels).forEach((k) => {
+      all_labels[k] = labels[k];
+    });
+  });
+
+  // Set up label legend
+  const legendEl = document.getElementById('legend');
+  Object.keys(all_labels).forEach((label) => {
+    let el = document.createElement('span');
+    el.innerText = `${all_labels[label]} ${label}`;
+    legendEl.appendChild(el);
+  });
+}
+
+export {showLegend};
 export default LABELS;

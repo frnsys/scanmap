@@ -2,6 +2,7 @@ import Map from './map';
 import Form from './control/form';
 import config from '../config';
 import { get } from './util';
+import { showLegend } from './labels';
 import { fetchLogs, fetchPinned, fadeMarkers, clearMarkers } from './logs';
 
 function setupApp(onSetup) {
@@ -105,6 +106,7 @@ function setupApp(onSetup) {
   // Initial load of data
   fetchLogs('event', map, form, true);
   fetchPinned();
+  showLegend();
 
   // Periodically fade markers based on age
   setInterval(() => {

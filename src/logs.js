@@ -29,20 +29,6 @@ const markers = {
 };
 const logMarkers = {};
 
-const ALL_LABELS = {};
-Object.values(LABELS).forEach((labels) => {
-  Object.keys(labels).forEach((k) => {
-    ALL_LABELS[k] = labels[k];
-  });
-});
-
-// Set up label legend
-const legendEl = document.getElementById('legend');
-Object.keys(ALL_LABELS).forEach((label) => {
-  let el = document.createElement('span');
-  el.innerText = `${ALL_LABELS[label]} ${label}`;
-  legendEl.appendChild(el);
-});
 
 // Add or update the marker for the given log
 function addOrUpdateMarker(log, map) {
