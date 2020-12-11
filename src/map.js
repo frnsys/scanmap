@@ -1,4 +1,5 @@
 import config from '../config';
+import FreehandMode from 'mapbox-gl-draw-freehand-mode';
 
 class Map {
   constructor(conf) {
@@ -67,6 +68,16 @@ class Map {
       center: coords,
       zoom: zoom,
     });
+  }
+
+  enableDrawing() {
+    let draw = new MapboxDraw({
+      displayControlsDefault: false,
+      modes: Object.assign(MapboxDraw.modes, {
+        draw_polygon: FreehandMode
+      })
+    });
+    this.map.addControl(draw);
   }
 }
 
