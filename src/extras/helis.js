@@ -1,8 +1,11 @@
+/*
+ * Shows helicopters on the map
+ */
+
 import {get, el} from '../util';
 
+const markers = {};
 const toggleEl = document.getElementById('toggle-helicopters');
-
-let markers = {};
 
 function updateMarkers(map, items) {
   if (items.length == 0) {

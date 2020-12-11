@@ -1,5 +1,5 @@
 import Map from './map';
-import Form from './form';
+import Form from './control/form';
 import config from '../config';
 import { get } from './util';
 import { fetchLogs, fetchPinned, fadeMarkers, clearMarkers } from './logs';
@@ -15,6 +15,10 @@ function setupApp(onSetup) {
       zoom: MAP_ZOOM,
       center: MAP_CENTER
     },
+
+    // Map on click handler.
+    // If the user is authenticated,
+    // show a preview marker where clicked
     (coord) => {
       if (form.authKey) {
         document.getElementById(
@@ -24,22 +28,25 @@ function setupApp(onSetup) {
       }
     }
   );
+
+  // Set up the form.
+  // Doesn't do anything until the user authenticates
   const form = new Form(map);
 
+  // Setup realtime event streams
   let logSource;
   function initEventSource() {
-    console.log('Initializing event source');
-    /* server sent events coooooode */
     logSource = new EventSource(SSE_URL);
     logSource.onmessage = function(ev) {
       // For now just reloading logs,
       // for compatibility with how the editing system works.
-      // TODO: properly integrate updates
       fetchLogs('event', map, form, true);
       fetchLogs('static', map, form, toggleEl.checked);
 
+      // Eventually might want to only load the new messages
       // const log = JSON.parse(ev.data);
     };
+
     // Reconnect on error
     logSource.addEventListener('error', (ev) => {
       console.log('Connection error');
@@ -59,21 +66,27 @@ function setupApp(onSetup) {
     console.log(`Center:${map.map.getCenter()}`);
   };
 
+  // Prompt to add a key and authenticate
   document.getElementById('add').addEventListener('click', () => {
     let authKey = prompt('Key');
-    form.activate(authKey, () => {
+    form.authenticate(authKey, () => {
       // Re-fetch logs on success,
       // to show edit UI if necessary
       fetchLogs('event', map, form, true);
       fetchLogs('static', map, form, toggleEl.checked);
+      map.enableDrawing();
     });
   });
+
+  // Toggle the info/legend pane
   document.getElementById('info-toggle').addEventListener('click', () => {
     let b = document.getElementById('info-body');
     let open = b.style.display != 'none';
     b.style.display = open ? 'none' : 'block';
     document.getElementById('info-toggle').innerText = open ? '▲' : '▼';
   });
+
+  // Hide pinned message
   document.getElementById('pinned-hide').addEventListener('click', () => {
     document.getElementById('pinned-log').style.display = 'none';
   });
@@ -89,13 +102,17 @@ function setupApp(onSetup) {
     fetchPinned();
   }, 5*60*1000);
 
+  // Initial load of data
   fetchLogs('event', map, form, true);
   fetchPinned();
+
+  // Periodically fade markers based on age
   setInterval(() => {
     fadeMarkers('event');
   }, 5000);
   onSetup(map);
 
+  // Toggle showing of static logs (i.e. points of interest)
   const toggleEl = document.getElementById('static-toggle-input');
   toggleEl.addEventListener('change', (ev) => {
     if (ev.target.checked) {

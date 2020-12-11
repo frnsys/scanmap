@@ -4,7 +4,7 @@ const dev = process.env.NODE_ENV !== 'production';
 module.exports = {
   entry: {
     main: './src/main',
-    panel: './src/panel',
+    panel: './src/control/panel',
   },
   output: {
     path: path.resolve(__dirname, 'static/dist'),

@@ -1,3 +1,4 @@
+// JSON get request
 function get(url, onSuccess, authKey) {
   return fetch(url, {
     headers: {
@@ -20,6 +21,7 @@ function get(url, onSuccess, authKey) {
     .then(onSuccess);
 }
 
+// JSON post request
 function post(url, data, onSuccess, authKey) {
   let form = data instanceof FormData;
   let headers = {

@@ -1,5 +1,9 @@
-import {post} from './util';
-import LABELS from './labels';
+/*
+ * Form for annotators to submit new annotations
+ */
+
+import {post} from '../util';
+import LABELS from '../labels';
 
 const fields = ['text', 'location', 'coordinates', 'label'];
 const overlay = document.getElementById('overlay');
@@ -14,16 +18,28 @@ const imagesEl = document.getElementById('image');
 class Form {
   constructor(map) {
     this.map = map;
+
+    // User's auth key
     this.authKey = '';
+
+    // The current map marker
     this.marker = null;
+
+    // Type of log the form is for
+    // i.e. "event" or "static".
+    // This reflects the active tab on the form
     this.logType = 'event';
 
+    // Controls for toggling the help/intro overlay
     document.getElementById('ready').addEventListener('click', () => {
-        overlay.style.display = 'none';
+      overlay.style.display = 'none';
     });
     document.getElementById('show-help').addEventListener('click', () => {
       overlay.style.display = 'block';
     });
+
+    // Control for triggering location search
+    // (either enter key or clicking the search icon)
     document.getElementById('location').addEventListener('keydown', (ev) => {
       if (ev.key == 'Enter') {
         this.queryLocation(ev.target.value);
@@ -33,11 +49,14 @@ class Form {
       this.queryLocation(document.getElementById('location').value);
     });
 
+    // Control for submitting the form
     document.getElementById('submit').addEventListener('click', () => this.submit());
 
+    // Set up log type switching (i.e. the event/static tabs)
     this.setLabels(this.logType);
     document.getElementById(`${this.logType}-hint`).style.display = 'block';
     [...document.querySelectorAll('.append-tab')].forEach((tab) => {
+      // Control for changing the tab/current log type
       let type = tab.dataset.type;
       tab.addEventListener('click', () => {
         this.logType = type;
@@ -50,6 +69,7 @@ class Form {
       });
     });
 
+    // Enable tabs for switching between event/static log types in the log feed
     [...document.querySelectorAll('.log-tab')].forEach((tab) => {
       let type = tab.dataset.type;
       tab.addEventListener('click', () => {
@@ -61,6 +81,8 @@ class Form {
     });
   }
 
+  // Load the log labels for the current log type
+  // into the form dropdown
   setLabels(logType) {
     labelsEl.innerHTML = '';
     Object.keys(LABELS[logType]).forEach((label) => {
@@ -72,6 +94,8 @@ class Form {
     });
   }
 
+  // Search for a location/coordinates
+  // for the given query
   queryLocation(query) {
     statusEl.innerText = 'Searching...';
     statusEl.style.display = 'block';
@@ -111,6 +135,7 @@ class Form {
     });
   }
 
+  // Show the map marker for the given coordinates
   previewCoords(coords, jump) {
     if (this.marker) this.marker.remove();
     this.marker = this.map.addMarker(coords, {
@@ -119,17 +144,21 @@ class Form {
     if (jump) this.map.jumpTo(coords);
   }
 
-  activate(authKey, onActivate) {
+  // Attempt to authenticate
+  // the form for a given key
+  authenticate(authKey, onActivate) {
     this.authKey = authKey;
 
+    // No auth key given, ignore
     if (this.authKey.trim() == "") return;
 
+    // Check that the key is valid
     authStatusEl.innerText = 'Authorizing';
     authStatusEl.style.display = 'block';
-    // Reset error
     post('checkauth', {}, (results) => {
+      // Valid, show the form
       if (results.success === true) {
-        // Show intro and bind help button
+        // Hide authentication status and show help/intro
         authStatusEl.style.display = 'none';
         overlay.style.display = 'block';
 
@@ -147,27 +176,34 @@ class Form {
     });
   }
 
+  // Submit the form (i.e. create a new log)
   submit() {
+    // Gather form data
     let data = {};
     fields.forEach((k) => {
       data[k] = document.getElementById(k).value;
     });
 
-    // All fields required
+    // All fields required, check they're all filled
     if (!fields.every((k) => data[k])) {
       alert('Please fill in the note, location, and coordinates');
 
+    // Prep data
     } else {
-      // Prep data
-      let img = imagesEl.files[0];
       let formData = new FormData();
+
+      // Get the image, if any
+      let img = imagesEl.files[0];
       if (img) formData.append('image', img);
+
+      // Load in the other form data
       Object.keys(data).forEach((k) => {
         formData.set(k, data[k]);
       });
 
+      // Post the log data
       this.post(`log/${this.logType}`, formData, (json) => {
-        // Reset fields
+        // Reset fields on completion
         resultsEl.innerHTML = '';
         fields.forEach((k) => {
           let inp = document.getElementById(k);
@@ -181,6 +217,8 @@ class Form {
     }
   }
 
+  // Convenience method for authenticated
+  // post requests
   post(url, data, onSuccess) {
     // Reset error
     errEl.style.display = 'none';

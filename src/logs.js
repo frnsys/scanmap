@@ -1,3 +1,11 @@
+/*
+ * Managing logs (rendering, editing, etc).
+ * Handles loading and rendering of logs for the log feed and
+ * the corresponding markers and popups on the map.
+ * Also handles when logs are deleted, created, and updated
+ * and syncing those changes to map markers and popups.
+ */
+
 import LABELS from './labels';
 import {get, post, el} from './util';
 
@@ -28,14 +36,15 @@ Object.values(LABELS).forEach((labels) => {
   });
 });
 
+// Set up label legend
 const legendEl = document.getElementById('legend');
 Object.keys(ALL_LABELS).forEach((label) => {
-  // Legend
   let el = document.createElement('span');
   el.innerText = `${ALL_LABELS[label]} ${label}`;
   legendEl.appendChild(el);
 });
 
+// Add or update the marker for the given log
 function addOrUpdateMarker(log, map) {
   let icon = log.label ? LABELS[log.type][log.label] : null;
   let labelText = log.label ? `${LABELS[log.type][log.label]} ${log.label}` : '';
@@ -119,6 +128,7 @@ function addOrUpdateMarker(log, map) {
   }
 }
 
+// Remove the log for the specified key from its marker
 function removeLogFromMarker(key, logType, elId) {
   if (markers[logType][key]) {
     let {marker} = markers[logType][key];
@@ -152,6 +162,7 @@ function removeLogFromMarker(key, logType, elId) {
   }
 }
 
+// Render logs for the log type
 function showLogs(logType, logs, map, form, showMarkers) {
   // Track what log entries we have
   let logIds = new Set([...document.querySelectorAll(`#${logType}-logs .logitem`)].map((el) => el.id));
@@ -505,8 +516,8 @@ function closePopups() {
   }
 }
 
+// Fade out markers based on how old they are
 function fadeMarkers(logType) {
-  // Fade out markers
   let now = new Date().getTime();
   Object.keys(markers[logType]).forEach((k) => {
     let {marker, lastUpdate} = markers[logType][k];
@@ -516,7 +527,7 @@ function fadeMarkers(logType) {
   });
 }
 
-
+// Load logs
 function fetchLogs(logType, map, form, showMarkers) {
   get(
     `log/${logType}`,
@@ -529,6 +540,7 @@ function fetchLogs(logType, map, form, showMarkers) {
   });
 }
 
+// Load pinned message
 function fetchPinned() {
   get('log/pinned', ({ logs }) => {
     if (logs.length > 0) {
@@ -547,6 +559,7 @@ function fetchPinned() {
   });
 }
 
+// Remove all markers for the specified log type
 function clearMarkers(logType) {
   logElIds[logType].forEach((elId) => {
     let key = logMarkers[elId];

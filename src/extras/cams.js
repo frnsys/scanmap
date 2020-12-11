@@ -1,7 +1,11 @@
+/*
+ * Show traffic cam feeds on the map
+ */
 import {get, el} from '../util';
 
 const toggleEl = document.getElementById('toggle-cams');
 
+// Create markers for cameras
 function makeMarkers(map, cams) {
   let markers = [];
   if (cams.length == 0) {
@@ -50,6 +54,7 @@ function makeMarkers(map, cams) {
   return markers;
 }
 
+// Setup cameras for the map
 function setupCams(map) {
   let cams = [];
   let markers = [];

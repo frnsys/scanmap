@@ -1,3 +1,7 @@
+/*
+ * Shows precinct boundaries on the map
+ */
+
 const toggleEl = document.getElementById('toggle-precincts');
 const layers = ['precincts', 'precincts-labels', 'precincts-outlines'];
 
