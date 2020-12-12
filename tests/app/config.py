@@ -27,7 +27,7 @@ GOOGLE_PLACES_API_KEY = '<STUB>'
 LOCATIONS = {
     'NY': {
         'LIVE': True,
-        'CAMERAS': 'tests/app/data/cams/ny.json',
+        'CAMERAS': 'data/cams/ny.json',
         'MAP': {
             'CENTER': [-73.96161699999999, 40.678806],
             'ZOOM': 12
