@@ -30,6 +30,7 @@ function setupApp(onSetup) {
       // for compatibility with how the editing system works.
       eventFeed.update(true);
       staticFeed.update(toggleEl.checked);
+      fetchPinned();
 
       // Eventually might want to only load the new messages
       // const log = JSON.parse(ev.data);
@@ -87,7 +88,6 @@ function setupApp(onSetup) {
         location.reload();
       }
     });
-    fetchPinned();
   }, 5*60*1000);
 
   // Initial load of data
