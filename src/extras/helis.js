@@ -2,7 +2,7 @@
  * Shows helicopters on the map
  */
 
-import {get, el} from '../util';
+import {api, el} from '../util';
 
 const markers = {};
 const toggleEl = document.getElementById('toggle-helicopters');
@@ -46,7 +46,7 @@ function updateMarkers(map, items) {
 }
 
 function updateHelicopters(map) {
-  get('helis', (json) => {
+  api.get('helis', (json) => {
     updateMarkers(map, json.helis);
   });
 }

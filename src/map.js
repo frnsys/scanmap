@@ -1,11 +1,11 @@
+import config from '../config';
+
 class Map {
-  constructor(conf, onClick) {
+  constructor(conf) {
     this.map = new mapboxgl.Map(conf);
     this.map.dragRotate.disable();
     this.map.touchZoomRotate.disableRotation();
-    this.clickListeners = {
-      root: onClick
-    };
+    this.clickListeners = {};
 
     this.map.on('click', (e) => {
       Object.values(this.clickListeners).forEach((fn) => {
@@ -70,4 +70,15 @@ class Map {
   }
 }
 
-export default Map;
+// Singleton of map
+mapboxgl.accessToken = config.MAPBOX_TOKEN;
+const map = new Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/streets-v11',
+    maxZoom: 18,
+    minZoom: 10,
+    zoom: MAP_ZOOM,
+    center: MAP_CENTER
+});
+
+export default map;

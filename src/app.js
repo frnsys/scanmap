@@ -1,38 +1,25 @@
-import Map from './map';
-import Form from './control/form';
-import config from '../config';
-import { get } from './util';
+import map from './map';
+import markers from './markers';
+import form from './control/form';
+import { api } from './util';
 import { showLegend } from './labels';
-import { fetchLogs, fetchPinned, fadeMarkers, clearMarkers } from './logs';
+import { Feed, fetchPinned } from './feed';
 
 function setupApp(onSetup) {
-  mapboxgl.accessToken = config.MAPBOX_TOKEN;
-  const map = new Map(
-    {
-      container: 'map',
-      style: 'mapbox://styles/mapbox/streets-v11',
-      maxZoom: 18,
-      minZoom: 10,
-      zoom: MAP_ZOOM,
-      center: MAP_CENTER
-    },
-
-    // Map on click handler.
-    // If the user is authenticated,
-    // show a preview marker where clicked
-    (coord) => {
-      if (form.authKey) {
-        document.getElementById(
-          'coordinates'
-        ).value = `${coord.lat},${coord.lng}`;
-        form.previewCoords([coord.lng, coord.lat]);
-      }
+  // If the user is authenticated,
+  // show a preview marker where clicked
+  map.addClickListener('preview', (coord) => {
+    if (api.authKey) {
+      document.getElementById(
+        'coordinates'
+      ).value = `${coord.lat},${coord.lng}`;
+      form.previewCoords([coord.lng, coord.lat]);
     }
-  );
+  });
 
-  // Set up the form.
-  // Doesn't do anything until the user authenticates
-  const form = new Form(map);
+  // Set up log feeds
+  let eventFeed = new Feed('event');
+  let staticFeed = new Feed('static');
 
   // Setup realtime event streams
   let logSource;
@@ -41,8 +28,8 @@ function setupApp(onSetup) {
     logSource.onmessage = function(ev) {
       // For now just reloading logs,
       // for compatibility with how the editing system works.
-      fetchLogs('event', map, form, true);
-      fetchLogs('static', map, form, toggleEl.checked);
+      eventFeed.update(true);
+      staticFeed.update(toggleEl.checked);
 
       // Eventually might want to only load the new messages
       // const log = JSON.parse(ev.data);
@@ -73,9 +60,9 @@ function setupApp(onSetup) {
     form.authenticate(authKey, () => {
       // Re-fetch logs on success,
       // to show edit UI if necessary
-      fetchLogs('event', map, form, true);
-      fetchLogs('static', map, form, toggleEl.checked);
-      map.enableDrawing();
+      eventFeed.update(true);
+      staticFeed.update(toggleEl.checked);
+      // map.enableDrawing();
     });
   });
 
@@ -94,7 +81,7 @@ function setupApp(onSetup) {
 
   // Check for updates
   setInterval(() => {
-    get('/version', (json) => {
+    api.get('/version', (json) => {
       if (VERSION != json.version) {
         console.log('New version detected, reloading...');
         location.reload();
@@ -104,13 +91,13 @@ function setupApp(onSetup) {
   }, 5*60*1000);
 
   // Initial load of data
-  fetchLogs('event', map, form, true);
+  eventFeed.update(true);
   fetchPinned();
   showLegend();
 
   // Periodically fade markers based on age
   setInterval(() => {
-    fadeMarkers('event');
+    markers.fade('event');
   }, 5000);
   onSetup(map);
 
@@ -118,9 +105,9 @@ function setupApp(onSetup) {
   const toggleEl = document.getElementById('static-toggle-input');
   toggleEl.addEventListener('change', (ev) => {
     if (ev.target.checked) {
-      fetchLogs('static', map, form, true);
+      staticFeed.update(true);
     } else {
-      clearMarkers('static');
+      staticFeed.reset();
     }
   });
 }

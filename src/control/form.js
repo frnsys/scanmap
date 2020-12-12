@@ -2,7 +2,8 @@
  * Form for annotators to submit new annotations
  */
 
-import {post} from '../util';
+import map from '../map';
+import {api} from '../util';
 import LABELS from '../labels';
 
 const fields = ['text', 'location', 'coordinates', 'label'];
@@ -16,12 +17,7 @@ const labelsEl = document.getElementById('label');
 const imagesEl = document.getElementById('image');
 
 class Form {
-  constructor(map) {
-    this.map = map;
-
-    // User's auth key
-    this.authKey = '';
-
+  constructor() {
     // The current map marker
     this.marker = null;
 
@@ -138,24 +134,24 @@ class Form {
   // Show the map marker for the given coordinates
   previewCoords(coords, jump) {
     if (this.marker) this.marker.remove();
-    this.marker = this.map.addMarker(coords, {
+    this.marker = map.addMarker(coords, {
       className: 'marker marker-preview'
     });
-    if (jump) this.map.jumpTo(coords);
+    if (jump) map.jumpTo(coords);
   }
 
   // Attempt to authenticate
   // the form for a given key
   authenticate(authKey, onActivate) {
-    this.authKey = authKey;
+    api.authKey = authKey;
 
     // No auth key given, ignore
-    if (this.authKey.trim() == "") return;
+    if (!api.authKey || api.authKey.trim() == "") return;
 
     // Check that the key is valid
     authStatusEl.innerText = 'Authorizing';
     authStatusEl.style.display = 'block';
-    post('checkauth', {}, (results) => {
+    api.post('checkauth', {}, (results) => {
       // Valid, show the form
       if (results.success === true) {
         // Hide authentication status and show help/intro
@@ -170,7 +166,7 @@ class Form {
         authStatusEl.innerText = 'Invalid key';
         authStatusEl.style.display = 'block';
       }
-    }, this.authKey).catch((err) => {
+    }).catch((err) => {
       authStatusEl.innerText = err;
       authStatusEl.style.display = 'block';
     });
@@ -217,12 +213,10 @@ class Form {
     }
   }
 
-  // Convenience method for authenticated
-  // post requests
   post(url, data, onSuccess) {
     // Reset error
     errEl.style.display = 'none';
-    post(url, data, onSuccess, this.authKey)
+    api.post(url, data, onSuccess)
       .catch((err) => {
         errEl.innerText = err;
         errEl.style.display = 'block';
@@ -230,4 +224,7 @@ class Form {
   }
 }
 
-export default Form;
+// Singleton form
+const form = new Form();
+
+export default form;

@@ -3,7 +3,7 @@
  * mainly for key management
  */
 
-import {get, post, el} from '../util';
+import {api, el} from '../util';
 
 // Show errors to user
 const errEl = document.getElementById('panel-errors');
@@ -18,7 +18,7 @@ const logs = new Set();
 const logsEl = document.getElementById('logs');
 function loadLogs() {
   // Request and render logs
-  get('panel/logs', (json) => {
+  api.get('panel/logs', (json) => {
     json.logs.forEach((log) => {
       // Avoid dupe logs
       if (logs.has(log.timestamp)) return;
@@ -59,14 +59,13 @@ function loadLogs() {
       // use to avoid duplicates
       logs.add(log.timestamp);
     });
-  }, KEY);
+  });
 }
 
 // Authentication
-let KEY;
 document.getElementById('key').addEventListener('keydown', (ev) => {
   if (ev.key == 'Enter') {
-    KEY = ev.target.value;
+    api.authKey = ev.target.value;
     ev.target.parentNode.removeChild(ev.target);
 
     // We use the response to requesting keys
@@ -82,7 +81,7 @@ document.getElementById('set-pinned').addEventListener('click', () => {
   if (text.length > 0) {
     let formData = new FormData();
     formData.set('text', text);
-    post('log/pinned', formData, (json) => {
+    api.post('log/pinned', formData, (json) => {
       if (json.success) {
         // Feedback on successful update
         // Janky, but fine for now
@@ -92,7 +91,7 @@ document.getElementById('set-pinned').addEventListener('click', () => {
           el.innerText = '';
         }, 1000);
       }
-    }, KEY).catch((err) => showError(err));
+    }).catch((err) => showError(err));
   }
 });
 
@@ -107,12 +106,12 @@ const typeNames = {
 
 // Create a new key of the specified type
 function addKey(type) {
-  post('keys', {
+  api.post('keys', {
     action: 'create',
     type: type
   }, (json) => {
     keyItem(json.key, type);
-  }, KEY);
+  });
 }
 
 // Render a key
@@ -129,13 +128,13 @@ function keyItem(key, type) {
         // Handler for revoking key
         click: () => {
           if (confirm(`Are you sure you want to revoke key "${key}"?`)) {
-            post('keys', {
+            api.post('keys', {
               key: key,
               action: 'revoke'
             }, () => {
               console.log('revoked');
               li.parentNode.removeChild(li);
-            }, KEY);
+            });
           }
         }
       }
@@ -147,14 +146,14 @@ function keyItem(key, type) {
 // Load keys for this map
 function loadKeys() {
   // This will fail if the user doesn't have a valid prime key
-  get('keys', (json) => {
+  api.get('keys', (json) => {
     document.getElementById('panel-main').style.display = 'block';
 
     // Render keys
     Object.keys(json.keys).forEach((type) => json.keys[type].forEach((k) => keyItem(k, type)));
 
     // Also load the current pinned message
-    get('log/pinned', (json) => {
+    api.get('log/pinned', (json) => {
       if (json.logs.length > 0) {
         document.getElementById('pinned').value = json.logs[0].data.text;
       }
@@ -164,7 +163,7 @@ function loadKeys() {
     setInterval(() => loadLogs(), 10000);
     loadLogs();
 
-  }, KEY).catch((err) => {
+  }).catch((err) => {
     showError(err);
   });
 }

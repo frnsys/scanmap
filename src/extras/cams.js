@@ -1,7 +1,7 @@
 /*
  * Show traffic cam feeds on the map
  */
-import {get, el} from '../util';
+import {api, el} from '../util';
 
 const toggleEl = document.getElementById('toggle-cams');
 
@@ -64,7 +64,7 @@ function setupCams(map) {
       // Minimize network traffic,
       // only load cams once
       if (!camsLoaded) {
-        get('cams', (json) => {
+        api.get('cams', (json) => {
           cams = json.cams;
           camsLoaded = true;
           markers = makeMarkers(map, cams);

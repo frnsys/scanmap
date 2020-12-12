@@ -1,52 +1,3 @@
-// JSON get request
-function get(url, onSuccess, authKey) {
-  return fetch(url, {
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-      'X-AUTH': authKey
-    },
-    method: 'GET'
-  })
-    .then((res) => {
-      if (!res.ok) {
-        if (res.status == 401) {
-          throw new Error('Unauthorized');
-        } else {
-          throw new Error(`Response ${res.status}`);
-        }
-      }
-      return res.json();
-    })
-    .then(onSuccess);
-}
-
-// JSON post request
-function post(url, data, onSuccess, authKey) {
-  let form = data instanceof FormData;
-  let headers = {
-      'X-AUTH': authKey,
-      'Accept': 'application/json',
-  };
-  if (!form) headers['Content-Type'] = 'application/json';
-  return fetch(url, {
-    headers: headers,
-    method: 'POST',
-    body: form ? data : JSON.stringify(data)
-  })
-    .then((res) => {
-      if (!res.ok) {
-        if (res.status == 401) {
-          throw new Error('Unauthorized');
-        } else {
-          throw new Error(`Response ${res.status}`);
-        }
-      }
-      return res.json();
-    })
-    .then(onSuccess);
-}
-
 // Convenience function to create HTML elements
 function el(spec) {
   let pa = document.createElement(spec.tag);
@@ -77,4 +28,56 @@ function el(spec) {
   return pa;
 }
 
-export {get, post, el};
+// Interface to the backend
+const api = {
+  authKey: '',
+
+  get(url, onSuccess) {
+    return fetch(url, {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'X-AUTH': this.authKey
+      },
+      method: 'GET'
+    })
+      .then((res) => {
+        if (!res.ok) {
+          if (res.status == 401) {
+            throw new Error('Unauthorized');
+          } else {
+            throw new Error(`Response ${res.status}`);
+          }
+        }
+        return res.json();
+      })
+      .then(onSuccess);
+  },
+
+  post(url, data, onSuccess) {
+    let form = data instanceof FormData;
+    let headers = {
+        'X-AUTH': this.authKey,
+        'Accept': 'application/json',
+    };
+    if (!form) headers['Content-Type'] = 'application/json';
+    return fetch(url, {
+      headers: headers,
+      method: 'POST',
+      body: form ? data : JSON.stringify(data)
+    })
+      .then((res) => {
+        if (!res.ok) {
+          if (res.status == 401) {
+            throw new Error('Unauthorized');
+          } else {
+            throw new Error(`Response ${res.status}`);
+          }
+        }
+        return res.json();
+      })
+      .then(onSuccess);
+  }
+};
+
+export {api, el};
