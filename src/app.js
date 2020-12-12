@@ -5,6 +5,27 @@ import { api } from './util';
 import { showLegend } from './labels';
 import { Feed, fetchPinned } from './feed';
 
+function listenEvents(cb) {
+  // Setup realtime event streams
+  let logSource;
+  function initEventSource() {
+    logSource = new EventSource(SSE_URL);
+    logSource.onmessage = cb;
+
+    // Reconnect on error
+    logSource.addEventListener('error', (ev) => {
+      console.log('Connection error');
+      logSource.close();
+      initEventSource();
+    });
+    /* end server sent events coooooode */
+  }
+  window.onbeforeunload = () => {
+    logSource.close();
+  }
+  initEventSource();
+}
+
 function setupApp(onSetup) {
   // If the user is authenticated,
   // show a preview marker where clicked
@@ -20,34 +41,16 @@ function setupApp(onSetup) {
   // Set up log feeds
   let eventFeed = new Feed('event');
   let staticFeed = new Feed('static');
+  listenEvents(() => {
+    // For now just reloading logs,
+    // for compatibility with how the editing system works.
+    eventFeed.update(true);
+    staticFeed.update(toggleEl.checked);
+    fetchPinned();
 
-  // Setup realtime event streams
-  let logSource;
-  function initEventSource() {
-    logSource = new EventSource(SSE_URL);
-    logSource.onmessage = function(ev) {
-      // For now just reloading logs,
-      // for compatibility with how the editing system works.
-      eventFeed.update(true);
-      staticFeed.update(toggleEl.checked);
-      fetchPinned();
-
-      // Eventually might want to only load the new messages
-      // const log = JSON.parse(ev.data);
-    };
-
-    // Reconnect on error
-    logSource.addEventListener('error', (ev) => {
-      console.log('Connection error');
-      logSource.close();
-      initEventSource();
-    });
-    /* end server sent events coooooode */
-  }
-  window.onbeforeunload = () => {
-    logSource.close();
-  }
-  initEventSource();
+    // Eventually might want to only load the new messages
+    // const log = JSON.parse(ev.data);
+  });
 
   // For getting current map zoom/center
   window.queryMap = () => {
