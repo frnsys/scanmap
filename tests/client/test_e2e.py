@@ -1,30 +1,10 @@
 from app.db import Database
 from app.keys import KeyRing
-from flask import Flask
 import multiprocessing
-import os
 import pytest
 import subprocess
 import tempfile
 import time
-
-@pytest.fixture(autouse=True)
-def redis():
-  check_docker = subprocess.run(
-    [
-      'docker',
-      'inspect',
-      '-f "{{.State.Running}}"',
-      'scanmap-redis'
-    ],
-    capture_output=True,
-    check=True
-  )
-
-  assert(check_docker.returncode == 0)
-  assert(str(check_docker.stdout, 'utf8').strip(' \n"') == 'true')
-
-  yield
 
 @pytest.fixture(autouse=True)
 def server(monkeypatch):
@@ -65,21 +45,19 @@ def run_end_to_end_test(testf):
     [
       'node',
       './node_modules/taiko/bin/taiko.js',
-      '--observe', # Uncomment to observe actions
+      # '--observe', # Uncomment to observe actions
       'tests/client/{}.js'.format(testf)
     ],
-    capture_output=True,
+    # capture_output=True,
     check=True
   )
 
   assert(e2e_test.returncode == 0)
 
-def test_happy():
-  """Tests add happy path"""
+def test_basic_annotation():
+  """Tests basic adding to map"""
+  run_end_to_end_test('annotation')
 
-  run_end_to_end_test('happy')
-
-def test_toggle_cams():
-  """Tests toggle cams button"""
-
-  run_end_to_end_test('toggle_cams')
+def test_basic_annotation_unauthenticated():
+  """Tests basic adding to map, but unauthenticated"""
+  run_end_to_end_test('annotation_noauth')
