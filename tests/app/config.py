@@ -21,8 +21,10 @@ LOGS_AFTER = {
 DB_PATH = ':memory:'   # Hack to prevent creating a dummy DB file
 KEYS_FILE = os.devnull # Hack to prevent creating a dummy key file
 
+REDIS_URL = 'redis://localhost:6379'
+
 # For querying coordinates for locations
-GOOGLE_PLACES_API_KEY = '<STUB>'
+GOOGLE_PLACES_API_KEY = os.getenv('SCANMAP_TEST_GOOGLE_PLACES_API_KEY', '<BLANK>')
 
 LOCATIONS = {
     'NY': {
