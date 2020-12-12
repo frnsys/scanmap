@@ -176,6 +176,8 @@ At minimum you need the coordinates for the center the map.
 
 ## Tests
 
+Set the environment variable `SCANMAP_TEST_GOOGLE_PLACES_API_KEY=<token>`
+
 Run `PYTHONPATH="$(pwd)/tests/app:$(pwd)" pytest` from the project root
 
 ---
