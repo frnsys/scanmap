@@ -38,6 +38,22 @@ function fade(logType) {
   });
 }
 
+function hide(logType) {
+  Object.keys(MARKERS[logType]).forEach((k) => {
+    let {marker} = MARKERS[logType][k];
+    marker._element.style.display = 'none';
+    const popup = marker.getPopup();
+    if (popup.isOpen()) marker.togglePopup();
+  });
+}
+
+function show(logType) {
+  Object.keys(MARKERS[logType]).forEach((k) => {
+    let {marker} = MARKERS[logType][k];
+    marker._element.style.display = 'block';
+  });
+}
+
 // Display one popup and hide the rest
 function showPopup(log) {
   let marker = getMarker(log);
@@ -202,4 +218,4 @@ function updateLog(log) {
   }
 }
 
-export default {keyForLog, upsertLog, updateLog, removeLog, showPopup, fade};
+export default {keyForLog, upsertLog, updateLog, removeLog, showPopup, hide, show, fade};

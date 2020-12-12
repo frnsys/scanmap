@@ -110,7 +110,7 @@ function setupApp(onSetup) {
     if (ev.target.checked) {
       staticFeed.update(true);
     } else {
-      staticFeed.reset();
+      staticFeed.hide();
     }
   });
 }

@@ -63,16 +63,14 @@ class Feed {
 
     // TODO Not ideal
     if (!showMarkers) {
-      this.reset();
+      this.hide();
+    } else {
+      markers.show(this.logType);
     }
   }
 
-  reset() {
-    this.logs.forEach((log) => {
-      markers.removeLog(log);
-    });
-    // TODO Not an ideal way of doing this
-    this.lastSeen = 0;
+  hide() {
+    markers.hide(this.logType);
   }
 }
 
