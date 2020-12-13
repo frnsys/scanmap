@@ -14,10 +14,11 @@ let expireTime = 60 * 60 * 1000; // in ms. One hour
 const minMarkerOpacity = 0.25;
 
 // Region/area paint properties
+const basePaintOpacity = 0.25;
 const defaultPaint = {
-  'fill-color': '#FFD620',
-  'fill-opacity': 0.1,
-  'fill-outline-color': '#000000',
+  'fill-color': '#3F64FD',
+  'fill-opacity': basePaintOpacity,
+  'fill-outline-color': '#ff0000',
   'fill-opacity-transition': {
     'duration': 0
   },
@@ -27,7 +28,7 @@ const defaultPaint = {
 };
 const highlightPaint = {
   'fill-color': '#3F64FD',
-  'fill-outline-color': '#3F64FD',
+  'fill-outline-color': '#ff0000',
   'fill-opacity': 0.5,
 };
 
@@ -61,8 +62,16 @@ function fade(logType) {
   Object.keys(MARKERS[logType]).forEach((k) => {
     let {marker, lastUpdate} = MARKERS[logType][k];
     let fade = Math.max(0, 1 - (now - lastUpdate)/expireTime);
-    if (fade < 0.1)
-    marker.getElement().style.opacity = Math.max(fade, minMarkerOpacity);
+    let opacity = Math.max(fade, minMarkerOpacity);
+    marker.getElement().style.opacity = opacity;
+
+    // Fade associated areas, but don't interfere
+    // if they are currently highlighted
+    if (!marker.getPopup().isOpen()) {
+      marker.areas.forEach((logId) => {
+        map.map.setPaintProperty(logId, 'fill-opacity', basePaintOpacity * opacity);
+      });
+    }
   });
 }
 
@@ -194,6 +203,8 @@ function upsertLog(log) {
             Object.keys(defaultPaint).forEach((k) => {
               map.map.setPaintProperty(log.id, k, defaultPaint[k]);
             });
+            let opacity = marker.getElement().style.opacity;
+            map.map.setPaintProperty(logId, 'fill-opacity', basePaintOpacity * opacity);
           });
         }
       }
