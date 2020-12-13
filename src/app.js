@@ -27,17 +27,6 @@ function listenEvents(cb) {
 }
 
 function setupApp(onSetup) {
-  // If the user is authenticated,
-  // show a preview marker where clicked
-  map.addClickListener('preview', (coord) => {
-    if (api.authKey) {
-      document.getElementById(
-        'coordinates'
-      ).value = `${coord.lat},${coord.lng}`;
-      form.previewCoords([coord.lng, coord.lat]);
-    }
-  });
-
   // Set up log feeds
   let eventFeed = new Feed('event');
   let staticFeed = new Feed('static');
@@ -66,7 +55,6 @@ function setupApp(onSetup) {
       // to show edit UI if necessary
       eventFeed.update(true);
       staticFeed.update(toggleEl.checked);
-      // map.enableDrawing();
     });
   });
 

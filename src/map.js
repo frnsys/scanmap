@@ -71,13 +71,13 @@ class Map {
   }
 
   enableDrawing() {
-    let draw = new MapboxDraw({
+    this.draw = new MapboxDraw({
       displayControlsDefault: false,
       modes: Object.assign(MapboxDraw.modes, {
         draw_polygon: FreehandMode
       })
     });
-    this.map.addControl(draw);
+    this.map.addControl(this.draw);
   }
 }
 

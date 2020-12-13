@@ -197,12 +197,15 @@ a, a:visited {
 }
 #append-form input {
   display: block;
-  margin: 0.5em 0;
   width: 100%;
+  margin: 0.5em 0 0 0;
 }
 #append-form input[type=file] {
   width: auto;
   display: inline-block;
+}
+#append-form input[type=submit] {
+  margin-bottom: 0.5em;
 }
 #append-form label {
   display: inline-block;
@@ -222,6 +225,7 @@ a, a:visited {
 #coord-results {
   color: #000;
   font-size: 0.8em;
+  margin: 0.5em 0;
 }
 #coord-results li {
   cursor: pointer;
@@ -233,6 +237,38 @@ a, a:visited {
   font-size: 0.6em;
   border: none;
   margin-top: 0;
+  /* Debugging */
+  /* display: none !important; */
+}
+#coordinates-type {
+  display: flex;
+  justify-content: space-between;
+}
+#coordinates-type ul {
+  display: inline-block;
+  margin-left: 0.25em;
+}
+#coordinates-type li {
+  display: inline-block;
+  margin-right: 0.25em;
+  cursor: pointer;
+}
+#coordinates-type li:hover {
+  text-decoration: underline;
+}
+#coordinates-type li.selected {
+  font-weight: bold;
+  text-decoration: underline;
+}
+#coordinates-type--hint {
+  font-size: 0.8em;
+  line-height: 1.5;
+}
+#coordinates-type--hint div {
+  display: none;
+}
+#coordinates-type--hint div.selected {
+  display: block;
 }
 
 #show-help {
