@@ -299,10 +299,15 @@ class Log {
         let coords = markers.markerPointForLog(this);
         map.jumpTo(coords);
         markers.showPopup(this);
+        if (this.coords.length > 1) {
+          let coords = this.latestCoords();
+          let bounds = coords.reduce((bounds, coord) => bounds.extend(coord),
+            new mapboxgl.LngLatBounds(coords[0], coords[0]));
+            map.map.fitBounds(bounds, {
+              padding: 20
+            });
+        }
       });
-      if (this.coords.length > 1) {
-        // TODO jump to marker, but zoom to fit region
-      }
       return true;
     }
   }
