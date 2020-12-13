@@ -230,7 +230,7 @@ class Form {
 
       // Hack so that the double-click that closes the drawing
       // doesn't trigger this event.
-      document.querySelector('#coordinates-type--hint [data-type=area]').innerText = 'Double-click to reset';
+      document.querySelector('#coordinates-type--hint [data-type=area]').innerText = 'Double-click to restart';
       setTimeout(() => {
         // Reset/redraw on double-click
         map.map.once('dblclick', (ev) => {
@@ -246,6 +246,11 @@ class Form {
     });
     map.map.on('draw.update', (ev) => {
       coordsEl.value = ev.features[0].geometry.coordinates[0].map((pt) => [...pt].reverse().join(',')).join(';');
+    });
+    map.map.on('draw.modechange', (ev) => {
+      if (ev.mode == 'simple_select') {
+        document.querySelector('#coordinates-type--hint [data-type=area]').innerText = 'Double-click to restart';
+      }
     });
   }
 

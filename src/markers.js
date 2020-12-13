@@ -308,6 +308,9 @@ function updateLog(log) {
 
 // Show associated popups when a region is clicked on
 map.map.on('click', (ev) => {
+  // Ignore if map is in drawing mode
+  if (map.draw.getMode() == 'draw_polygon') return;
+
   let feats = map.map.queryRenderedFeatures(ev.point);
   let areas = feats.filter((f) => f.properties['type'] == 'area');
   areas.forEach((a) => {
