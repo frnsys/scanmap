@@ -24,6 +24,7 @@ import form from './control/form';
 //    is stale. B has the most up-to-date state.
 // This should be an easy thing to fix (update existing logs instead of replacing them)
 // and I'll try to get to it after this refactor
+// Then we can also potentially cache things like the markerPoint polylabel calculation
 class Log {
   constructor(data) {
     Object.keys(data).forEach((k) => {
@@ -32,6 +33,13 @@ class Log {
     this.el = document.getElementById(this.id);
     this.icon = this.label ? LABELS[this.type][this.label] : null;
     this.labelText = this.label ? `${this.icon} ${this.label} @ ` : '';
+  }
+
+  // TODO Eventually replace reading from the element dataset, see note above
+  latestCoords() {
+    return this.el.dataset.coords
+      .split(';').map(
+        (pt) => pt.split(',').map((c) => parseFloat(c)).reverse());
   }
 
   render() {
@@ -55,7 +63,7 @@ class Log {
       // Move marker if necessary
       if (this.el.dataset.coords != this.coordinates) {
         // Remove existing marker
-        markers.removeLog(this);
+        markers.removeLog(this, true);
 
         // Add to new marker
         this.el.dataset.coords = this.coordinates;
@@ -153,14 +161,26 @@ class Log {
                   if (ev.target.closest('.logitem').dataset.permit == 'true') {
                     let inp = ev.target.parentNode.querySelector('.logitem-location-input');
                     let can = ev.target.parentNode.querySelector('.logitem-location-edit-cancel');
-                    let coords = ev.target.parentNode.querySelector('.logitem-coords');
-                    map.addClickListener(this.id, (coord) => {
-                      coords.value = `${coord.lat},${coord.lng}`;
-                      form.previewCoords([coord.lng, coord.lat]);
-                    });
+                    let coordsEl = ev.target.parentNode.querySelector('.logitem-coords');
+
+                    // Edit point or area
+                    let coords = this.latestCoords();
+                    if (coords.length == 1) {
+                      map.addClickListener(this.id, (coord) => {
+                        coordsEl.value = `${coord.lat},${coord.lng}`;
+                        form.previewCoords([coord.lng, coord.lat]);
+                      });
+                    } else {
+                      this._featureId = map.draw.add({
+                        type: 'Polygon',
+                        coordinates: [coords]
+                      })[0];
+                      map.draw.changeMode('direct_select', {featureId: this._featureId});
+                    }
+
                     inp.style.display = 'inline';
                     can.style.display = 'inline';
-                    coords.style.display = 'block';
+                    coordsEl.style.display = 'block';
                     inp.value = this.location;
                     inp.focus();
                     ev.target.style.display = 'none';
@@ -178,18 +198,28 @@ class Log {
                     let inp = ev.target;
                     let el = inp.parentNode.querySelector('.logitem-location');
                     let can = inp.parentNode.querySelector('.logitem-location-edit-cancel');
-                    let coords = inp.parentNode.querySelector('.logitem-coords');
+                    let coordsEl = inp.parentNode.querySelector('.logitem-coords');
                     inp.style.display = 'none';
                     can.style.display = 'none';
-                    coords.style.display = 'none';
+                    coordsEl.style.display = 'none';
                     el.style.display = 'inline';
                     map.removeClickListener(this.id);
+
+                    // If editing an area, clean up
+                    if (this._featureId) {
+                      let selected = map.draw.getSelected();
+                      let feat = selected.features[0];
+                      coordsEl.value = feat.geometry.coordinates[0].map((pt) => [...pt].reverse().join(',')).join(';');
+                      map.draw.delete([this._featureId]);
+                      this._featureId = null;
+                    }
+
                     api.post('log/edit', {
                       timestamp: this._id,
                       action: 'update',
                       changes: {
                         location: inp.value,
-                        coordinates: coords.value
+                        coordinates: coordsEl.value
                       }
                     }, () => {
                       el.innerText = inp.value;
@@ -213,6 +243,12 @@ class Log {
                   coords.style.display = 'none';
                   el.style.display = 'inline';
                   map.removeClickListener(this.id);
+
+                  // If editing an area, clean up
+                  if (this._featureId) {
+                    map.draw.delete([this._featureId]);
+                    this._featureId = null;
+                  }
                 }
               }
             }, {
@@ -274,7 +310,7 @@ class Log {
                   action: 'delete'
                 }, () => {
                   this.el.parentNode.removeChild(this.el);
-                  markers.removeLog(this);
+                  markers.removeLog(this, false);
                 });
               }
             }
@@ -287,14 +323,19 @@ class Log {
       markers.upsertLog(this);
 
       // Jump to marker on click
-      if (this.coords.length == 2) {
-        this.el.addEventListener('click', () => {
-          let coords = this.el.dataset.coords.split(',').map((c) => parseFloat(c));
-          coords.reverse();
-          map.jumpTo(coords);
-          markers.showPopup(this);
-        });
-      }
+      this.el.addEventListener('click', () => {
+        let coords = markers.markerPointForLog(this);
+        map.jumpTo(coords);
+        markers.showPopup(this);
+        if (this.coords.length > 1) {
+          let coords = this.latestCoords();
+          let bounds = coords.reduce((bounds, coord) => bounds.extend(coord),
+            new mapboxgl.LngLatBounds(coords[0], coords[0]));
+            map.map.fitBounds(bounds, {
+              padding: 20
+            });
+        }
+      });
       return true;
     }
   }

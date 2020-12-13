@@ -26,6 +26,10 @@ class Form {
     // This reflects the active tab on the form
     this.logType = 'event';
 
+    this.drawMode = 'point';
+  }
+
+  initialize() {
     // Controls for toggling the help/intro overlay
     document.getElementById('ready').addEventListener('click', () => {
       overlay.style.display = 'none';
@@ -47,6 +51,20 @@ class Form {
 
     // Control for submitting the form
     document.getElementById('submit').addEventListener('click', () => this.submit());
+
+    // Control for toggling annotation type (point/area)
+    document.querySelectorAll('#coordinates-type li').forEach((li) => {
+      let type = li.dataset.type;
+      li.addEventListener('click', () => {
+        document.querySelector('#coordinates-type li.selected').classList.remove('selected');
+        li.classList.add('selected');
+
+        document.querySelector('#coordinates-type--hint .selected').classList.remove('selected');
+        document.querySelector(`#coordinates-type--hint [data-type=${type}]`).classList.add('selected');
+
+        this.setDrawMode(type);
+      });
+    });
 
     // Set up log type switching (i.e. the event/static tabs)
     this.setLabels(this.logType);
@@ -75,6 +93,8 @@ class Form {
         tab.classList.add('selected');
       });
     });
+
+    this.setupMap();
   }
 
   // Load the log labels for the current log type
@@ -106,8 +126,12 @@ class Form {
       if (json.results.length > 0) {
         // Choose first result by default
         let res = json.results[0];
-        coordsEl.value = res.coordinates;
         this.previewCoords([res.coordinates[1], res.coordinates[0]], true);
+
+        // If draw mode is point, set the coordinates to this
+        if (this.drawMode == 'point') {
+          coordsEl.value = res.coordinates;
+        }
 
         // Only show first 5 results
         json.results.slice(0, 5).forEach((res) => {
@@ -119,8 +143,12 @@ class Form {
             if (selected) selected.classList.remove('selected');
             li.classList.add('selected');
 
-            coordsEl.value = res.coordinates;
             this.previewCoords([res.coordinates[1], res.coordinates[0]], true);
+
+            // If draw mode is point, set the coordinates to this
+            if (this.drawMode == 'point') {
+              coordsEl.value = res.coordinates;
+            }
           });
           resultsEl.appendChild(li);
         });
@@ -157,11 +185,13 @@ class Form {
         // Hide authentication status and show help/intro
         authStatusEl.style.display = 'none';
         overlay.style.display = 'block';
+        document.getElementById('add').style.display = 'none';
 
         // Show form
         document.getElementById('append').style.display = 'block';
         document.getElementById('log-tabs').style.display = 'flex';
         onActivate();
+        this.initialize();
       } else {
         authStatusEl.innerText = 'Invalid key';
         authStatusEl.style.display = 'block';
@@ -172,6 +202,96 @@ class Form {
     });
   }
 
+  setupMap() {
+    // If the user is authenticated,
+    // show a preview marker where clicked
+    map.addClickListener('preview', (coord) => {
+      if (api.authKey) {
+        if (this.drawMode == 'point') {
+          coordsEl.value = `${coord.lat},${coord.lng}`;
+        }
+        this.previewCoords([coord.lng, coord.lat]);
+      }
+    });
+
+    // When double-clicking in area draw mode,
+    // initiate drawing
+    map.map.on('dblclick', (ev) => {
+      if (this.drawMode == 'area') {
+        ev.preventDefault();
+
+        // Reset the drawing
+        coordsEl.value = '';
+        map.draw.deleteAll();
+        map.draw.changeMode('draw_polygon');
+        document.querySelector('#coordinates-type--hint [data-type=area]').innerText = 'Click to add point. Esc to cancel';
+      }
+    });
+
+    // Let user select an existing area instead drawing a new one
+    map.map.on('click', (ev) => {
+      if (this.drawMode != 'area') return;
+      if (coordsEl.value != '') return;
+      let drawMode = map.draw.getMode();
+      if (drawMode == 'draw_polygon' || drawMode == 'direct_select') return;
+
+      let feats = map.map.queryRenderedFeatures(ev.point);
+
+      // Only load the clicked area's coordinates if it's the only area there (otherwise
+      // it's ambiguous what the user means to select).
+      // Each area, even if identical to another log's area, is rendered as a separate feature,
+      // so we can't assume that if we have more than one area they are not actually the same
+      // geometry.
+      let areas = [...new Set(feats.filter((f) => f.properties['type'] == 'area').map((f) => {
+        // Turns out the actual geometry points (areas[0].geometry.coordinates[0]) are slightly off,
+        // so instead we use a property where we store the extract coordinates as a string.
+        return f.properties.coords;
+      }))];
+      if (areas.length == 1) {
+        coordsEl.value = areas[0];
+      }
+    });
+
+    // Enable drawing
+    map.enableDrawing();
+    let updateCoords = (ev) => {
+      coordsEl.value = ev.features[0].geometry.coordinates[0].map((pt) => [...pt].reverse().join(',')).join(';');
+    };
+    map.map.on('draw.create', updateCoords);
+    map.map.on('draw.update', updateCoords);
+    map.map.on('draw.modechange', (ev) => {
+      // Sometimes the mode will change back to simple select,
+      // update the help hint for the user
+      if (this.drawMode == 'area' && ev.mode == 'simple_select') {
+        if (coordsEl.value.includes(';')) {
+          document.querySelector('#coordinates-type--hint [data-type=area]').innerText = 'Double-click to reset';
+        } else {
+          document.querySelector('#coordinates-type--hint [data-type=area]').innerText = 'Double-click to draw, or click an area';
+        }
+      }
+    });
+  }
+
+  setDrawMode(type) {
+    this.drawMode = type;
+    if (type == 'point') {
+      map.draw.deleteAll();
+      map.draw.changeMode('simple_select');
+
+      // Use preview marker location as initial value
+      if (this.marker) {
+        let coord = this.marker._lngLat;
+        coordsEl.value = `${coord.lat},${coord.lng}`;
+      } else {
+        coordsEl.value = '';
+      }
+    } else if (type == 'area') {
+      coordsEl.value = '';
+      map.draw.changeMode('simple_select');
+      document.querySelector('#coordinates-type--hint [data-type=area]').innerText = 'Double-click to draw, or click an area';
+    }
+  }
+
   // Submit the form (i.e. create a new log)
   submit() {
     // Gather form data
@@ -180,9 +300,24 @@ class Form {
       data[k] = document.getElementById(k).value;
     });
 
+    // Check that we have the necessary coordinates
+    let drawModeValid = false;
+    if (this.drawMode == 'area') {
+      let coords = data['coordinates'].split(';');
+      // Need at least 3 points + closing point to be a shape
+      // And first point should be the same as the last point (closed shape)
+      drawModeValid = coords.length > 3 && coords[0] == coords[coords.length - 1];
+    } else if (this.drawMode == 'point') {
+      drawModeValid = data['coordinates'].split(',').length == 2;
+    }
+
     // All fields required, check they're all filled
-    if (!fields.every((k) => data[k])) {
-      alert('Please fill in the note, location, and coordinates');
+    if (!(drawModeValid && fields.every((k) => data[k]))) {
+      if (this.drawMode == 'area') {
+        alert(`Please fill in the note, location, and finish drawing the area`);
+      } else {
+        alert(`Please fill in the note, location, and ${this.drawMode}`);
+      }
 
     // Prep data
     } else {
@@ -200,17 +335,26 @@ class Form {
       // Post the log data
       this.post(`log/${this.logType}`, formData, (json) => {
         // Reset fields on completion
-        resultsEl.innerHTML = '';
-        fields.forEach((k) => {
-          let inp = document.getElementById(k);
-          if (inp.tagName !== 'SELECT') {
-            inp.value = '';
-          }
-        });
-        imagesEl.value = '';
-        if (this.marker) this.marker.remove();
+        this.reset();
       });
     }
+  }
+
+  reset() {
+    resultsEl.innerHTML = '';
+    fields.forEach((k) => {
+      let inp = document.getElementById(k);
+      if (inp.tagName !== 'SELECT') {
+        inp.value = '';
+      }
+    });
+    imagesEl.value = '';
+
+    // Clear map annotations
+    // and reload draw mode
+    map.draw.deleteAll();
+    if (this.marker) this.marker.remove();
+    this.setDrawMode(this.drawMode);
   }
 
   post(url, data, onSuccess) {

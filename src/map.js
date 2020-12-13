@@ -43,10 +43,10 @@ class Map {
       }).setDOMContent(opts.element);
 
       if (opts.onPopupOpen) {
-        popup.on('open', () => opts.onPopupOpen(popup));
+        popup.on('open', () => opts.onPopupOpen(popup, marker));
       }
       if (opts.onPopupClose) {
-        popup.on('close', () => opts.onPopupClose(popup));
+        popup.on('close', () => opts.onPopupClose(popup, marker));
       }
 
       marker.setPopup(popup)
@@ -67,6 +67,13 @@ class Map {
       center: coords,
       zoom: zoom,
     });
+  }
+
+  enableDrawing() {
+    this.draw = new MapboxDraw({
+      displayControlsDefault: false
+    });
+    this.map.addControl(this.draw);
   }
 }
 

@@ -2,6 +2,8 @@
 {% block head %}
 <script src="https://api.mapbox.com/mapbox-gl-js/v1.10.1/mapbox-gl.js"></script>
 <link href="https://api.mapbox.com/mapbox-gl-js/v1.10.1/mapbox-gl.css" rel="stylesheet" />
+<script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.2.0/mapbox-gl-draw.js'></script>
+<link href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.2.0/mapbox-gl-draw.css' rel='stylesheet' type='text/css' />
 {% endblock %}
 
 {% block content %}
@@ -70,12 +72,25 @@
             <div data-type="static" class="append-tab">Static</div>
         </div>
         <div id="append-form">
+            <div id="coordinates-type">
+                <div>
+                    Type:
+                    <ul>
+                        <li data-type="point" class="selected">Point</li>
+                        <li data-type="area">Area</li>
+                    </ul>
+                </div>
+                <div id="coordinates-type--hint">
+                    <div data-type="point" class="selected">Click on map to set point</div>
+                    <div data-type="area">Double-click to enable draw mode</div>
+                </div>
+            </div>
             <input id="text" type="text" placeholder="Note" />
             <div id="location-search-field">
                 <input id="location" type="text" placeholder="Location" />
                 <div id="location-search">🔍</div>
             </div>
-            <input id="coordinates" type="text" readonly />
+            <input id="coordinates" type="text" readonly autocomplete="off" />
             <ul id="coord-results"></ul>
             <select id="label"></select>
             <div>
