@@ -209,6 +209,15 @@ class Form {
       if (api.authKey) {
         if (this.drawMode == 'point') {
           coordsEl.value = `${coord.lat},${coord.lng}`;
+
+        // A workaround for this weird behavior where,
+        // if you're in draw-polygon mode and you double-click
+        // without drawing anything, you get taken out of draw_polygon mode.
+        // This will put us back into draw_polygon mode when this happens
+        } else if (this.drawMode == 'area') {
+          if (map.draw.getMode() != 'draw_polygon' && coordsEl.value == '') {
+            this.setDrawMode(this.drawMode);
+          }
         }
         this.previewCoords([coord.lng, coord.lat]);
       }
@@ -229,6 +238,7 @@ class Form {
           ev.preventDefault();
 
           // Reset the drawing
+          coordsEl.value = '';
           map.draw.deleteAll();
           this.setDrawMode(this.drawMode);
         });
