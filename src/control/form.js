@@ -224,22 +224,21 @@ class Form {
         coordsEl.value = '';
         map.draw.deleteAll();
         map.draw.changeMode('draw_polygon');
-        document.querySelector('#coordinates-type--hint [data-type=area]').innerText = 'Click to add point';
+        document.querySelector('#coordinates-type--hint [data-type=area]').innerText = 'Click to add point. Esc to cancel';
       }
     });
 
     // Enable drawing
     map.enableDrawing();
-    map.map.on('draw.create', (ev) => {
+    let updateCoords = (ev) => {
       coordsEl.value = ev.features[0].geometry.coordinates[0].map((pt) => [...pt].reverse().join(',')).join(';');
-    });
-    map.map.on('draw.update', (ev) => {
-      coordsEl.value = ev.features[0].geometry.coordinates[0].map((pt) => [...pt].reverse().join(',')).join(';');
-    });
+    };
+    map.map.on('draw.create', updateCoords);
+    map.map.on('draw.update', updateCoords);
     map.map.on('draw.modechange', (ev) => {
       // Sometimes the mode will change back to simple select,
       // update the help hint for the user
-      if (ev.mode == 'simple_select' && this.drawMode == 'area') {
+      if (this.drawMode == 'area' && ev.mode == 'simple_select') {
         if (coordsEl.value.includes(';')) {
           document.querySelector('#coordinates-type--hint [data-type=area]').innerText = 'Double-click to reset';
         } else {
