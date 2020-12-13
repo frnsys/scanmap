@@ -1,3 +1,8 @@
+/*
+ * Test that append log form
+ * doesn't show up on invalid key.
+ */
+
 const assert = require('assert');
 const { openBrowser, goto, click, prompt, accept, textBox, $, focus, write, press, text, button, closeBrowser } = require('taiko');
 (async () => {

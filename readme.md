@@ -180,6 +180,8 @@ Set the environment variable `SCANMAP_TEST_GOOGLE_PLACES_API_KEY=<token>`
 
 Run `PYTHONPATH="$(pwd)/tests/app:$(pwd)" pytest` from the project root
 
+If you need to debug the end-to-end/frontend tests, uncomment the `--observe` line in `tests/client/test_e2e.py`
+
 ---
 
 # Deployment

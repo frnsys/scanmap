@@ -86,6 +86,10 @@ function upsertLog(log) {
   if (log.coords.length == 2) {
     let ch = [{
       tag: 'div',
+      className: 'popup-location',
+      innerText: log.location
+    }, {
+      tag: 'div',
       className: 'popup-label',
       innerText: log.labelText.slice(0, -2),
     }, {
@@ -140,10 +144,6 @@ function upsertLog(log) {
       let element = el({
         tag: 'div',
         children: [{
-          tag: 'div',
-          className: 'popup-location',
-          innerText: log.location
-        }, {
           tag: 'div',
           className: 'popup-logs',
           children: [newLog]
@@ -214,7 +214,7 @@ function updateLog(log) {
     let popupItem = popupEl.querySelector(`#popup-${log.id} .popup-label`);
     popupItem.innerText = log.labelText.slice(0, -2);
     popupEl.querySelector(`#popup-${log.id} h3`).innerText = log.text;
-    popupEl.querySelector('.popup-location').innerText = log.location;
+    popupEl.querySelector(`#popup-${log.id} .popup-location`).innerText = log.location;
   }
 }
 
