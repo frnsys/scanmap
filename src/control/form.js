@@ -228,6 +228,22 @@ class Form {
       }
     });
 
+    // Let user select an existing area instead drawing a new one
+    map.map.on('click', (ev) => {
+      if (this.drawMode != 'area') return;
+      if (coordsEl.value != '') return;
+      let drawMode = map.draw.getMode();
+      if (drawMode == 'draw_polygon' || drawMode == 'direct_select') return;
+
+      let feats = map.map.queryRenderedFeatures(ev.point);
+      let areas = feats.filter((f) => f.properties['type'] == 'area');
+      if (areas.length == 1) {
+        // Turns out the actual geometry points (areas[0].geometry.coordinates[0]) are slightly off,
+        // so instead we use a property where we store the extract coordinates as a string.
+        coordsEl.value = areas[0].properties.coords;
+      }
+    });
+
     // Enable drawing
     map.enableDrawing();
     let updateCoords = (ev) => {
@@ -262,6 +278,7 @@ class Form {
         coordsEl.value = '';
       }
     } else if (type == 'area') {
+      coordsEl.value = '';
       map.draw.changeMode('simple_select');
       document.querySelector('#coordinates-type--hint [data-type=area]').innerText = 'Double-click to enable draw mode';
     }

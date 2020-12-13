@@ -27,7 +27,7 @@ const defaultPaint = {
   }
 };
 const highlightPaint = {
-  'fill-color': '#3F64FD',
+  'fill-color': '#F94646',
   'fill-outline-color': '#ff0000',
   'fill-opacity': 0.5,
 };
@@ -201,7 +201,7 @@ function upsertLog(log) {
         if (marker.areas) {
           marker.areas.forEach((logId) => {
             Object.keys(defaultPaint).forEach((k) => {
-              map.map.setPaintProperty(log.id, k, defaultPaint[k]);
+              map.map.setPaintProperty(logId, k, defaultPaint[k]);
             });
             let opacity = marker.getElement().style.opacity;
             map.map.setPaintProperty(logId, 'fill-opacity', basePaintOpacity * opacity);
@@ -229,7 +229,14 @@ function upsertLog(log) {
       'properties': {
         'type': 'area',
         'logType': log.type,
-        'markerKey': log.markerKey
+        'markerKey': log.markerKey,
+
+        // Kind of weird, you'd assume we can get the polygon points
+        // from the geometry itself. But it's actually not exactly
+        // the same as the coordinates we specify when given back
+        // as a mapbox feature. So we put this here so we can
+        // keep track of the exact specified coordinates
+        'coords': log.coordinates
       }
     };
 
