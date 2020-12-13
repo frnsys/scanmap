@@ -218,6 +218,21 @@ class Form {
     map.enableDrawing();
     map.map.on('draw.create', (ev) => {
       coordsEl.value = ev.features[0].geometry.coordinates[0].map((pt) => [...pt].reverse().join(',')).join(';');
+
+      // Hack so that the double-click that closes the drawing
+      // doesn't trigger this event.
+      document.querySelector('#coordinates-type--hint [data-type=area]').innerText = 'Double-click to reset';
+      setTimeout(() => {
+        // Reset/redraw on double-click
+        map.map.once('dblclick', (ev) => {
+          // Prevent zoom on double click just this once
+          ev.preventDefault();
+
+          // Reset the drawing
+          map.draw.deleteAll();
+          this.setDrawMode(this.drawMode);
+        });
+      }, 500);
     });
     map.map.on('draw.update', (ev) => {
       coordsEl.value = ev.features[0].geometry.coordinates[0].map((pt) => [...pt].reverse().join(',')).join(';');
@@ -238,6 +253,7 @@ class Form {
         coordsEl.value = '';
       }
     } else if (type == 'area') {
+      document.querySelector('#coordinates-type--hint [data-type=area]').innerText = 'Double-click to finish shape';
       map.draw.changeMode('draw_polygon');
     }
   }
