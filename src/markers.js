@@ -218,31 +218,38 @@ function upsertLog(log) {
 
   // Render area/region
   if (log.coords.length > 1) {
-    // TODO delete from this when the log is deleted
+    // TODO delete from this when the log is deleted or moved to a different marker
     marker.areas.push(log.id);
 
-    // TODO how to update these?
-    map.map.addSource(log.id, {
-      'type': 'geojson',
-      'data': {
-        'type': 'Feature',
-        'geometry': {
-          'type': 'Polygon',
-          'coordinates': [log.coords]
-        },
-        'properties': {
-          'type': 'area',
-          'logType': log.type,
-          'markerKey': log.markerKey // TODO what if this changes?
-        }
+    let data = {
+      'type': 'Feature',
+      'geometry': {
+        'type': 'Polygon',
+        'coordinates': [log.coords]
+      },
+      'properties': {
+        'type': 'area',
+        'logType': log.type,
+        'markerKey': log.markerKey // TODO what if this changes?
       }
-    });
-    map.map.addLayer({
-      'id': log.id,
-      'type': 'fill',
-      'source': log.id,
-      'paint': defaultPaint
-    });
+    };
+
+    // Check if log region is already on the map
+    let source = map.map.getSource(log.id);
+    if (!source) {
+      map.map.addSource(log.id, {
+        'type': 'geojson',
+        'data': data,
+      });
+      map.map.addLayer({
+        'id': log.id,
+        'type': 'fill',
+        'source': log.id,
+        'paint': defaultPaint
+      });
+    } else {
+      source.setData(data);
+    }
   }
 }
 
