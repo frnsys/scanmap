@@ -314,7 +314,17 @@ map.map.on('click', (ev) => {
     let {logType, markerKey} = a.properties;
     let {marker} = MARKERS[logType][markerKey];
     let popup = marker.getPopup();
-    if (!popup.isOpen()) marker.togglePopup();
+
+    // Hack to prevent interference w/
+    // markers' default click events:
+    // Without this, if you click on the marker in an area,
+    // that will open the popup from that event,
+    // and then re-close it when togglePopup() is fired.
+    // So we wait a bit to let the original marker
+    // to trigger its own popup and then check if it's open.
+    setTimeout(() => {
+      if (!popup.isOpen()) marker.togglePopup();
+    }, 100);
   });
 });
 
