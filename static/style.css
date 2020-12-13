@@ -342,6 +342,7 @@ select {
   height: 16px;
   background-color: yellow;
   border: 4px solid black;
+  pointer-events: none;
 }
 .marker-camera {
   background-color: transparent;
