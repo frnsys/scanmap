@@ -164,6 +164,30 @@ function upsertLog(log) {
       marker: map.addMarker(markerPoint, {element, icon})
     };
   }
+
+  // Render area/region
+  if (log.coords.length > 1) {
+    map.map.addSource(log.id, {
+      'type': 'geojson',
+      'data': {
+        'type': 'Feature',
+        'geometry': {
+          'type': 'Polygon',
+          'coordinates': [log.coords]
+        }
+      }
+    });
+    map.map.addLayer({
+      'id': log.id,
+      'type': 'fill',
+      'source': log.id,
+      'paint': {
+        'fill-color': '#FFD620',
+        'fill-opacity': 0.25,
+        'fill-outline-color': '#000000'
+      }
+    });
+  }
 }
 
 // Remove the log for the specified key from its marker

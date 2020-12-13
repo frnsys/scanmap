@@ -82,9 +82,12 @@ function setupApp(onSetup) {
   }, 5*60*1000);
 
   // Initial load of data
-  eventFeed.update(true);
-  fetchPinned();
-  showLegend();
+  // Wait for map to finish loading
+  map.map.on('load', () => {
+    eventFeed.update(true);
+    fetchPinned();
+    showLegend();
+  });
 
   // Periodically fade markers based on age
   setInterval(() => {
