@@ -66,8 +66,8 @@ html, body {
   margin-bottom: 2em;
 }
 #intro button {
-  margin: 0 auto;
   display: block;
+  margin: 0.5em auto 0;
 }
 #intro a, #intro a:visited {
   color: blue;
