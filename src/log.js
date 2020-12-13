@@ -24,6 +24,7 @@ import form from './control/form';
 //    is stale. B has the most up-to-date state.
 // This should be an easy thing to fix (update existing logs instead of replacing them)
 // and I'll try to get to it after this refactor
+// Then we can also potentially cache things like the markerPoint polylabel calculation
 class Log {
   constructor(data) {
     Object.keys(data).forEach((k) => {
@@ -32,6 +33,13 @@ class Log {
     this.el = document.getElementById(this.id);
     this.icon = this.label ? LABELS[this.type][this.label] : null;
     this.labelText = this.label ? `${this.icon} ${this.label} @ ` : '';
+  }
+
+  // TODO Eventually replace reading from the element dataset, see note above
+  latestCoords() {
+    return this.el.dataset.coords
+      .split(';').map(
+        (pt) => pt.split(',').map((c) => parseFloat(c)).reverse());
   }
 
   render() {
@@ -287,13 +295,13 @@ class Log {
       markers.upsertLog(this);
 
       // Jump to marker on click
-      if (this.coords.length == 2) {
-        this.el.addEventListener('click', () => {
-          let coords = this.el.dataset.coords.split(',').map((c) => parseFloat(c));
-          coords.reverse();
-          map.jumpTo(coords);
-          markers.showPopup(this);
-        });
+      this.el.addEventListener('click', () => {
+        let coords = markers.markerPointForLog(this);
+        map.jumpTo(coords);
+        markers.showPopup(this);
+      });
+      if (this.coords.length > 1) {
+        // TODO jump to marker, but zoom to fit region
       }
       return true;
     }

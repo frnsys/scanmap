@@ -18,7 +18,9 @@ class Feed {
           _id: l.timestamp.toString(),
           id: l.timestamp.toString().replace('.', '-'),
           dt: new Date(l.timestamp*1000).toLocaleString('en-US'),
-          coords: l.data.coordinates.split(',').map((c) => parseFloat(c)),
+
+          // Reverse because mapbox does (lng, lat)
+          coords: l.data.coordinates.split(';').map((pt) => pt.split(',').map((c) => parseFloat(c)).reverse()),
           ...l.data, ...l
         })));
         this.render(showMarkers);
@@ -61,7 +63,6 @@ class Feed {
       });
     });
 
-    // TODO Not ideal
     if (!showMarkers) {
       this.hide();
     } else {

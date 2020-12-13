@@ -1,6 +1,7 @@
 import map from './map';
 import {el} from './util';
 import LABELS from './labels';
+import polylabel from 'polylabel';
 
 // Markers for each log type
 const MARKERS = {
@@ -13,8 +14,17 @@ let expireTime = 60 * 60 * 1000; // in ms. One hour
 const minMarkerOpacity = 0.25;
 
 function keyForLog(log) {
-  let coords = log.el.dataset.coords.split(',').map((c) => parseFloat(c));
-  return `${coords[1]}_${coords[0]}`;
+  let markerPoint = markerPointForLog(log);
+  return `${markerPoint[0]}_${markerPoint[1]}`;
+}
+
+function markerPointForLog(log) {
+  let points = log.latestCoords();
+  if (points.length == 1) {
+    return points[0];
+  } else {
+    return polylabel([points], 1.0);
+  }
 }
 
 // Get marker for a log, if any
@@ -81,80 +91,78 @@ function closePopups() {
 // Add or update the marker for the given log
 function upsertLog(log) {
   let icon = log.icon;
+  let markerPoint = markerPointForLog(log);
 
   // Add marker to map
-  if (log.coords.length == 2) {
-    let ch = [{
-      tag: 'div',
-      className: 'popup-location',
-      innerText: log.location
-    }, {
-      tag: 'div',
-      className: 'popup-label',
-      innerText: log.labelText.slice(0, -2),
-    }, {
-      tag: 'div',
-      className: 'popup-when',
-      innerText: log.dt,
-    }, {
-      tag: 'h3',
-      innerText: log.text
-    }];
-    if (log.image) {
-      ch.push({
-        tag: 'img',
-        src: `/img/${log.image}`
-      });
-    }
-    let newLog = el({
-      id: `popup-${log.id}`,
-      tag: 'div',
-      dataset: {
-        icon: icon
-      },
-      className: 'popup-log',
-      children: ch
+  let ch = [{
+    tag: 'div',
+    className: 'popup-location',
+    innerText: log.location
+  }, {
+    tag: 'div',
+    className: 'popup-label',
+    innerText: log.labelText.slice(0, -2),
+  }, {
+    tag: 'div',
+    className: 'popup-when',
+    innerText: log.dt,
+  }, {
+    tag: 'h3',
+    innerText: log.text
+  }];
+  if (log.image) {
+    ch.push({
+      tag: 'img',
+      src: `/img/${log.image}`
     });
+  }
+  let newLog = el({
+    id: `popup-${log.id}`,
+    tag: 'div',
+    dataset: {
+      icon: icon
+    },
+    className: 'popup-log',
+    children: ch
+  });
 
-    // Check if marker exists for this location,
-    // if so, append log
-    let marker  = getMarker(log);
-    if (marker) {
-      // Update marker icon to latest event's icon
-      let markerEl = marker.getElement();
-      if (icon) {
-        markerEl.innerText = icon;
-        markerEl.style.background = 'none';
-      } else {
-        markerEl.innerText = '';
-        markerEl.style.background = 'red';
-      }
-
-      // Add to popup list
-      let popup = marker.getPopup();
-      let popupEl = popup._content;
-      popupEl.querySelector('.popup-logs').prepend(newLog);
-
-      MARKERS[log.type][log.markerKey].lastUpdate = log.timestamp*1000;
-
-      // Reset fade
-      markerEl.style.opacity = 1;
+  // Check if marker exists for this location,
+  // if so, append log
+  let marker  = getMarker(log);
+  if (marker) {
+    // Update marker icon to latest event's icon
+    let markerEl = marker.getElement();
+    if (icon) {
+      markerEl.innerText = icon;
+      markerEl.style.background = 'none';
     } else {
-      // Create new marker
-      let element = el({
-        tag: 'div',
-        children: [{
-          tag: 'div',
-          className: 'popup-logs',
-          children: [newLog]
-        }]
-      });
-      log.coords.reverse();
-      MARKERS[log.type][log.markerKey] = {
-        lastUpdate: log.timestamp*1000,
-        marker: map.addMarker(log.coords, {element, icon})
-      };
+      markerEl.innerText = '';
+      markerEl.style.background = 'red';
     }
+
+    // Add to popup list
+    let popup = marker.getPopup();
+    let popupEl = popup._content;
+    popupEl.querySelector('.popup-logs').prepend(newLog);
+
+    MARKERS[log.type][log.markerKey].lastUpdate = log.timestamp*1000;
+
+    // Reset fade
+    markerEl.style.opacity = 1;
+  } else {
+    // Create new marker
+    let element = el({
+      tag: 'div',
+      children: [{
+        tag: 'div',
+        className: 'popup-logs',
+        children: [newLog]
+      }]
+    });
+    MARKERS[log.type][log.markerKey] = {
+      lastUpdate: log.timestamp*1000,
+      marker: map.addMarker(markerPoint, {element, icon})
+    };
   }
 }
 
@@ -218,4 +226,4 @@ function updateLog(log) {
   }
 }
 
-export default {keyForLog, upsertLog, updateLog, removeLog, showPopup, hide, show, fade};
+export default {keyForLog, upsertLog, updateLog, removeLog, showPopup, hide, show, fade, markerPointForLog};

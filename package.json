@@ -6,7 +6,9 @@
     "build": "NODE_ENV=production webpack --progress --colors -p",
     "stats": "NODE_ENV=production webpack --progress --colors -p --json > stats.json"
   },
-  "dependencies": {},
+  "dependencies": {
+    "polylabel": "^1.1.0"
+  },
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.39",
     "@babel/plugin-proposal-class-properties": "^7.0.0-beta.42",
