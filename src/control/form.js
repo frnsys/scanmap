@@ -263,7 +263,7 @@ class Form {
         coordsEl.value = '';
       }
     } else if (type == 'area') {
-      document.querySelector('#coordinates-type--hint [data-type=area]').innerText = 'Double-click to finish shape';
+      document.querySelector('#coordinates-type--hint [data-type=area]').innerText = 'Click to start, double-click to finish';
       map.draw.changeMode('draw_polygon');
     }
   }

@@ -246,11 +246,9 @@ a, a:visited {
 }
 #coordinates-type ul {
   display: inline-block;
-  margin-left: 0.25em;
 }
 #coordinates-type li {
   display: inline-block;
-  margin-right: 0.25em;
   cursor: pointer;
 }
 #coordinates-type li:hover {
@@ -261,7 +259,7 @@ a, a:visited {
   text-decoration: underline;
 }
 #coordinates-type--hint {
-  font-size: 0.8em;
+  font-size: 0.7em;
   line-height: 1.5;
 }
 #coordinates-type--hint div {
