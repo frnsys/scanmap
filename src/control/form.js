@@ -236,11 +236,19 @@ class Form {
       if (drawMode == 'draw_polygon' || drawMode == 'direct_select') return;
 
       let feats = map.map.queryRenderedFeatures(ev.point);
-      let areas = feats.filter((f) => f.properties['type'] == 'area');
-      if (areas.length == 1) {
+
+      // Only load the clicked area's coordinates if it's the only area there (otherwise
+      // it's ambiguous what the user means to select).
+      // Each area, even if identical to another log's area, is rendered as a separate feature,
+      // so we can't assume that if we have more than one area they are not actually the same
+      // geometry.
+      let areas = [...new Set(feats.filter((f) => f.properties['type'] == 'area').map((f) => {
         // Turns out the actual geometry points (areas[0].geometry.coordinates[0]) are slightly off,
         // so instead we use a property where we store the extract coordinates as a string.
-        coordsEl.value = areas[0].properties.coords;
+        return f.properties.coords;
+      }))];
+      if (areas.length == 1) {
+        coordsEl.value = areas[0];
       }
     });
 
@@ -258,7 +266,7 @@ class Form {
         if (coordsEl.value.includes(';')) {
           document.querySelector('#coordinates-type--hint [data-type=area]').innerText = 'Double-click to reset';
         } else {
-          document.querySelector('#coordinates-type--hint [data-type=area]').innerText = 'Double-click to enable draw mode';
+          document.querySelector('#coordinates-type--hint [data-type=area]').innerText = 'Double-click to draw, or click an area';
         }
       }
     });
@@ -280,7 +288,7 @@ class Form {
     } else if (type == 'area') {
       coordsEl.value = '';
       map.draw.changeMode('simple_select');
-      document.querySelector('#coordinates-type--hint [data-type=area]').innerText = 'Double-click to enable draw mode';
+      document.querySelector('#coordinates-type--hint [data-type=area]').innerText = 'Double-click to draw, or click an area';
     }
   }
 

@@ -264,6 +264,7 @@ a, a:visited {
 }
 #coordinates-type--hint div {
   display: none;
+  margin-left: 1.5em;
 }
 #coordinates-type--hint div.selected {
   display: block;
