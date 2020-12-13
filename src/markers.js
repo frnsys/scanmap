@@ -13,6 +13,24 @@ const MARKERS = {
 let expireTime = 60 * 60 * 1000; // in ms. One hour
 const minMarkerOpacity = 0.25;
 
+// Region/area paint properties
+const defaultPaint = {
+  'fill-color': '#FFD620',
+  'fill-opacity': 0.1,
+  'fill-outline-color': '#000000',
+  'fill-opacity-transition': {
+    'duration': 0
+  },
+  'fill-color-transition': {
+    'duration': 0
+  }
+};
+const highlightPaint = {
+  'fill-color': '#3F64FD',
+  'fill-outline-color': '#3F64FD',
+  'fill-opacity': 0.5,
+};
+
 function keyForLog(log) {
   let markerPoint = markerPointForLog(log);
   return `${markerPoint[0]}_${markerPoint[1]}`;
@@ -128,7 +146,7 @@ function upsertLog(log) {
 
   // Check if marker exists for this location,
   // if so, append log
-  let marker  = getMarker(log);
+  let marker = getMarker(log);
   if (marker) {
     // Update marker icon to latest event's icon
     let markerEl = marker.getElement();
@@ -159,14 +177,40 @@ function upsertLog(log) {
         children: [newLog]
       }]
     });
+    marker = map.addMarker(markerPoint, {
+      element, icon,
+      onPopupOpen: (_, marker) => {
+        if (marker.areas) {
+          marker.areas.forEach((logId) => {
+            Object.keys(highlightPaint).forEach((k) => {
+              map.map.setPaintProperty(logId, k, highlightPaint[k]);
+            });
+          });
+        }
+      },
+      onPopupClose: (_, marker) => {
+        if (marker.areas) {
+          marker.areas.forEach((logId) => {
+            Object.keys(defaultPaint).forEach((k) => {
+              map.map.setPaintProperty(log.id, k, defaultPaint[k]);
+            });
+          });
+        }
+      }
+    });
+    marker.areas = [];
     MARKERS[log.type][log.markerKey] = {
-      lastUpdate: log.timestamp*1000,
-      marker: map.addMarker(markerPoint, {element, icon})
+      marker,
+      lastUpdate: log.timestamp*1000
     };
   }
 
   // Render area/region
   if (log.coords.length > 1) {
+    // TODO delete from this when the log is deleted
+    marker.areas.push(log.id);
+
+    // TODO how to update these?
     map.map.addSource(log.id, {
       'type': 'geojson',
       'data': {
@@ -174,6 +218,11 @@ function upsertLog(log) {
         'geometry': {
           'type': 'Polygon',
           'coordinates': [log.coords]
+        },
+        'properties': {
+          'type': 'area',
+          'logType': log.type,
+          'markerKey': log.markerKey // TODO what if this changes?
         }
       }
     });
@@ -181,11 +230,7 @@ function upsertLog(log) {
       'id': log.id,
       'type': 'fill',
       'source': log.id,
-      'paint': {
-        'fill-color': '#FFD620',
-        'fill-opacity': 0.25,
-        'fill-outline-color': '#000000'
-      }
+      'paint': defaultPaint
     });
   }
 }
@@ -249,5 +294,17 @@ function updateLog(log) {
     popupEl.querySelector(`#popup-${log.id} .popup-location`).innerText = log.location;
   }
 }
+
+// Show associated popups when a region is clicked on
+map.map.on('click', (ev) => {
+  let feats = map.map.queryRenderedFeatures(ev.point);
+  let areas = feats.filter((f) => f.properties['type'] == 'area');
+  areas.forEach((a) => {
+    let {logType, markerKey} = a.properties;
+    let {marker} = MARKERS[logType][markerKey];
+    let popup = marker.getPopup();
+    if (!popup.isOpen()) marker.togglePopup();
+  });
+});
 
 export default {keyForLog, upsertLog, updateLog, removeLog, showPopup, hide, show, fade, markerPointForLog};

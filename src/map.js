@@ -43,10 +43,10 @@ class Map {
       }).setDOMContent(opts.element);
 
       if (opts.onPopupOpen) {
-        popup.on('open', () => opts.onPopupOpen(popup));
+        popup.on('open', () => opts.onPopupOpen(popup, marker));
       }
       if (opts.onPopupClose) {
-        popup.on('close', () => opts.onPopupClose(popup));
+        popup.on('close', () => opts.onPopupClose(popup, marker));
       }
 
       marker.setPopup(popup)
