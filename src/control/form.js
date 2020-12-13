@@ -209,17 +209,22 @@ class Form {
       if (api.authKey) {
         if (this.drawMode == 'point') {
           coordsEl.value = `${coord.lat},${coord.lng}`;
-
-        // A workaround for this weird behavior where,
-        // if you're in draw-polygon mode and you double-click
-        // without drawing anything, you get taken out of draw_polygon mode.
-        // This will put us back into draw_polygon mode when this happens
-        } else if (this.drawMode == 'area') {
-          if (map.draw.getMode() != 'draw_polygon' && coordsEl.value == '') {
-            this.setDrawMode(this.drawMode);
-          }
         }
         this.previewCoords([coord.lng, coord.lat]);
+      }
+    });
+
+    // When double-clicking in area draw mode,
+    // initiate drawing
+    map.map.on('dblclick', (ev) => {
+      if (this.drawMode == 'area') {
+        ev.preventDefault();
+
+        // Reset the drawing
+        coordsEl.value = '';
+        map.draw.deleteAll();
+        map.draw.changeMode('draw_polygon');
+        document.querySelector('#coordinates-type--hint [data-type=area]').innerText = 'Click to add point';
       }
     });
 
@@ -227,29 +232,19 @@ class Form {
     map.enableDrawing();
     map.map.on('draw.create', (ev) => {
       coordsEl.value = ev.features[0].geometry.coordinates[0].map((pt) => [...pt].reverse().join(',')).join(';');
-
-      // Hack so that the double-click that closes the drawing
-      // doesn't trigger this event.
-      document.querySelector('#coordinates-type--hint [data-type=area]').innerText = 'Double-click to restart';
-      setTimeout(() => {
-        // Reset/redraw on double-click
-        map.map.once('dblclick', (ev) => {
-          // Prevent zoom on double click just this once
-          ev.preventDefault();
-
-          // Reset the drawing
-          coordsEl.value = '';
-          map.draw.deleteAll();
-          this.setDrawMode(this.drawMode);
-        });
-      }, 500);
     });
     map.map.on('draw.update', (ev) => {
       coordsEl.value = ev.features[0].geometry.coordinates[0].map((pt) => [...pt].reverse().join(',')).join(';');
     });
     map.map.on('draw.modechange', (ev) => {
-      if (ev.mode == 'simple_select') {
-        document.querySelector('#coordinates-type--hint [data-type=area]').innerText = 'Double-click to restart';
+      // Sometimes the mode will change back to simple select,
+      // update the help hint for the user
+      if (ev.mode == 'simple_select' && this.drawMode == 'area') {
+        if (coordsEl.value.includes(';')) {
+          document.querySelector('#coordinates-type--hint [data-type=area]').innerText = 'Double-click to reset';
+        } else {
+          document.querySelector('#coordinates-type--hint [data-type=area]').innerText = 'Double-click to enable draw mode';
+        }
       }
     });
   }
@@ -268,8 +263,8 @@ class Form {
         coordsEl.value = '';
       }
     } else if (type == 'area') {
-      document.querySelector('#coordinates-type--hint [data-type=area]').innerText = 'Click to start, double-click to finish';
-      map.draw.changeMode('draw_polygon');
+      map.draw.changeMode('simple_select');
+      document.querySelector('#coordinates-type--hint [data-type=area]').innerText = 'Double-click to enable draw mode';
     }
   }
 
