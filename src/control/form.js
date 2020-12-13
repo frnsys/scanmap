@@ -301,8 +301,10 @@ class Form {
     imagesEl.value = '';
 
     // Clear map annotations
+    // and reload draw mode
     map.draw.deleteAll();
     if (this.marker) this.marker.remove();
+    this.setDrawMode(this.drawMode);
   }
 
   post(url, data, onSuccess) {
