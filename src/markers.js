@@ -218,7 +218,6 @@ function upsertLog(log) {
 
   // Render area/region
   if (log.coords.length > 1) {
-    // TODO delete from this when the log is deleted or moved to a different marker
     marker.areas.push(log.id);
 
     let data = {
@@ -230,7 +229,7 @@ function upsertLog(log) {
       'properties': {
         'type': 'area',
         'logType': log.type,
-        'markerKey': log.markerKey // TODO what if this changes?
+        'markerKey': log.markerKey
       }
     };
 
@@ -254,9 +253,12 @@ function upsertLog(log) {
 }
 
 // Remove the log for the specified key from its marker
-function removeLog(log) {
+function removeLog(log, keepArea) {
   let marker = getMarker(log);
   if (marker) {
+    // Remove from this marker's areas
+    marker.areas = marker.areas.filter((id) => id != log.id);
+
     let markerEl = marker.getElement();
     let popupEl = marker.getPopup()._content;
 
@@ -282,6 +284,12 @@ function removeLog(log) {
         markerEl.style.background = 'red';
       }
     }
+  }
+
+  // Delete area
+  if (log.coords.length > 1 && !keepArea) {
+    map.map.removeLayer(log.id);
+    map.map.removeSource(log.id);
   }
 }
 

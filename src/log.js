@@ -63,7 +63,7 @@ class Log {
       // Move marker if necessary
       if (this.el.dataset.coords != this.coordinates) {
         // Remove existing marker
-        markers.removeLog(this);
+        markers.removeLog(this, true);
 
         // Add to new marker
         this.el.dataset.coords = this.coordinates;
@@ -310,7 +310,7 @@ class Log {
                   action: 'delete'
                 }, () => {
                   this.el.parentNode.removeChild(this.el);
-                  markers.removeLog(this);
+                  markers.removeLog(this, false);
                 });
               }
             }
