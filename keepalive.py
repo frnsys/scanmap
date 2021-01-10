@@ -1,3 +1,8 @@
+"""
+Maintains SSE connections
+and also triggers the disconnecting of stale clients
+"""
+
 import json
 import config
 from time import sleep
