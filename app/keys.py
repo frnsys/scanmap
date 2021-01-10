@@ -1,5 +1,4 @@
 import yaml
-import config
 import random
 import string
 
