@@ -1,11 +1,11 @@
 import json
 import config
 from time import sleep
-from server import app, sse
+from server import app
 
 while True:
     print('Pinging')
     with app.app_context():
         for location in config.LOCATIONS.keys():
-            sse.publish(json.dumps({'keepalive': True}), channel=location)
+            app.sse.publish(json.dumps({'keepalive': True}), channel=location)
     sleep(45)

@@ -12,4 +12,5 @@ def create_app(package_name=__name__, static_folder='../static', template_folder
     app.register_blueprint(sse, url_prefix='/location-stream')
     app.register_blueprint(bp)
     cache.init_app(app)
+    app.sse = sse
     return app
