@@ -53,7 +53,7 @@ DB_PATH = 'data/logs.db'
 KEYS_FILE = 'data/keys.yml'
 
 # Redis instance for SSE
-REDIS_URL = 'redis://localhost'
+SSE_REDIS_URL = 'redis://localhost'
 
 # For querying coordinates for locations
 GOOGLE_PLACES_API_KEY = '<key>'
@@ -100,7 +100,7 @@ LOGS_AFTER = {
 DB_PATH = 'data/logs.db'
 KEYS_FILE = 'data/keys.yml'
 GOOGLE_PLACES_API_KEY = '<KEY>'
-REDIS_URL = 'redis://localhost'
+SSE_REDIS_URL = 'redis://localhost'
 DEBUG = False
 
 CACHE = {

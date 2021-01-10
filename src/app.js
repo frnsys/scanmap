@@ -14,10 +14,11 @@ function listenEvents(cb) {
 
     // Reconnect on error
     logSource.addEventListener('error', (ev) => {
-      console.log('Connection error');
+      console.log('Connection error, reconnecting');
       logSource.close();
       initEventSource();
     });
+
     /* end server sent events coooooode */
   }
   window.onbeforeunload = () => {
@@ -30,7 +31,7 @@ function setupApp(onSetup) {
   // Set up log feeds
   let eventFeed = new Feed('event');
   let staticFeed = new Feed('static');
-  listenEvents(() => {
+  listenEvents((ev) => {
     // For now just reloading logs,
     // for compatibility with how the editing system works.
     eventFeed.update(true);
