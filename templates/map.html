@@ -17,14 +17,14 @@
         </div>
         <div id="log">
             <div id="log-tabs">
-                <div data-type="event" class="log-tab selected">Events</div>
-                <div data-type="static" class="log-tab">Points of Interest</div>
+                <div data-type="event" class="log-tab selected" translate>Events</div>
+                <div data-type="static" class="log-tab" translate>Points of Interest</div>
             </div>
             <div id="event-logs" class="logs selected">
-                <div class="no-log">No recent posts</div>
+                <div class="no-log" translate>No recent posts</div>
             </div>
             <div id="static-logs" class="logs">
-                <div class="no-log">No recent posts</div>
+                <div class="no-log" translate>No recent posts</div>
             </div>
         </div>
         <div id="info">
@@ -34,17 +34,17 @@
                 <div id="toggles">
                     {% set extras = conf.EXTRAS|default({}) %}
                     {% if extras.CAMERAS %}
-                        <div id="toggle-cams"><input type="checkbox" autocomplete="off" id="cam-toggle-input"> <label for="cam-toggle-input">Traffic cams</label></div>
+                        <div id="toggle-cams"><input type="checkbox" autocomplete="off" id="cam-toggle-input"> <label for="cam-toggle-input" translate>Traffic cams</label></div>
                     {% endif %}
                     {% if extras.HELICOPTERS %}
-                        <div id="toggle-helicopters"><input type="checkbox" autocomplete="off" id="helicopters-toggle-input"> <label for="helicopters-toggle-input">Helicopters</label></div>
+                        <div id="toggle-helicopters"><input type="checkbox" autocomplete="off" id="helicopters-toggle-input"> <label for="helicopters-toggle-input" translate>Helicopters</label></div>
                     {% endif %}
                     {% if extras.PRECINCTS %}
-                        <div id="toggle-precincts"><input type="checkbox" autocomplete="off" id="precincts-toggle-input"> <label for="precincts-toggle-input">Precincts</label></div>
+                        <div id="toggle-precincts"><input type="checkbox" autocomplete="off" id="precincts-toggle-input"> <label for="precincts-toggle-input" translate>Precincts</label></div>
                     {% endif %}
-                    <div id="toggle-static"><input type="checkbox" autocomplete="off" id="static-toggle-input"> <label for="static-toggle-input">Points of Interest</label></div>
+                    <div id="toggle-static"><input type="checkbox" autocomplete="off" id="static-toggle-input"> <label for="static-toggle-input" translate>Points of Interest</label></div>
                 </div>
-                <div id="add">If you have a key, click here to start adding.</div>
+                <div id="add" translate>If you have a key, click here to start adding.</div>
                 <div id="legend"></div>
             </div>
         </div>
@@ -70,27 +70,27 @@
             </p>
 
             <div>{{ conf.INFO | safe }}</div>
-            <button id="ready">Got it</button>
+            <button id="ready" translate>Got it</button>
         </div>
     </div>
     <div id="auth-status"></div>
     <div id="append">
         <div id="append-tabs">
-            <div data-type="event" class="append-tab selected">Event</div>
-            <div data-type="static" class="append-tab">Static</div>
+            <div data-type="event" class="append-tab selected" translate>Event</div>
+            <div data-type="static" class="append-tab" translate>Point of Interest</div>
         </div>
         <div id="append-form">
             <div id="coordinates-type">
                 <div>
-                    Type:
+                    <span translate>Type</span>:
                     <ul>
-                        <li data-type="point" class="selected">Point</li>
-                        <li data-type="area">Area</li>
+                        <li data-type="point" class="selected" translate>Point</li>
+                        <li data-type="area" translate>Area</li>
                     </ul>
                 </div>
                 <div id="coordinates-type--hint">
-                    <div data-type="point" class="selected">Click on map to set point</div>
-                    <div data-type="area">Double-click to enable draw mode</div>
+                    <div data-type="point" class="selected" translate>Click on map to set point</div>
+                    <div data-type="area" translate>Double-click to enable draw mode</div>
                 </div>
             </div>
             <input id="text" type="text" placeholder="Note" />
@@ -102,14 +102,14 @@
             <ul id="coord-results"></ul>
             <select id="label"></select>
             <div>
-                <label for="image">Photo</label>
+                <label for="image" translate>Photo</label>
                 <input id="image" type="file" />
             </div>
             <input id="submit" type="submit" value="Submit" />
             <div class="extra-info">
-                <div id="event-hint" class="hint">Events disappear from the map after 24 hours</div>
-                <div id="static-hint" class="hint">Static items stay on the map indefinitely</div>
-                <div id="show-help">Help</div>
+                <div id="event-hint" class="hint" translate>Events disappear from the map after 24 hours</div>
+                <div id="static-hint" class="hint" translate>Points of interest stay on the map indefinitely</div>
+                <div id="show-help" translate>Help</div>
             </div>
         </div>
         <div id="error"></div>

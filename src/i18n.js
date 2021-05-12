@@ -38,5 +38,11 @@ function t(key, data) {
   }, tmpl);
 }
 
-export { lang, loadLanguage };
+function translate() {
+  [...document.querySelectorAll('[translate]')].forEach((el) => {
+    el.innerText = t(el.innerText);
+  });
+}
+
+export { lang, loadLanguage, translate };
 export default t;

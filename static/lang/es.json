@@ -19,5 +19,32 @@
     "camera": "Camara",
     "phone": "Teléfono",
     "police_bldg": "Edificio Policia",
-    "military_bldg": "Edificio Militar"
+    "military_bldg": "Edificio Militar",
+
+    "Events": "Eventos",
+    "Points of Interest": "Puntos de Interés",
+    "Event": "Evento",
+    "Point of Interest": "Punto de interés",
+    "Point": "Punto",
+    "Area": "Área",
+    "Type": "Tipo",
+    "Helicopters": "Helicópteros",
+    "Precincts": "Recintos de la Policía",
+    "Traffic cams": "Cámaras de tráfico",
+    "No recent posts": "No hay publicaciones recientes",
+    "If you have a key, click here to start adding.": "Si tiene una clave, haga clic aquí para comenzar a agregar.",
+    "Click on map to set point": "Haga clic en el mapa para establecer el punto",
+    "Click to add point. Esc to cancel": "Haga clic para agregar un punto. Esc para cancelar",
+    "Double-click to enable draw mode": "Haga doble clic para habilitar el modo de dibujo",
+    "Double-click to draw, or click an area": "Haga doble clic para dibujar o haga clic en un área",
+    "Double-click to reset": "Haga doble clic para restablecer",
+    "Photo": "Foto",
+    "Searching...": "Buscando...",
+    "No results": "No hay resultados",
+    "Events disappear from the map after 24 hours": "Los eventos desaparecen del mapa después de 24 horas.",
+    "Points of interest stay on the map indefinitely": "Los puntos de interés permanecen en el mapa indefinidamente",
+    "Authorizing": "Autorizando",
+    "Invalid key": "Clave inválida",
+
+    "Got it": "Entiendo"
 }

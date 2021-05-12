@@ -114,7 +114,7 @@ class Form {
   // Search for a location/coordinates
   // for the given query
   queryLocation(query) {
-    statusEl.innerText = 'Searching...';
+    statusEl.innerText = t('Searching...');
     statusEl.style.display = 'block';
 
     // Search for possible coordinates
@@ -154,7 +154,7 @@ class Form {
           resultsEl.appendChild(li);
         });
       } else {
-        resultsEl.innerText = 'No results';
+        resultsEl.innerText = t('No results');
       }
       statusEl.style.display = 'none';
     });
@@ -178,7 +178,7 @@ class Form {
     if (!api.authKey || api.authKey.trim() == "") return;
 
     // Check that the key is valid
-    authStatusEl.innerText = 'Authorizing';
+    authStatusEl.innerText = t('Authorizing');
     authStatusEl.style.display = 'block';
     api.post('checkauth', {}, (results) => {
       // Valid, show the form
@@ -194,7 +194,7 @@ class Form {
         onActivate();
         this.initialize();
       } else {
-        authStatusEl.innerText = 'Invalid key';
+        authStatusEl.innerText = t('Invalid key');
         authStatusEl.style.display = 'block';
       }
     }).catch((err) => {
@@ -225,7 +225,7 @@ class Form {
         coordsEl.value = '';
         map.draw.deleteAll();
         map.draw.changeMode('draw_polygon');
-        document.querySelector('#coordinates-type--hint [data-type=area]').innerText = 'Click to add point. Esc to cancel';
+        document.querySelector('#coordinates-type--hint [data-type=area]').innerText = t('Click to add point. Esc to cancel');
       }
     });
 
@@ -265,9 +265,9 @@ class Form {
       // update the help hint for the user
       if (this.drawMode == 'area' && ev.mode == 'simple_select') {
         if (coordsEl.value.includes(';')) {
-          document.querySelector('#coordinates-type--hint [data-type=area]').innerText = 'Double-click to reset';
+          document.querySelector('#coordinates-type--hint [data-type=area]').innerText = t('Double-click to reset');
         } else {
-          document.querySelector('#coordinates-type--hint [data-type=area]').innerText = 'Double-click to draw, or click an area';
+          document.querySelector('#coordinates-type--hint [data-type=area]').innerText = t('Double-click to draw, or click an area');
         }
       }
     });
@@ -289,7 +289,7 @@ class Form {
     } else if (type == 'area') {
       coordsEl.value = '';
       map.draw.changeMode('simple_select');
-      document.querySelector('#coordinates-type--hint [data-type=area]').innerText = 'Double-click to draw, or click an area';
+      document.querySelector('#coordinates-type--hint [data-type=area]').innerText = t('Double-click to draw, or click an area');
     }
   }
 

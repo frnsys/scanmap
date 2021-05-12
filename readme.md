@@ -162,6 +162,22 @@ You need to provide a translation file with the label translations in the `stati
 
 Note: `static/lang/en.json` is empty b/c the label default language is English.
 
+UI elements that should be translated can have a "translate" attribute added to them, and then a corresponding entry in the translation file. For example:
+
+```
+<div class="foo" translate>No recent posts</div>
+```
+
+Then, in the translation file, e.g. `static/lang/es.json`:
+
+```
+{
+    ...
+    "No recent posts": "No hay publicaciones recientes",
+    ...
+}
+```
+
 ## Adding new labels
 
 Edit `LABELS` in `src/labels.js`. Make sure you update the translations in the language files (see above).
