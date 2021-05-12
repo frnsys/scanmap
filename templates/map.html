@@ -32,9 +32,16 @@
             <div id="info-body">
                 <div>{{ conf.INFO | safe }}</div>
                 <div id="toggles">
-                    <div id="toggle-cams"><input type="checkbox" autocomplete="off" id="cam-toggle-input"> <label for="cam-toggle-input">Traffic cams</label></div>
-                    <div id="toggle-helicopters"><input type="checkbox" autocomplete="off" id="helicopters-toggle-input"> <label for="helicopters-toggle-input">Helicopters</label></div>
-                    <div id="toggle-precincts"><input type="checkbox" autocomplete="off" id="precincts-toggle-input"> <label for="precincts-toggle-input">Precincts</label></div>
+                    {% set extras = conf.EXTRAS|default({}) %}
+                    {% if extras.CAMERAS %}
+                        <div id="toggle-cams"><input type="checkbox" autocomplete="off" id="cam-toggle-input"> <label for="cam-toggle-input">Traffic cams</label></div>
+                    {% endif %}
+                    {% if extras.HELICOPTERS %}
+                        <div id="toggle-helicopters"><input type="checkbox" autocomplete="off" id="helicopters-toggle-input"> <label for="helicopters-toggle-input">Helicopters</label></div>
+                    {% endif %}
+                    {% if extras.PRECINCTS %}
+                        <div id="toggle-precincts"><input type="checkbox" autocomplete="off" id="precincts-toggle-input"> <label for="precincts-toggle-input">Precincts</label></div>
+                    {% endif %}
                     <div id="toggle-static"><input type="checkbox" autocomplete="off" id="static-toggle-input"> <label for="static-toggle-input">Points of Interest</label></div>
                 </div>
                 <div id="add">If you have a key, click here to start adding.</div>

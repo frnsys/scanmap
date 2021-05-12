@@ -2,7 +2,7 @@ import json
 import config
 import requests
 from app import create_app, get_conf, cache
-from flask import jsonify, send_from_directory
+from flask import jsonify, send_from_directory, abort
 
 app = create_app()
 
@@ -52,23 +52,26 @@ def get_helicopter_locations(location):
         results[tail]['lng'] = lng
     return list(results.values())
 
-
 @app.route('/<location>/cams')
 def cams(location):
+    conf = get_conf(location) # Check for 404
     cams = cameras.get(location, [])
-    conf = get_conf(location)
     return jsonify(cams=cams)
 
 @app.route('/<location>/precincts')
 def precincts(location):
-    loc = location.lower()
-    return send_from_directory('../data/precincts', '{}.geojson'.format(loc))
+    conf = get_conf(location)
+    extras = conf.get('EXTRAS', {})
+    filename = extras.get('PRECINCTS')
+    if filename is None:
+        abort(404)
+    return send_from_directory('../data/precincts', filename)
 
 # Cache timeout matches flightradar24 frontend
 @app.route('/<location>/helis')
 @cache.cached(timeout=8)
 def helis(location):
-    conf = get_conf(location)
+    conf = get_conf(location) # Check for 404
     items = get_helicopter_locations(location)
     return jsonify(helis=items)
 
