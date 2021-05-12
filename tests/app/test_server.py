@@ -27,11 +27,11 @@ def log_in_db():
 
     routes.db.add(
         'event',
-        'NY',
+        'ny',
         'WRITE',
         {'text': 'TEST', 'location': 'X AND Y ST', 'coordinates': '0,0', 'label': 'other'})
 
-    yield routes.db.logs('NY', 1)[0]
+    yield routes.db.logs('ny', 1)[0]
 
 @pytest.fixture
 def admin_log_in_db():
@@ -39,11 +39,11 @@ def admin_log_in_db():
 
     routes.db.add(
         'admin',
-        'NY',
+        'ny',
         'WRITE',
         {'text': 'TEST', 'location': 'X AND Y ST', 'coordinates': '0,0', 'label': 'other'})
 
-    yield routes.db.logs('NY', 1, type='admin')[0]
+    yield routes.db.logs('ny', 1, type='admin')[0]
 
 
 @pytest.fixture
@@ -103,7 +103,7 @@ def test_get_version(client):
 def test_get_map_location(client):
     """Tests getting a known location"""
 
-    map_response = client.get('/NY/')
+    map_response = client.get('/ny/')
 
     assert(map_response.status_code == 200)
 
@@ -123,7 +123,7 @@ def test_get_unknown_map_location(client):
 def test_get_cams(client):
     """Tests getting cams"""
 
-    cams_response = client.get('/NY/cams')
+    cams_response = client.get('/ny/cams')
 
     assert(cams_response.status_code == 200)
 
@@ -143,7 +143,7 @@ def test_get_cams_unknown_location(client):
 def test_get_log(client, log_in_db):
     """Tests getting logs without auth"""
 
-    log_response = client.get('/NY/log/event')
+    log_response = client.get('/ny/log/event')
 
     assert(log_response.status_code == 200)
     assert(len(log_response.get_json()['logs']) == 1)
@@ -160,11 +160,11 @@ def test_get_log_hit_cache(client, sse, log_in_db):
 
     from app import routes
 
-    log_response = client.get('/NY/log/event')
+    log_response = client.get('/ny/log/event')
 
     assert(log_response.status_code == 200)
 
-    cached = routes.cache.get('/NY/log/event_noauth')
+    cached = routes.cache.get('/ny/log/event_noauth')
 
     assert(cached.status_code == 200)
     assert(len(cached.get_json()['logs']) == 1)
@@ -172,7 +172,7 @@ def test_get_log_hit_cache(client, sse, log_in_db):
 def test_new_log_unauthorized(client, log_in_db):
     """Tests adding log without a key"""
 
-    log_response = client.post('/NY/log/event')
+    log_response = client.post('/ny/log/event')
 
     assert(log_response.status_code == 401)
 
@@ -182,14 +182,14 @@ def test_new_log_ok(client, sse, log_in_db):
     from app import routes
 
     log_response = client.post(
-        '/NY/log/event',
+        '/ny/log/event',
         headers={'X-AUTH': 'WRITE'},
         json={'text': 'TEST', 'location': 'A AND B ST', 'coordinates': '0,0', 'label': 'other'})
 
     assert(log_response.status_code == 200)
     assert(log_response.get_json() == {'success': True})
     assert(sse.publish_called)
-    assert(len(routes.db.logs('NY', 10)) == 2)
+    assert(len(routes.db.logs('ny', 10)) == 2)
 
 def test_new_log_no_cache(client, sse, log_in_db):
     """Tests adding a new log doesn't populate cache"""
@@ -197,23 +197,23 @@ def test_new_log_no_cache(client, sse, log_in_db):
     from app import routes
 
     log_response = client.post(
-        '/NY/log/event',
+        '/ny/log/event',
         headers={'X-AUTH': 'WRITE'},
         json={'text': 'TEST', 'location': 'A AND B ST', 'coordinates': '0,0', 'label': 'other'})
 
     assert(log_response.status_code == 200)
 
-    cached = routes.cache.get('/NY/log/event_WRITE')
+    cached = routes.cache.get('/ny/log/event_WRITE')
 
     assert(cached == None)
 
 def test_get_log_admin(client, log_in_db):
     """Tests getting admin logs"""
 
-    log_response = client.get('/NY/log/admin')
+    log_response = client.get('/ny/log/admin')
     assert(log_response.status_code == 400)
 
-    log_response = client.get('/NY/log/admin/all')
+    log_response = client.get('/ny/log/admin/all')
     assert(log_response.status_code == 400)
 
 def test_new_log_admin(client, sse, log_in_db):
@@ -222,7 +222,7 @@ def test_new_log_admin(client, sse, log_in_db):
     from app import routes
 
     log_response = client.post(
-        '/NY/log/admin',
+        '/ny/log/admin',
         headers={'X-AUTH': 'WRITE'},
         json={'text': 'TEST', 'location': 'A AND B ST', 'coordinates': '0,0', 'label': 'other'})
 
@@ -238,7 +238,7 @@ def test_new_log_admin(client, sse, log_in_db):
 def test_edit_log_unauthorized_key(client, sse, log_in_db):
     """Tests editing a log file with an unauthorized key"""
 
-    edit_log_response = client.post('/NY/log/edit', headers={'X-AUTH': 'BOGUS'})
+    edit_log_response = client.post('/ny/log/edit', headers={'X-AUTH': 'BOGUS'})
 
     assert(edit_log_response.status_code == 401)
 
@@ -247,7 +247,7 @@ def test_edit_log_bad_payload(client, sse, log_in_db):
 
     with pytest.raises(KeyError):
         edit_log_response = client.post(
-            '/NY/log/edit',
+            '/ny/log/edit',
             headers={'X-AUTH': 'PRIME'},
             json={'bogus': ''})
 
@@ -255,7 +255,7 @@ def test_edit_log_unknown_action(client, sse, log_in_db):
     """Tests edit log with an unknown action"""
 
     edit_log_response = client.post(
-        '/NY/log/edit',
+        '/ny/log/edit',
         headers={'X-AUTH': 'PRIME'},
         json={'action': 'bogus', 'timestamp': log_in_db['timestamp']})
 
@@ -266,7 +266,7 @@ def test_edit_log_delete(client, sse, log_in_db):
     """Tests deleting a log record"""
 
     edit_log_response = client.post(
-        '/NY/log/edit',
+        '/ny/log/edit',
         headers={'X-AUTH': 'PRIME'},
         json={'action': 'delete', 'timestamp': log_in_db['timestamp']})
 
@@ -286,7 +286,7 @@ def test_edit_log_update(client, sse, log_in_db):
     }
 
     edit_log_response = client.post(
-        '/NY/log/edit',
+        '/ny/log/edit',
         headers={'X-AUTH': 'WRITE'},
         json=request_body)
 
@@ -294,7 +294,7 @@ def test_edit_log_update(client, sse, log_in_db):
     assert(edit_log_response.get_json() == {'success': True})
     assert(sse.publish_called)
     assert(
-        routes.db.log('NY', log_in_db['timestamp'])['data']['location'] == 'NEW ADDRESS'
+        routes.db.log('ny', log_in_db['timestamp'])['data']['location'] == 'NEW ADDRESS'
     )
 
 def test_edit_log_editor_is_not_submitter(client, sse, log_in_db):
@@ -302,7 +302,7 @@ def test_edit_log_editor_is_not_submitter(client, sse, log_in_db):
 
     from app import routes
 
-    routes.kr.add_key('NY', 'write', 'WRITE_2')
+    routes.kr.add_key('ny', 'write', 'WRITE_2')
 
     request_body = {
         'action': 'update',
@@ -311,7 +311,7 @@ def test_edit_log_editor_is_not_submitter(client, sse, log_in_db):
     }
 
     edit_log_response = client.post(
-        '/NY/log/edit',
+        '/ny/log/edit',
         headers={'X-AUTH': 'WRITE_2'},
         json=request_body)
 
@@ -321,7 +321,7 @@ def test_edit_admin_log_delete(client, sse, admin_log_in_db):
     """Tests deleting an admin log record"""
 
     edit_log_response = client.post(
-        '/NY/log/edit',
+        '/ny/log/edit',
         headers={'X-AUTH': 'PRIME'},
         json={'action': 'delete', 'timestamp': admin_log_in_db['timestamp']})
 
@@ -331,7 +331,7 @@ def test_edit_admin_log_update(client, sse, admin_log_in_db):
     """Tests updating an admin log record"""
 
     edit_log_response = client.post(
-        '/NY/log/edit',
+        '/ny/log/edit',
         headers={'X-AUTH': 'PRIME'},
         json={
             'action': 'update',
@@ -352,7 +352,7 @@ def test_get_location_unauthorized(client):
     """Tests searching for location with an unauthorized key"""
 
     location_response = client.post(
-        '/NY/location',
+        '/ny/location',
         headers={'X-AUTH': 'BOGUS'},
         json={'query': 'barclays center'})
 
@@ -367,7 +367,7 @@ def test_get_location_barclays_center(client, monkeypatch):
         lambda *args, **kwargs: MockResponse('google_places_ok_0_address'))
 
     location_response = client.post(
-        '/NY/location',
+        '/ny/location',
         headers={'X-AUTH': 'WRITE'},
         json={'query': 'barclays center'})
 
@@ -383,7 +383,7 @@ def test_get_location_cross_streets(client, monkeypatch):
         lambda *args, **kwargs: MockResponse('google_places_ok_1_cross'))
 
     location_response = client.post(
-        '/NY/location',
+        '/ny/location',
         headers={'X-AUTH': 'WRITE'},
         json={'query': 'bergen st and 4th av'})
 
@@ -399,7 +399,7 @@ def test_get_location_cross_streets(client, monkeypatch):
 def test_get_panel_ok(client):
     """Tests getting a panel"""
 
-    panel_response = client.get('/NY/cams')
+    panel_response = client.get('/ny/cams')
 
     assert(panel_response.status_code == 200)
 
@@ -419,21 +419,21 @@ def test_get_panel_unknown_location(client):
 def test_keys_no_auth(client):
     """Tests keys route with no auth"""
 
-    keys_response = client.get('/NY/keys')
+    keys_response = client.get('/ny/keys')
 
     assert(keys_response.status_code == 401)
 
 def test_keys_not_prime(client):
     """Tests keys route with an auth key that isn't an admin"""
 
-    keys_response = client.get('/NY/keys', headers={'X-AUTH': 'WRITE'})
+    keys_response = client.get('/ny/keys', headers={'X-AUTH': 'WRITE'})
 
     assert(keys_response.status_code == 401)
 
 def test_keys_prime_get(client):
     """Tests keys route with a prime key"""
 
-    keys_response = client.get('/NY/keys', headers={'X-AUTH': 'PRIME'})
+    keys_response = client.get('/ny/keys', headers={'X-AUTH': 'PRIME'})
 
     assert(keys_response.status_code == 200)
 
@@ -441,7 +441,7 @@ def test_keys_new_key_unauthorized(client):
     """Tests adding a new key with an unauthorized key"""
 
     keys_response = client.post(
-        '/NY/keys',
+        '/ny/keys',
         headers={'X-AUTH': 'WRITE'},
         json={'action': 'create'})
 
@@ -453,18 +453,18 @@ def test_keys_new_key_ok(client):
     from app import routes
 
     keys_response = client.post(
-        '/NY/keys',
+        '/ny/keys',
         headers={'X-AUTH': 'PRIME'},
         json={'action': 'create'})
 
     assert(keys_response.status_code == 200)
-    assert(len(routes.kr.get_keys('NY')['write']) == 2)
+    assert(len(routes.kr.get_keys('ny')['write']) == 2)
 
 def test_keys_revoke_key_unauthorized(client):
     """Tests revoking a key with an unauthorized key"""
 
     keys_response = client.post(
-        '/NY/keys',
+        '/ny/keys',
         headers={'X-AUTH': 'WRITE'},
         json={'action': 'revoke', 'key': 'WRITE'})
 
@@ -476,12 +476,12 @@ def test_keys_revoke_key_ok(client):
     from app import routes
 
     keys_response = client.post(
-        '/NY/keys',
+        '/ny/keys',
         headers={'X-AUTH': 'PRIME'},
         json={'action': 'revoke', 'key': 'WRITE'})
 
     assert(keys_response.status_code == 200)
-    assert(len(routes.kr.get_keys('NY')['write']) == 0)
+    assert(len(routes.kr.get_keys('ny')['write']) == 0)
 
 # -----------------------------------
 # -----------------------------------
@@ -492,7 +492,7 @@ def test_keys_revoke_key_ok(client):
 def test_check_auth_ok_key(client):
     """Tests check auth with a good key and location"""
 
-    auth_response = client.post('/NY/checkauth', headers={'X-AUTH': 'WRITE'})
+    auth_response = client.post('/ny/checkauth', headers={'X-AUTH': 'WRITE'})
 
     assert(auth_response.status_code == 200)
     assert(auth_response.is_json)
@@ -501,7 +501,7 @@ def test_check_auth_ok_key(client):
 def test_check_auth_bad_key(client):
     """Tests check auth with a bad key"""
 
-    auth_response = client.post('/NY/checkauth', headers={'X-AUTH': 'BOGUS'})
+    auth_response = client.post('/ny/checkauth', headers={'X-AUTH': 'BOGUS'})
 
     assert(auth_response.status_code == 200)
     assert(auth_response.is_json)

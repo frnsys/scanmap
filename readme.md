@@ -1,4 +1,4 @@
-App is broken down by location, which is just a key identifying a location, e.g. `NY`.
+App is broken down by location, which is just a key identifying a location, e.g. `ny`.
 
 # Overview
 
@@ -59,7 +59,7 @@ SSE_REDIS_URL = 'redis://localhost'
 GOOGLE_PLACES_API_KEY = '<key>'
 
 LOCATIONS = {
-    '<location key:NY>': {
+    '<location key:ny>': {
         'LIVE': <display map link on homepage:True>,
         'MAP_CENTER': <lonlat:[-73.96161699999999, 40.678806]>,
         'SEARCH': {
@@ -79,7 +79,7 @@ LOCATIONS = {
 
 ```
 # data/keys.yml
-<location key:NY>:
+<location key:ny>:
     prime: # admin keys
         - <auth key>
     write: # regular write access keys
@@ -108,7 +108,7 @@ CACHE = {
 }
 
 LOCATIONS = {
-    'NY': {
+    'ny': {
         'LIVE': True,
         'MAP': {
             'CENTER': [-73.96161699999999, 40.678806],
@@ -138,7 +138,7 @@ export default {
 Example `keys.yml`:
 
 ```
-<location key:NY>:
+<location key:ny>:
     <type key:write>:
         - <auth key>
         - <auth key>
@@ -354,8 +354,8 @@ print(results.toJSON())
 
 There are scripts that help you do this in `scripts/`:
 
-1. Get data from OSM: `python osm_surveillance.py NYC NY`, which creates `output/surveillance__NYC_NY_....json`
-2. Load data into scanmap: `python ingest_pois.py output/surveillance__NYC_NY_....json`
+1. Get data from OSM: `python osm_surveillance.py NYC ny`, which creates `output/surveillance__NYC_ny_....json`
+2. Load data into scanmap: `python ingest_pois.py output/surveillance__NYC_ny....json`
 
 ---
 

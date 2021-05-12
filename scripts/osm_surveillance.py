@@ -5,7 +5,7 @@ Usage:
 
 Example:
 
-    python osm_surveillance.py NYC NY
+    python osm_surveillance.py NYC ny
 
 Outputs file to `output/`
 """
@@ -19,7 +19,7 @@ from OSMPythonTools.overpass import Overpass, overpassQueryBuilder
 # E.g. NYC
 city = sys.argv[1]
 
-# E.g. NY (i.e. the scanmap name)
+# E.g. ny (i.e. the scanmap name)
 location = sys.argv[2]
 
 overpass = Overpass()

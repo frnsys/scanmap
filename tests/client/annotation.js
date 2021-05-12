@@ -18,7 +18,7 @@ const { openBrowser, goto, doubleClick, click, prompt, confirm, accept, textBox,
   try {
     await openBrowser();
     await goto('localhost:8800');
-    await click('NY');
+    await click('ny');
 
     // Assert no barricade marker yet
     assert.strictEqual(await text('🚧', within($('#map'))).exists(), false);

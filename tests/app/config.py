@@ -27,7 +27,7 @@ SSE_REDIS_URL = 'redis://localhost:6379'
 GOOGLE_PLACES_API_KEY = os.getenv('SCANMAP_TEST_GOOGLE_PLACES_API_KEY', '<BLANK>')
 
 LOCATIONS = {
-    'NY': {
+    'ny': {
         'LIVE': True,
         'EXTRAS': {
             'CAMERAS': 'data/cams/ny.json',

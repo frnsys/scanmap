@@ -2,7 +2,7 @@
 Data should be JSON, formatted like:
 
 [{
-    "location": "NY",
+    "location": "ny",
     "data": {
         "coordinates": "40.,-73.",
         "image": "foo.jpg",

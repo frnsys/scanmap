@@ -13,18 +13,18 @@ def database():
 def test_get_empty(database):
     """Tests a fetch on an empty database"""
 
-    assert(not any(database.logs('NY', 1)))
+    assert(not any(database.logs('ny', 1)))
 
 def test_add(database):
     """Tests an add then fetch"""
 
     database.add(
         'event',
-        'NY',
+        'ny',
         'WRITEKEY',
         { 'text': 'TEST', 'location': 'LOCATION', 'coordinates': '0,0', 'label': 'other' })
 
-    logs = database.logs('NY', 1)
+    logs = database.logs('ny', 1)
 
     assert(any(logs))
     assert(logs[0]['timestamp'])
@@ -39,69 +39,69 @@ def test_delete(database):
 
     database.add(
         'event',
-        'NY',
+        'ny',
         'WRITEKEY',
         { 'text': 'TEST', 'location': 'LOCATION', 'coordinates': '0,0', 'label': 'other' })
 
-    logs = database.logs('NY', 1)
+    logs = database.logs('ny', 1)
 
     assert(any(logs))
 
-    database.delete('NY', logs[0]['timestamp'])
+    database.delete('ny', logs[0]['timestamp'])
 
-    assert(not any(database.logs('NY', 1)))
+    assert(not any(database.logs('ny', 1)))
 
 def test_get_different_locations(database):
     """Tests adding multiple locations and fetching from one"""
 
     database.add(
         'event',
-        'NY',
+        'ny',
         'WRITEKEY',
         { 'text': 'NY TEST', 'location': 'NY LOCATION', 'coordinates': '0,0', 'label': 'other' })
 
     database.add(
         'event',
-        'PA',
+        'pa',
         'WRITEKEY',
         { 'text': 'PA TEST', 'location': 'PA LOCATION', 'coordinates': '0,0', 'label': 'other' })
 
-    assert(len(database.logs('NY', 2)) == 1)
-    assert(len(database.logs('PA', 2)) == 1)
+    assert(len(database.logs('ny', 2)) == 1)
+    assert(len(database.logs('pa', 2)) == 1)
 
 def test_get_specific(database):
     """Tests getting a specific log record"""
 
     database.add(
         'event',
-        'NY',
+        'ny',
         'WRITEKEY',
         { 'text': 'TEST', 'location': 'LOCATION', 'coordinates': '0,0', 'label': 'other' })
 
-    logs = database.logs('NY', 10)
+    logs = database.logs('ny', 10)
 
     assert(any(logs))
-    assert(database.log('NY', logs[0]['timestamp']))
+    assert(database.log('ny', logs[0]['timestamp']))
 
 def test_update(database):
     """Tests update"""
 
     database.add(
         'event',
-        'NY',
+        'ny',
         'WRITEKEY',
         { 'text': 'TEST', 'location': 'LOCATION', 'coordinates': '0,0', 'label': 'other' })
 
-    logs = database.logs('NY', 1)
+    logs = database.logs('ny', 1)
 
     assert(any(logs))
 
     database.update(
-        'NY',
+        'ny',
         logs[0]['timestamp'],
         { 'text': 'NEW', 'location': 'DIFFERENT', 'coordinates': '1,1', 'label': 'another' })
 
-    log = database.log('NY', logs[0]['timestamp'])
+    log = database.log('ny', logs[0]['timestamp'])
 
     assert(any(log))
     assert(log['data']['text'] == 'NEW')

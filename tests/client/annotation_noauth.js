@@ -10,7 +10,7 @@ const { openBrowser, goto, click, prompt, accept, textBox, $, focus, write, pres
     try {
         await openBrowser();
         await goto('localhost:8800');
-        await click('NY');
+        await click('ny');
         await prompt('Key', async () => accept('WRONG'));
         await click('If you have a key, click here to start adding');
         assert.strictEqual(await text('Invalid key').exists(), true);

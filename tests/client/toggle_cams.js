@@ -6,7 +6,7 @@ const { openBrowser, goto, click, $, closeBrowser } = require('taiko');
         await openBrowser();
         await goto('localhost:8800');
         assert.strictEqual(await $('.marker-camera').exists(), false);
-        await click('NY');
+        await click('ny');
         await click('Traffic cams');
         assert.strictEqual(await $('.marker-camera').exists(), true);
     } catch (error) {
