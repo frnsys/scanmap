@@ -1,3 +1,4 @@
+import {lang} from './i18n';
 import config from '../config';
 
 class Map {
@@ -13,7 +14,9 @@ class Map {
       });
     });
 
-    let language = new MapboxLanguage();
+    let language = new MapboxLanguage({
+      defaultLanguage: lang
+    });
     this.map.addControl(language);
   }
 

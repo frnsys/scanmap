@@ -38,5 +38,5 @@ function t(key, data) {
   }, tmpl);
 }
 
-export { loadLanguage };
+export { lang, loadLanguage };
 export default t;
