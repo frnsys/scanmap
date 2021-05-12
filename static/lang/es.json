@@ -1,0 +1,23 @@
+{
+    "alert": "Alerta",
+    "police_presence": "Policia Presente",
+    "units_requested": "Llamaron Unidades",
+    "fire": "Fuego",
+    "prisoner_van": "Furgoneta del Juicio",
+    "group": "Grupo",
+    "injury": "Herido",
+    "barricade": "Barricada",
+    "aviation": "Aviación",
+    "aid": "Primeros Auxilios",
+    "military": "Militares",
+    "staging_area": "Área de Ensayo",
+    "protestor_barricade": "Barricada de Protestantes",
+    "arrests": "Arrestos",
+    "far_right_group": "Grupo de Extrema Derecha",
+    "other": "Otro",
+    "jail": "Celda",
+    "camera": "Camara",
+    "phone": "Teléfono",
+    "police_bldg": "Edificio Policia",
+    "military_bldg": "Edificio Militar"
+}
