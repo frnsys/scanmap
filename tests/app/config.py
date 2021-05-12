@@ -29,7 +29,9 @@ GOOGLE_PLACES_API_KEY = os.getenv('SCANMAP_TEST_GOOGLE_PLACES_API_KEY', '<BLANK>
 LOCATIONS = {
     'NY': {
         'LIVE': True,
-        'CAMERAS': 'data/cams/ny.json',
+        'EXTRAS': {
+            'CAMERAS': 'data/cams/ny.json',
+        },
         'MAP': {
             'CENTER': [-73.96161699999999, 40.678806],
             'ZOOM': 12
