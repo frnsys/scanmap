@@ -6,6 +6,8 @@ const toggleEl = document.getElementById('toggle-precincts');
 const layers = ['precincts', 'precincts-labels', 'precincts-outlines'];
 
 function setupPrecincts(map) {
+  if (!toggleEl) return;
+
   map = map.map;
   let source = {
     'type': 'geojson',

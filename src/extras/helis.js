@@ -57,6 +57,8 @@ function removeHelicopters() {
 }
 
 function setupHelicopters(map) {
+  if (!toggleEl) return;
+
   let interval;
   toggleEl.addEventListener('change', (ev) => {
     if (ev.target.checked) {

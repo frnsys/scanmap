@@ -56,6 +56,8 @@ function makeMarkers(map, cams) {
 
 // Setup cameras for the map
 function setupCams(map) {
+  if (!toggleEl) return;
+
   let cams = [];
   let markers = [];
   let camsLoaded = false;
