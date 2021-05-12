@@ -1,3 +1,4 @@
+import t from './i18n';
 import map from './map';
 import LABELS from './labels';
 import markers from './markers';
@@ -32,7 +33,11 @@ class Log {
     });
     this.el = document.getElementById(this.id);
     this.icon = this.label ? LABELS[this.type][this.label] : null;
-    this.labelText = this.label ? `${this.icon} ${this.label} @ ` : '';
+    this.labelText = this.label ? `${this.textForLabel(this.label)} @ ` : '';
+  }
+
+  textForLabel(label) {
+    return `${LABELS[this.type][label]} ${t(label)}`
   }
 
   // TODO Eventually replace reading from the element dataset, see note above
@@ -119,7 +124,7 @@ class Log {
                 tag: 'select',
                 children: Object.keys(LABELS[this.type]).map((label) => ({
                   tag: 'option',
-                  innerText: `${LABELS[this.type][label]} ${label}`,
+                  innerText: this.textForLabel(label),
                   value: label,
                   selected: label == this.label
                 })),
@@ -133,7 +138,7 @@ class Log {
                         label: ev.target.value
                       }
                     }, () => {
-                      let text = newLabel && newLabel !== 'other' ? `${LABELS[this.type][newLabel]} ${newLabel} @ ` : '';
+                      let text = newLabel && newLabel !== 'other' ? `${this.textForLabel(newLabel)} @ ` : '';
                       let labelEl = ev.target.closest('.logitem').querySelector('.logitem-label');
                       labelEl.innerText = text;
                       labelEl.style.display = 'inline';

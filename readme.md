@@ -154,6 +154,18 @@ To add a new city:
 
 At minimum you need the coordinates for the center the map.
 
+## Adding new languages
+
+There is basic support for other languages (for the map labels).
+
+You need to provide a translation file with the label translations in the `static/lang` folder. See `static/lang/es.json` for an example.
+
+Note: `static/lang/en.json` is empty b/c the label default language is English.
+
+## Adding new labels
+
+Edit `LABELS` in `src/labels.js`. Make sure you update the translations in the language files (see above).
+
 ---
 
 # Development

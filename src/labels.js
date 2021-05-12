@@ -1,3 +1,5 @@
+import t from './i18n';
+
 const LABELS = {
   'event': {
     'alert': '⚠',
@@ -42,7 +44,7 @@ function showLegend() {
   const legendEl = document.getElementById('legend');
   Object.keys(all_labels).forEach((label) => {
     let el = document.createElement('span');
-    el.innerText = `${all_labels[label]} ${label}`;
+    el.innerText = `${all_labels[label]} ${t(label)}`;
     legendEl.appendChild(el);
   });
 }
