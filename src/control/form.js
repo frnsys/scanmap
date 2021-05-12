@@ -2,6 +2,7 @@
  * Form for annotators to submit new annotations
  */
 
+import t from '../i18n';
 import map from '../map';
 import {api} from '../util';
 import LABELS from '../labels';
@@ -104,7 +105,7 @@ class Form {
     Object.keys(LABELS[logType]).forEach((label) => {
       // Form dropdown
       let el = document.createElement('option');
-      el.innerText = `${LABELS[logType][label]} ${label}`
+      el.innerText = `${LABELS[logType][label]} ${t(label)}`
       el.value = label;
       labelsEl.appendChild(el);
     });

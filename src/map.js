@@ -12,6 +12,9 @@ class Map {
         fn(e.lngLat);
       });
     });
+
+    let language = new MapboxLanguage();
+    this.map.addControl(language);
   }
 
   addClickListener(id, fn) {
@@ -81,7 +84,7 @@ class Map {
 mapboxgl.accessToken = config.MAPBOX_TOKEN;
 const map = new Map({
     container: 'map',
-    style: 'mapbox://styles/mapbox/streets-v11',
+    style: 'mapbox://styles/mapbox/streets-v10',
     maxZoom: 18,
     minZoom: 10,
     zoom: MAP_ZOOM,
