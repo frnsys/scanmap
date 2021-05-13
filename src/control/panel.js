@@ -106,7 +106,7 @@ const typeNames = {
 
 // Create a new key of the specified type
 function addKey(type) {
-  api.post('keys', {
+  api.post('panel/keys', {
     action: 'create',
     type: type
   }, (json) => {
@@ -128,7 +128,7 @@ function keyItem(key, type) {
         // Handler for revoking key
         click: () => {
           if (confirm(`Are you sure you want to revoke key "${key}"?`)) {
-            api.post('keys', {
+            api.post('panel/keys', {
               key: key,
               action: 'revoke'
             }, () => {
@@ -146,7 +146,7 @@ function keyItem(key, type) {
 // Load keys for this map
 function loadKeys() {
   // This will fail if the user doesn't have a valid prime key
-  api.get('keys', (json) => {
+  api.get('panel/keys', (json) => {
     document.getElementById('panel-main').style.display = 'block';
 
     // Render keys

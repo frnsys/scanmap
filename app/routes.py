@@ -200,8 +200,7 @@ def admin_logs(location):
     return jsonify(logs=logs)
 
 
-# TODO
-@bp.route('/<location>/keys', methods=['GET', 'POST'])
+@bp.route('/<location>/panel/keys', methods=['GET', 'POST'])
 def keys(location):
     key = request.headers.get('X-AUTH')
     if not kr.check_key(key, location) == 'prime':

@@ -424,28 +424,28 @@ def test_get_panel_unknown_location(client):
 
 # -----------------------------------
 # -----------------------------------
-# ---  GET, POST /<location>/keys ---
+# ---  GET, POST /<location>/panel/keys ---
 # -----------------------------------
 # -----------------------------------
 
 def test_keys_no_auth(client):
     """Tests keys route with no auth"""
 
-    keys_response = client.get('/ny/keys')
+    keys_response = client.get('/ny/panel/keys')
 
     assert(keys_response.status_code == 401)
 
 def test_keys_not_prime(client):
     """Tests keys route with an auth key that isn't an admin"""
 
-    keys_response = client.get('/ny/keys', headers={'X-AUTH': 'WRITE'})
+    keys_response = client.get('/ny/panel/keys', headers={'X-AUTH': 'WRITE'})
 
     assert(keys_response.status_code == 401)
 
 def test_keys_prime_get(client):
     """Tests keys route with a prime key"""
 
-    keys_response = client.get('/ny/keys', headers={'X-AUTH': 'PRIME'})
+    keys_response = client.get('/ny/panel/keys', headers={'X-AUTH': 'PRIME'})
 
     assert(keys_response.status_code == 200)
 
@@ -453,7 +453,7 @@ def test_keys_new_key_unauthorized(client):
     """Tests adding a new key with an unauthorized key"""
 
     keys_response = client.post(
-        '/ny/keys',
+        '/ny/panel/keys',
         headers={'X-AUTH': 'WRITE'},
         json={'action': 'create'})
 
@@ -465,7 +465,7 @@ def test_keys_new_key_ok(client):
     from app import routes
 
     keys_response = client.post(
-        '/ny/keys',
+        '/ny/panel/keys',
         headers={'X-AUTH': 'PRIME'},
         json={'action': 'create'})
 
@@ -476,7 +476,7 @@ def test_keys_revoke_key_unauthorized(client):
     """Tests revoking a key with an unauthorized key"""
 
     keys_response = client.post(
-        '/ny/keys',
+        '/ny/panel/keys',
         headers={'X-AUTH': 'WRITE'},
         json={'action': 'revoke', 'key': 'WRITE'})
 
@@ -488,7 +488,7 @@ def test_keys_revoke_key_ok(client):
     from app import routes
 
     keys_response = client.post(
-        '/ny/keys',
+        '/ny/panel/keys',
         headers={'X-AUTH': 'PRIME'},
         json={'action': 'revoke', 'key': 'WRITE'})
 
