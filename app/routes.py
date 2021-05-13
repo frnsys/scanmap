@@ -5,6 +5,7 @@ from app.db import Database
 from app.keys import KeyRing
 from app.geo import search_places
 from app.image import save_image
+from app.labels import LabelManager
 from flask_caching import Cache
 from flask_sse import sse
 from datetime import datetime, timezone, timedelta
@@ -13,6 +14,7 @@ from flask import Blueprint, abort, request, render_template, jsonify, send_from
 bp = Blueprint('main', __name__)
 kr = KeyRing(config.KEYS_FILE)
 db = Database(config.DB_PATH)
+lm = LabelManager(config.LABELS_PATH)
 cache = Cache(config=config.CACHE)
 
 
@@ -234,6 +236,63 @@ def keys(location):
 
     keys = kr.get_keys(location)
     return jsonify(keys=keys)
+
+
+@bp.route('/<location>/panel/labels')
+def edit_labels(location):
+    key = request.headers.get('X-AUTH')
+    if not kr.check_key(key, location) == 'prime':
+        abort(401)
+
+    if request.method == 'POST':
+        data = request.get_json()
+        action = data['action']
+        if action == 'hide':
+            label = data['label']
+            success = lm.hide(location, label)
+            if success:
+                db.add('admin', location, key, {
+                    'type': 'labels',
+                    'action': action,
+                    'target': {
+                        'label': label,
+                    }
+                })
+            return jsonify(success=success)
+        elif action == 'edit':
+            icon = data['icon']
+            label = data['label']
+            success = lm.edit_icon(location, label, icon)
+            if success:
+                db.add('admin', location, key, {
+                    'type': 'labels',
+                    'action': action,
+                    'target': {
+                        'label': label,
+                        'icon': icon,
+                    }
+                })
+            return jsonify(success=success)
+        elif action == 'create':
+            icon = data['icon']
+            label = data['label']
+            success = lm.create(location, label, icon)
+            if success:
+                db.add('admin', location, key, {
+                    'type': 'labels',
+                    'action': action,
+                    'target': {
+                        'label': label,
+                        'icon': icon,
+                    }
+                })
+            return jsonify(success=success)
+        return jsonify(success=False)
+
+    labels = lm.load(location)
+    return jsonify(labels=labels)
+
+
 
 @bp.route('/<location>/checkauth', methods=['POST'])
 def check_auth(location):
