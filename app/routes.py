@@ -200,6 +200,7 @@ def admin_logs(location):
     return jsonify(logs=logs)
 
 
+# TODO
 @bp.route('/<location>/keys', methods=['GET', 'POST'])
 def keys(location):
     key = request.headers.get('X-AUTH')
@@ -238,8 +239,8 @@ def keys(location):
     return jsonify(keys=keys)
 
 
-@bp.route('/<location>/panel/labels')
-def edit_labels(location):
+@bp.route('/<location>/panel/labels', methods=['GET', 'POST'])
+def labels(location):
     key = request.headers.get('X-AUTH')
     if not kr.check_key(key, location) == 'prime':
         abort(401)
@@ -289,7 +290,7 @@ def edit_labels(location):
             return jsonify(success=success)
         return jsonify(success=False)
 
-    labels = lm.load(location)
+    labels = lm.labels(location)
     return jsonify(labels=labels)
 
 
