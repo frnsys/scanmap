@@ -44,6 +44,13 @@ def map(location):
     conf = get_conf(location)
     return render_template('map.html', conf=conf, location=location)
 
+@bp.route('/<location>/labels')
+def labels(location):
+    labels = {
+        k: v['icon'] for k, v in lm.labels(location).items()
+        if not v['hide']
+    }
+    return jsonify(labels=labels)
 
 @bp.route('/<location>/log/<type>', methods=['GET', 'POST'])
 @cache.cached(timeout=5,
@@ -239,7 +246,7 @@ def keys(location):
 
 
 @bp.route('/<location>/panel/labels', methods=['GET', 'POST'])
-def labels(location):
+def panel_labels(location):
     key = request.headers.get('X-AUTH')
     if not kr.check_key(key, location) == 'prime':
         abort(401)

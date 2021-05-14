@@ -2,7 +2,7 @@ import map from './map';
 import markers from './markers';
 import form from './control/form';
 import { api } from './util';
-import { showLegend } from './labels';
+import { renderLegend } from './labels';
 import { Feed, fetchPinned } from './feed';
 
 function listenEvents(cb) {
@@ -87,7 +87,7 @@ function setupApp(onSetup) {
   map.map.on('load', () => {
     eventFeed.update(true);
     fetchPinned();
-    showLegend();
+    renderLegend();
   });
 
   // Periodically fade markers based on age
