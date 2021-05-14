@@ -145,6 +145,11 @@ html, body {
 #info div {
   margin: 0.7em 0px;
 }
+#info #info-body img,
+#intro-info img {
+  vertical-align: middle;
+  max-height: 32px;
+}
 #info #info-toggle {
   margin: 0;
   line-height: 1;
