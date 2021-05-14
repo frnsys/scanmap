@@ -180,7 +180,9 @@ Then, in the translation file, e.g. `static/lang/es.json`:
 
 ## Adding new labels
 
-Edit `LABELS` in `src/labels.js`. Make sure you update the translations in the language files (see above).
+To add labels that are common across _all_ maps, edit `LABELS` in `src/labels.js`. Make sure you update the translations in the language files (see above).
+
+Custom labels can be added on a per-map basis through that map's admin panel.
 
 ---
 
