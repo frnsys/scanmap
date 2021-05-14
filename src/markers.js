@@ -1,6 +1,5 @@
 import map from './map';
 import {el} from './util';
-import LABELS from './labels';
 import polylabel from 'polylabel';
 
 // Markers for each log type

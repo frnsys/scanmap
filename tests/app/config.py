@@ -20,6 +20,7 @@ LOGS_AFTER = {
 # Where the database and keys files are located
 DB_PATH = ':memory:'   # Hack to prevent creating a dummy DB file
 KEYS_FILE = os.devnull # Hack to prevent creating a dummy key file
+LABELS_PATH = os.devnull # Hack to prevent creating a dummy labels file
 
 SSE_REDIS_URL = 'redis://localhost:6379'
 

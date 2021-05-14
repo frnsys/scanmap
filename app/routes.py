@@ -5,6 +5,7 @@ from app.db import Database
 from app.keys import KeyRing
 from app.geo import search_places
 from app.image import save_image
+from app.labels import LabelManager
 from flask_caching import Cache
 from flask_sse import sse
 from datetime import datetime, timezone, timedelta
@@ -13,6 +14,7 @@ from flask import Blueprint, abort, request, render_template, jsonify, send_from
 bp = Blueprint('main', __name__)
 kr = KeyRing(config.KEYS_FILE)
 db = Database(config.DB_PATH)
+lm = LabelManager(config.LABELS_PATH)
 cache = Cache(config=config.CACHE)
 
 
@@ -42,6 +44,13 @@ def map(location):
     conf = get_conf(location)
     return render_template('map.html', conf=conf, location=location)
 
+@bp.route('/<location>/labels')
+def labels(location):
+    labels = {
+        k: v['icon'] for k, v in lm.labels(location).items()
+        if not v['hide']
+    }
+    return jsonify(labels=labels)
 
 @bp.route('/<location>/log/<type>', methods=['GET', 'POST'])
 @cache.cached(timeout=5,
@@ -198,7 +207,7 @@ def admin_logs(location):
     return jsonify(logs=logs)
 
 
-@bp.route('/<location>/keys', methods=['GET', 'POST'])
+@bp.route('/<location>/panel/keys', methods=['GET', 'POST'])
 def keys(location):
     key = request.headers.get('X-AUTH')
     if not kr.check_key(key, location) == 'prime':
@@ -234,6 +243,75 @@ def keys(location):
 
     keys = kr.get_keys(location)
     return jsonify(keys=keys)
+
+
+@bp.route('/<location>/panel/labels', methods=['GET', 'POST'])
+def panel_labels(location):
+    key = request.headers.get('X-AUTH')
+    if not kr.check_key(key, location) == 'prime':
+        abort(401)
+
+    if request.method == 'POST':
+        data = request.get_json()
+        action = data['action']
+        if action == 'hide':
+            label = data['label']
+            success = lm.hide(location, label)
+            if success:
+                db.add('admin', location, key, {
+                    'type': 'labels',
+                    'action': action,
+                    'target': {
+                        'label': label,
+                    }
+                })
+            return jsonify(success=success)
+        elif action == 'unhide':
+            label = data['label']
+            success = lm.unhide(location, label)
+            if success:
+                db.add('admin', location, key, {
+                    'type': 'labels',
+                    'action': action,
+                    'target': {
+                        'label': label,
+                    }
+                })
+            return jsonify(success=success)
+        elif action == 'edit':
+            icon = data['icon']
+            label = data['label']
+            success = lm.edit_icon(location, label, icon)
+            if success:
+                db.add('admin', location, key, {
+                    'type': 'labels',
+                    'action': action,
+                    'target': {
+                        'label': label,
+                        'icon': icon,
+                    }
+                })
+            return jsonify(success=success)
+        elif action == 'create':
+            icon = data['icon']
+            label = data['label']
+            success = lm.create(location, label, icon)
+            if success:
+                db.add('admin', location, key, {
+                    'type': 'labels',
+                    'action': action,
+                    'target': {
+                        'label': label,
+                        'icon': icon,
+                    }
+                })
+            return jsonify(success=success)
+        return jsonify(success=False)
+
+    labels = lm.labels(location)
+    return jsonify(labels=labels)
+
+
 
 @bp.route('/<location>/checkauth', methods=['POST'])
 def check_auth(location):

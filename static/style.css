@@ -460,6 +460,11 @@ select {
   max-width: 640px;
   margin: 0 auto;
 }
+#panel h2 {
+	margin: 1em 0;
+	border-top: 1px solid #fcb;
+	padding-top: 1em;
+}
 #panel #key {
   display: block;
   margin: 1em auto;
@@ -473,8 +478,32 @@ select {
 #panel .key-prime {
   color: #ffcb00;
 }
+#panel #manage-labels {
+  text-align: center;
+}
+#panel #labels {
+  padding: 0 2em 2em 2em;
+}
+#panel #labels .hidden {
+  opacity: 0.25;
+}
+#panel #icon,
+#panel .edit-label-icon {
+  width: 2em;
+  text-align: center;
+}
+#panel .edit-label-icon {
+  margin-right: 0.5em;
+  border: none;
+  border-bottom: 1px solid #303030;
+  background: #282828;
+}
 #panel-main {
   display: none;
+}
+.hide-label {
+  margin: 0 0.5em;
+  display: inline-block;
 }
 .revoke-key {
   margin-left: 0.5em;
@@ -529,6 +558,10 @@ select {
   text-align: center;
   width: 100%;
   padding: 0.5em 1em;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
 }
 #set-pinned-status {
   text-align: center;

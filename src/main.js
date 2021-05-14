@@ -1,4 +1,5 @@
 import setupApp from './app';
+import {updateLabels} from './labels';
 import setupCams from './extras/cams';
 import setupPrecincts from './extras/precincts';
 import setupHelicopters from './extras/helis';
@@ -11,5 +12,6 @@ loadLanguage(() => {
     setupHelicopters(map);
   });
 
+  updateLabels();
   translate();
 });

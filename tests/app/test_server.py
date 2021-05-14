@@ -1,5 +1,6 @@
 from app.db import Database
 from app.keys import KeyRing
+from app.labels import LabelManager
 from datetime import datetime, timezone
 import json
 import pytest
@@ -58,22 +59,32 @@ def sse(monkeypatch):
 
 @pytest.fixture()
 def client(monkeypatch):
-    with tempfile.NamedTemporaryFile() as keyf:
-        # Copy over the test keys to the temporary key file
-        with open('tests/app/data/keys.yml', mode='rb') as testkeyf:
-            keyf.write(testkeyf.read())
-            keyf.flush()
+    # Copy over the test keys to the temporary key file
+    keyf = tempfile.NamedTemporaryFile()
+    with open('tests/app/data/keys.yml', mode='rb') as testkeyf:
+        keyf.write(testkeyf.read())
+        keyf.flush()
 
-        with tempfile.NamedTemporaryFile() as dbf:
-            from app import routes, create_app
+    labelsf = tempfile.NamedTemporaryFile()
+    with open('tests/app/data/labels.yml', mode='rb') as testlabelsf:
+        labelsf.write(testlabelsf.read())
+        labelsf.flush()
 
-            # Stub key ring and database
-            monkeypatch.setattr(routes, 'kr', KeyRing(keyf.name))
-            monkeypatch.setattr(routes, 'db', Database(dbf.name))
+    dbf = tempfile.NamedTemporaryFile()
+    from app import routes, create_app
 
-            import server
-            server.app.config['TESTING'] = True
-            yield server.app.test_client()
+    # Stub key ring and database
+    monkeypatch.setattr(routes, 'kr', KeyRing(keyf.name))
+    monkeypatch.setattr(routes, 'db', Database(dbf.name))
+    monkeypatch.setattr(routes, 'lm', LabelManager(labelsf.name))
+
+    import server
+    server.app.config['TESTING'] = True
+    yield server.app.test_client()
+
+    keyf.close()
+    labelsf.close()
+    dbf.close()
 
 # ---------------------
 # ---------------------
@@ -97,6 +108,7 @@ def test_get_version(client):
 # -------------------------
 # -------------------------
 # ---  GET /<location>/ ---
+
 # -------------------------
 # -------------------------
 
@@ -412,28 +424,28 @@ def test_get_panel_unknown_location(client):
 
 # -----------------------------------
 # -----------------------------------
-# ---  GET, POST /<location>/keys ---
+# ---  GET, POST /<location>/panel/keys ---
 # -----------------------------------
 # -----------------------------------
 
 def test_keys_no_auth(client):
     """Tests keys route with no auth"""
 
-    keys_response = client.get('/ny/keys')
+    keys_response = client.get('/ny/panel/keys')
 
     assert(keys_response.status_code == 401)
 
 def test_keys_not_prime(client):
     """Tests keys route with an auth key that isn't an admin"""
 
-    keys_response = client.get('/ny/keys', headers={'X-AUTH': 'WRITE'})
+    keys_response = client.get('/ny/panel/keys', headers={'X-AUTH': 'WRITE'})
 
     assert(keys_response.status_code == 401)
 
 def test_keys_prime_get(client):
     """Tests keys route with a prime key"""
 
-    keys_response = client.get('/ny/keys', headers={'X-AUTH': 'PRIME'})
+    keys_response = client.get('/ny/panel/keys', headers={'X-AUTH': 'PRIME'})
 
     assert(keys_response.status_code == 200)
 
@@ -441,7 +453,7 @@ def test_keys_new_key_unauthorized(client):
     """Tests adding a new key with an unauthorized key"""
 
     keys_response = client.post(
-        '/ny/keys',
+        '/ny/panel/keys',
         headers={'X-AUTH': 'WRITE'},
         json={'action': 'create'})
 
@@ -453,7 +465,7 @@ def test_keys_new_key_ok(client):
     from app import routes
 
     keys_response = client.post(
-        '/ny/keys',
+        '/ny/panel/keys',
         headers={'X-AUTH': 'PRIME'},
         json={'action': 'create'})
 
@@ -464,7 +476,7 @@ def test_keys_revoke_key_unauthorized(client):
     """Tests revoking a key with an unauthorized key"""
 
     keys_response = client.post(
-        '/ny/keys',
+        '/ny/panel/keys',
         headers={'X-AUTH': 'WRITE'},
         json={'action': 'revoke', 'key': 'WRITE'})
 
@@ -476,12 +488,105 @@ def test_keys_revoke_key_ok(client):
     from app import routes
 
     keys_response = client.post(
-        '/ny/keys',
+        '/ny/panel/keys',
         headers={'X-AUTH': 'PRIME'},
         json={'action': 'revoke', 'key': 'WRITE'})
 
     assert(keys_response.status_code == 200)
     assert(len(routes.kr.get_keys('ny')['write']) == 0)
+
+# -------------------------------------------
+# -------------------------------------------
+# ---  GET, POST /<location>/panel/labels ---
+# -------------------------------------------
+# -------------------------------------------
+
+def test_labels_no_auth(client):
+    """Tests labels route with no auth"""
+    response = client.get('/ny/panel/labels')
+    assert(response.status_code == 401)
+
+def test_labels_not_prime(client):
+    """Tests labels route with an auth key that isn't an admin"""
+    response = client.get('/ny/panel/labels', headers={'X-AUTH': 'WRITE'})
+    assert(response.status_code == 401)
+
+def test_labels_prime_get(client):
+    """Tests labels route with a prime key"""
+    response = client.get('/ny/panel/labels', headers={'X-AUTH': 'PRIME'})
+    assert(response.status_code == 200)
+
+def test_labels_new_label_unauthorized(client):
+    """Tests adding a new label with an unauthorized key"""
+    response = client.post(
+        '/ny/panel/labels',
+        headers={'X-AUTH': 'WRITE'},
+        json={'action': 'create', 'label': 'bar', 'icon': '🔮'})
+    assert(response.status_code == 401)
+
+def test_labels_new_label_ok(client):
+    """Tests add a label with a prime key"""
+    from app import routes
+    response = client.post(
+        '/ny/panel/labels',
+        headers={'X-AUTH': 'PRIME'},
+        json={'action': 'create', 'label': 'bar', 'icon': '🔮'})
+    assert(response.status_code == 200)
+    assert(len(routes.lm.labels('ny')) == 2)
+
+def test_labels_hide_label_unauthorized(client):
+    """Tests hiding a label with an unauthorized key"""
+    response = client.post(
+        '/ny/panel/labels',
+        headers={'X-AUTH': 'WRITE'},
+        json={'action': 'hide', 'label': 'foo'})
+    assert(response.status_code == 401)
+
+def test_labels_hide_label_ok(client):
+    """Tests hiding a key with a prime key"""
+    from app import routes
+    response = client.post(
+        '/ny/panel/labels',
+        headers={'X-AUTH': 'PRIME'},
+        json={'action': 'hide', 'label': 'foo'})
+    assert(response.status_code == 200)
+    assert(routes.lm.labels('ny')['foo']['hide'])
+
+def test_labels_unhide_label_unauthorized(client):
+    """Tests unhiding a label with an unauthorized key"""
+    response = client.post(
+        '/ny/panel/labels',
+        headers={'X-AUTH': 'WRITE'},
+        json={'action': 'unhide', 'label': 'foo'})
+    assert(response.status_code == 401)
+
+def test_labels_unhide_label_ok(client):
+    """Tests unhiding a key with a prime key"""
+    from app import routes
+    response = client.post(
+        '/ny/panel/labels',
+        headers={'X-AUTH': 'PRIME'},
+        json={'action': 'unhide', 'label': 'foo'})
+    assert(response.status_code == 200)
+    assert(not routes.lm.labels('ny')['foo']['hide'])
+
+def test_labels_edit_label_unauthorized(client):
+    """Tests editing a label with an unauthorized key"""
+    response = client.post(
+        '/ny/panel/labels',
+        headers={'X-AUTH': 'WRITE'},
+        json={'action': 'edit', 'label': 'foo', 'icon': '🔮'})
+    assert(response.status_code == 401)
+
+def test_labels_edit_label_ok(client):
+    """Tests editing a key with a prime key"""
+    from app import routes
+    response = client.post(
+        '/ny/panel/labels',
+        headers={'X-AUTH': 'PRIME'},
+        json={'action': 'edit', 'label': 'foo', 'icon': '🔮'})
+    assert(response.status_code == 200)
+    assert(routes.lm.labels('ny')['foo']['icon'] == '🔮')
 
 # -----------------------------------
 # -----------------------------------
