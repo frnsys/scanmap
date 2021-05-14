@@ -259,6 +259,18 @@ def labels(location):
                     }
                 })
             return jsonify(success=success)
+        elif action == 'unhide':
+            label = data['label']
+            success = lm.unhide(location, label)
+            if success:
+                db.add('admin', location, key, {
+                    'type': 'labels',
+                    'action': action,
+                    'target': {
+                        'label': label,
+                    }
+                })
+            return jsonify(success=success)
         elif action == 'edit':
             icon = data['icon']
             label = data['label']
