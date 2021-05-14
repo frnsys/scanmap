@@ -23,7 +23,6 @@ def search_places(query, conf):
     results = data['candidates']
 
     # Hard filter to keep search results relevant to the region
-    # print(results)
     results = [r for r in results
                 if r.get('formatted_address') and conf['SEARCH']['FILTER'] in r['formatted_address']]
 

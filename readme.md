@@ -206,9 +206,12 @@ Custom labels can be added on a per-map basis through that map's admin panel.
 
 ## Tests
 
-Set the environment variable `SCANMAP_TEST_GOOGLE_PLACES_API_KEY=<token>`
+First:
 
-Run `PYTHONPATH="$(pwd)/tests/app:$(pwd)" pytest` from the project root
+- Set the environment variable `SCANMAP_TEST_GOOGLE_PLACES_API_KEY=<token>`
+- Ensure that `redis-server` is running
+
+Then run `PYTHONPATH="$(pwd)/tests/app:$(pwd)" pytest` from the project root
 
 If you need to debug the end-to-end/frontend tests, uncomment the `--observe` line in `tests/client/test_e2e.py`
 

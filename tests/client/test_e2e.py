@@ -1,5 +1,6 @@
 from app.db import Database
 from app.keys import KeyRing
+from app.labels import LabelManager
 import multiprocessing
 import pytest
 import subprocess
@@ -8,29 +9,38 @@ import time
 
 @pytest.fixture(autouse=True)
 def server(monkeypatch):
-    with tempfile.NamedTemporaryFile() as keyf:
-        # Copy over the test keys to the temporary key file
-        with open('tests/app/data/keys.yml', mode='rb') as testkeyf:
-            keyf.write(testkeyf.read())
-            keyf.flush()
+    # Copy over the test keys to the temporary key file
+    keyf = tempfile.NamedTemporaryFile()
+    with open('tests/app/data/keys.yml', mode='rb') as testkeyf:
+        keyf.write(testkeyf.read())
+        keyf.flush()
 
-        with tempfile.NamedTemporaryFile() as dbf:
-            from app import routes
+    labelsf = tempfile.NamedTemporaryFile()
+    with open('tests/app/data/labels.yml', mode='rb') as testlabelsf:
+        labelsf.write(testlabelsf.read())
+        labelsf.flush()
 
-            # Stub key ring and database
-            monkeypatch.setattr(routes, 'kr', KeyRing(keyf.name))
-            monkeypatch.setattr(routes, 'db', Database(dbf.name))
+    dbf = tempfile.NamedTemporaryFile()
+    from app import routes
 
-            import server
+    # Stub key ring and database
+    monkeypatch.setattr(routes, 'kr', KeyRing(keyf.name))
+    monkeypatch.setattr(routes, 'db', Database(dbf.name))
+    monkeypatch.setattr(routes, 'lm', LabelManager(labelsf.name))
 
-            proc = multiprocessing.Process(target=lambda: server.app.run(port=8800))
-            proc.start()
+    import server
+    server.app.config['TESTING'] = True
+    proc = multiprocessing.Process(target=lambda: server.app.run(port=8800, debug=True))
+    proc.start()
 
-            time.sleep(5)
+    time.sleep(5)
 
-            yield
+    yield
 
-            proc.terminate()
+    proc.terminate()
+    keyf.close()
+    labelsf.close()
+    dbf.close()
 
 def run_end_to_end_test(testf):
   """
