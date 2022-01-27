@@ -377,6 +377,10 @@ select {
 .logitem-meta {
   font-size: 0.8em;
 }
+.logitem-text a,
+.logitem-text a:visited {
+  color: #697afd;
+}
 .logitem-coords {
   display: none;
   font-size: 0.7em;
@@ -433,6 +437,10 @@ select {
 .popup-log h3 {
   margin: 0;
   font-weight: normal;
+}
+.popup-log a,
+.popup-log a:visited {
+  color: #4e61f9;
 }
 .popup-log {
   margin-bottom: 1em;

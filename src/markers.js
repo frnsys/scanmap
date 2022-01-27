@@ -1,6 +1,6 @@
 import map from './map';
-import {el} from './util';
 import polylabel from 'polylabel';
+import {el, processText} from './util';
 
 // Markers for each log type
 const MARKERS = {
@@ -134,7 +134,7 @@ function upsertLog(log) {
     innerText: log.dt,
   }, {
     tag: 'h3',
-    innerText: log.text
+    innerHTML: processText(log.text)
   }];
   if (log.image) {
     ch.push({

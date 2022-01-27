@@ -2,7 +2,7 @@ import t from './i18n';
 import map from './map';
 import LABELS from './labels';
 import markers from './markers';
-import {api, el} from './util';
+import {api, el, processText} from './util';
 import form from './control/form';
 
 // TODO
@@ -55,7 +55,7 @@ class Log {
       this.markerKey = markers.keyForLog(this);
 
       this.el.dataset.permit = this.permit || false;
-      this.el.querySelector('.logitem-text').innerText = this.text;
+      this.el.querySelector('.logitem-text').innerHTML = processText(this.text);
       this.el.querySelector('.logitem-location').innerText = this.location;
 
       // Update label and marker if needed
@@ -266,7 +266,7 @@ class Log {
           }, {
             tag: 'div',
             className: 'logitem-text',
-            innerText: this.text,
+            innerHTML: processText(this.text),
             on: {
               dblclick: (ev) => {
                 if (ev.target.closest('.logitem').dataset.permit == 'true') {
