@@ -88,8 +88,8 @@ mapboxgl.accessToken = config.MAPBOX_TOKEN;
 const map = new Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/streets-v10',
-    maxZoom: 18,
-    minZoom: 10,
+    maxZoom: config.MAX_ZOOM || 18,
+    minZoom: config.MIN_ZOOM || 10,
     zoom: MAP_ZOOM,
     center: MAP_CENTER
 });

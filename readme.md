@@ -135,6 +135,8 @@ export default {
 };
 ```
 
+You can also specify a `MAX_ZOOM` and `MIN_ZOOM` for the map here.
+
 Example `keys.yml`:
 
 ```
