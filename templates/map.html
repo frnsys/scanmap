@@ -121,6 +121,7 @@ const MAP_CENTER = {{ conf.MAP['CENTER'] }};
 const MAP_ZOOM = {{ conf.MAP['ZOOM'] }};
 const MAP_MIN_ZOOM = {{ conf.MAP['ZOOM_MIN']|default(10) }};
 const MAP_MAX_ZOOM = {{ conf.MAP['ZOOM_MAX']|default(18) }};
+const EXPIRE_TIME = {{ conf['EXPIRE_TIME']|default(60 * 60) }};
 const VERSION = '{{ config.VERSION }}';
 const SSE_URL = '{{url_for("sse.stream", channel=location)}}'
 </script>

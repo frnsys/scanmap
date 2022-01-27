@@ -8,8 +8,10 @@ const MARKERS = {
   event: []
 };
 
-// When markers expire
-let expireTime = 60 * 60 * 1000; // in ms. One hour
+// Markers expire after this many milliseconds
+const expireTime = EXPIRE_TIME * 1000;
+
+// Minimum opacity for fully-faded markers
 const minMarkerOpacity = 0.25;
 
 // Region/area paint properties

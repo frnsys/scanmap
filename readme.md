@@ -43,7 +43,9 @@ VERSION = '1591117380'
 # Maximum amount of logs to send
 MAX_LOGS = 200
 
-# Show only logs from within the past
+# Show only event logs from within the past
+# Set to `None` to show all event logs,
+# up to MAX_LOGS
 LOGS_AFTER = {
     'days': 1
 }
@@ -112,8 +114,15 @@ LOCATIONS = {
         'LIVE': True,
         'MAP': {
             'CENTER': [-73.96161699999999, 40.678806],
-            'ZOOM': 12
+            'ZOOM': 12,
+
+            # Optional, defaults are 10 and 18
+            'ZOOM_MIN': 10,
+            'ZOOM_MAX': 18
         },
+        # Optional, when map markers should be expired, in seconds.
+        # Default is 1hr
+        'EXPIRE_TIME': 60*60,
         'SEARCH': {
             'FILTER': ' NY ',
             'CENTER': [40.678802, -73.95528399999999],

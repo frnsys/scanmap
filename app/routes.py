@@ -98,8 +98,11 @@ def log(location, type):
         elif type == 'event':
             # Limit amount of event logs that are sent
             now = datetime.utcnow().replace(tzinfo=timezone.utc)
-            interval = (now - timedelta(**config.LOGS_AFTER)).timestamp()
-            logs = db.logs(location, n=config.MAX_LOGS, after=interval, type='event')
+            if config.LOGS_AFTER is None:
+                logs = db.logs(location, n=config.MAX_LOGS, type='event')
+            else:
+                interval = (now - timedelta(**config.LOGS_AFTER)).timestamp()
+                logs = db.logs(location, n=config.MAX_LOGS, after=interval, type='event')
         elif type == 'pinned':
             # For pinned, only return latest
             logs = db.logs(location, n=1, type='pinned')
