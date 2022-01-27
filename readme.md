@@ -28,7 +28,7 @@ The following API keys are required:
 You need three files to configure the application:
 
 - `config.py`: general app/maps configuration options
-- `config.js`: mostly for setting up mapbox
+- `config.js`: for setting up mapbox and defining labels
 - `data/keys.yml`: adding/revoking keys for adding to maps
 
 Notation here is `<description:example value>`.
@@ -195,9 +195,42 @@ Then, in the translation file, e.g. `static/lang/es.json`:
 
 ## Adding new labels
 
-To add labels that are common across _all_ maps, edit `LABELS` in `src/labels.js`. Make sure you update the translations in the language files (see above).
+To add labels that are common across _all_ maps, edit the `LABELS` key in `config.js`. It should have the following structure:
 
-Custom labels can be added on a per-map basis through that map's admin panel.
+```
+LABELS: {
+  'event': {
+    'alert': '⚠',
+    'fire': '🔥',
+  },
+  'static': {
+    'camera': '👁️',
+    'phone': '☎️',
+  }
+}
+```
+
+Make sure you update the translations in the language files (see above).
+
+Custom labels can be added on a per-map basis through that map's admin panel or at `data/labels.yml` (by default, its location depends on `LABELS_PATH` in `config.py`).
+
+The `labels.yml` file has the structure:
+
+```
+<location>:
+  <label>:
+    hide: false
+    icon: "🍉"
+```
+
+For example:
+
+```
+ny:
+  a_new_label:
+    hide: false
+    icon: "🍉"
+```
 
 ---
 

@@ -1,36 +1,8 @@
 import t from './i18n';
 import {api} from './util';
+import config from '../config';
 
-const LABELS = {
-  'event': {
-    'alert': '⚠',
-    'police_presence':'👮',
-    'units_requested':'🚓',
-    'fire': '🔥',
-    'prisoner_van': '🚐',
-    'group': '🚩',
-    'injury': '🩹',
-    'barricade': '🚧',
-    'aviation': '🚁',
-    'aid': '⛑️',
-    'military': '💂',
-    'staging_area': '📡',
-    'protestor_barricade': '🛡️',
-    'arrests': '🚨',
-    'far_right_group': '🐍',
-    'gas_flashbangs_etc': '💨',
-    'other': '🔹',
-  },
-  'static': {
-    'jail': '🔒',
-    'camera': '👁️',
-    'phone': '☎️',
-    'police_bldg': '🛂',
-    'military_bldg': '🏰',
-    'staging_area': '📡',
-    'other': '🔹',
-  }
-};
+const LABELS = config.LABELS;
 
 // Keep track of labels common for all maps
 const commonEventLabels = Object.assign({}, LABELS['event']);
