@@ -1,7 +1,7 @@
 import os
 import config
-from werkzeug import secure_filename
 from datetime import datetime, timezone
+from werkzeug.utils import secure_filename
 
 ALLOWED_EXTENSIONS = ['png', 'jpg', 'JPG', 'jpeg']
 
