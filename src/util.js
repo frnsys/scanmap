@@ -33,6 +33,11 @@ const api = {
   authKey: '',
 
   get(url, onSuccess) {
+    // If default location is set,
+    // we need to ensure proper routing for location data
+    if (!url.startsWith('/')) {
+      url = `${HERE}/${url}`;
+    }
     return fetch(url, {
       headers: {
         'Accept': 'application/json',
@@ -55,6 +60,9 @@ const api = {
   },
 
   post(url, data, onSuccess) {
+    if (!url.startsWith('/')) {
+      url = `${HERE}/${url}`;
+    }
     let form = data instanceof FormData;
     let headers = {
         'X-AUTH': this.authKey,

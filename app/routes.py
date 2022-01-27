@@ -27,10 +27,15 @@ def get_conf(loc):
 
 @bp.route('/')
 def index():
-    # List all live locations
-    return render_template('index.html',
-            locations=[k for k in config.LOCATIONS.keys()
-                if config.LOCATIONS[k]['LIVE']])
+    if hasattr(config, 'DEFAULT_LOCATION'):
+        location = config.DEFAULT_LOCATION
+        conf = get_conf(location)
+        return render_template('map.html', conf=conf, location=location)
+    else:
+        # List all live locations
+        return render_template('index.html',
+                locations=[k for k in config.LOCATIONS.keys()
+                    if config.LOCATIONS[k]['LIVE']])
 
 
 @bp.route('/version')

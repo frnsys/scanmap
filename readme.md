@@ -99,6 +99,10 @@ LOGS_AFTER = {
     'days': 1
 }
 
+# If you don't want to show a listing of all the locations
+# at the root route, you can instead choose to show a default location
+# DEFAULT_LOCATION = 'ny'
+
 DB_PATH = 'data/logs.db'
 KEYS_FILE = 'data/keys.yml'
 GOOGLE_PLACES_API_KEY = '<KEY>'
