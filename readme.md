@@ -36,6 +36,9 @@ Notation here is `<description:example value>`.
 ```
 # config.py
 
+# Optionally set the title for the site
+TITLE = 'scanmap'
+
 # Version timestamp, which can be used
 # to get frontend clients to reload for an update
 VERSION = '1591117380'
@@ -62,6 +65,9 @@ GOOGLE_PLACES_API_KEY = '<key>'
 
 LOCATIONS = {
     '<location key:ny>': {
+        # Optional map-specific title
+        'TITLE': 'ny map',
+
         'LIVE': <display map link on homepage:True>,
         'MAP_CENTER': <lonlat:[-73.96161699999999, 40.678806]>,
         'SEARCH': {
