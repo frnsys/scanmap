@@ -201,7 +201,7 @@ def image(fname):
 @bp.route('/<location>/panel')
 def panel(location):
     conf = get_conf(location)
-    return render_template('panel.html', conf=conf)
+    return render_template('panel.html', conf=conf, location=location)
 
 
 @bp.route('/<location>/panel/logs')
